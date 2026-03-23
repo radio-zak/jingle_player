@@ -33,8 +33,12 @@ class PlayerSection extends StatelessWidget {
                       return ActionButton(
                         label: buttonLabel,
                         onPressed: player.editMode
-                            ? () => player.savePalette(index)
-                            : () => player.getPalette(index),
+                            ? () async {
+                                await player.savePalette(index);
+                              }
+                            : () async {
+                                await player.getPalette(index);
+                              },
                         color: player.editMode
                             ? Colors.orange
                             : player.activePalette == index

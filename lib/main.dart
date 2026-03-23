@@ -178,13 +178,17 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   void initState() {
+    initializePlayers();
     setState(() {
       super.initState();
       windowManager.addListener(this);
-      audioPlayer = Provider.of<AudioHandler>(context, listen: false);
-      audioPlayer.initialize(playerCount, paletteCount);
-      audioPlayer.getPalette(audioPlayer.activePalette);
     });
+  }
+
+  Future<void> initializePlayers() async {
+    audioPlayer = Provider.of<AudioHandler>(context, listen: false);
+    await audioPlayer.initialize(playerCount, paletteCount);
+    await audioPlayer.getPalette(audioPlayer.activePalette);
   }
 
   @override

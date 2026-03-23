@@ -30,6 +30,8 @@ class JingleSelector extends StatelessWidget {
               ? Theme.of(context).colorScheme.primaryFixedDim
               : player.editMode && player.sourceMap[index] != null
               ? Colors.orange
+              : player.paletteLoading
+              ? Theme.of(context).colorScheme.primaryFixedDim
               : player.sourceMap[index] == null
               ? Theme.of(context).colorScheme.primaryFixedDim
               : player.sourceMap[index] != player.sourceFile
@@ -90,7 +92,9 @@ class JingleSelector extends StatelessWidget {
                               ),
                               child: Text(
                                 overflow: TextOverflow.ellipsis,
-                                player.titleMap[index]!,
+                                player.paletteLoading
+                                    ? 'Loading...'
+                                    : player.titleMap[index]!,
                                 style: TextTheme.of(context).titleLarge,
                               ),
                             ),
@@ -108,8 +112,8 @@ class JingleSelector extends StatelessWidget {
                                     height: 24,
                                     color: Colors.black87,
                                     child: TextButton(
-                                      onPressed: () =>
-                                          player.setButtonSource(index),
+                                      onPressed: () async =>
+                                          await player.setButtonSource(index),
                                       child: Text(
                                         'Pick file',
                                         style: TextTheme.of(context).bodySmall,
@@ -129,6 +133,12 @@ class JingleSelector extends StatelessWidget {
                                     ),
                                   ),
                                 ],
+                              )
+                            : player.paletteLoading
+                            ? Container(
+                                height: 20,
+                                width: 184,
+                                child: LinearProgressIndicator(),
                               )
                             : Text(
                                 player.parseDuration(player.durationMap[index]),

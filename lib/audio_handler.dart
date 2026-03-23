@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wav/wav.dart';
@@ -30,6 +31,8 @@ class AudioHandler extends ChangeNotifier {
   bool editMode = false;
   int palettes = 4;
   int activePalette = 0;
+  bool paletteLoading = false;
+  late SharedPreferencesAsync localStorage;
 
   final keyMap = {
     0: LogicalKeyboardKey.digit1,
@@ -53,7 +56,8 @@ class AudioHandler extends ChangeNotifier {
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
 
-  void initialize(int playerCount, int paletteCount) {
+  Future<void> initialize(int playerCount, int paletteCount) async {
+    localStorage = await SharedPreferencesAsync();
     List.generate(playerCount, (index) {
       sourceMap.addAll({index: null});
       titleMap.addAll({index: 'No file selected'});
@@ -186,8 +190,6 @@ class AudioHandler extends ChangeNotifier {
   }
 
   Future<void> savePalette(int id) async {
-    final SharedPreferences palette = await SharedPreferences.getInstance();
-
     List<String> sourceList = [];
     List<String> titleList = titleMap.values.toList();
 
@@ -201,29 +203,45 @@ class AudioHandler extends ChangeNotifier {
     }
     String encodedSourceMap = jsonEncode(sourceList);
     String encodedTitleMap = jsonEncode(titleList);
-    await palette.setString('palette-$id-sources', encodedSourceMap);
-    await palette.setString('palette-$id-titles', encodedTitleMap);
+    await localStorage.setString('palette-$id-sources', encodedSourceMap);
+    await localStorage.setString('palette-$id-titles', encodedTitleMap);
+  }
+
+  Future<void> loadPaletteFromStorage(int id) async {
+    Isolate.run(() async {
+      await getPalette(id);
+    });
   }
 
   Future<void> getPalette(int id) async {
+    paletteLoading = true;
+    notifyListeners();
     await stop();
-    final SharedPreferences palette = await SharedPreferences.getInstance();
 
     activePalette = id;
-    final encodedSourceMap = await palette.getString('palette-$id-sources');
-    final encodedTitleMap = await palette.getString('palette-$id-titles');
+    final encodedSourceMap = await localStorage.getString(
+      'palette-$id-sources',
+    );
+    final encodedTitleMap = await localStorage.getString('palette-$id-titles');
     if (encodedSourceMap == null) {
       sourceMap.updateAll((key, value) => value = null);
       titleMap.updateAll((key, value) => value = 'No file selected');
       durationMap.updateAll((key, value) => value = '');
+      paletteLoading = false;
       notifyListeners();
       return;
     }
     if (encodedTitleMap == null) {
       return;
     }
-    List<dynamic> decodedMap = json.decode(encodedSourceMap);
-    List<dynamic> decodedTitles = json.decode(encodedTitleMap);
+    final List<dynamic> decodedMap = await Isolate.run<List<dynamic>>(() {
+      final map = json.decode(encodedSourceMap);
+      return map;
+    });
+    final List<dynamic> decodedTitles = await Isolate.run<List<dynamic>>(() {
+      final map = json.decode(encodedTitleMap);
+      return map;
+    });
     for (var i = 0; i < decodedMap.length; i++) {
       if (decodedMap[i] == '') {
         sourceMap.addAll({i: null});
@@ -239,6 +257,7 @@ class AudioHandler extends ChangeNotifier {
     for (var i = 0; i < decodedTitles.length; i++) {
       titleMap.addAll({i: decodedTitles[i]});
     }
+    paletteLoading = false;
     notifyListeners();
   }
 }

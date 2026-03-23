@@ -12,6 +12,9 @@ class JingleGrid extends StatelessWidget {
 
   Future<void> handleButtonClick(BuildContext context, int index) async {
     final audioHandler = Provider.of<AudioHandler>(context, listen: false);
+    if (audioHandler.paletteLoading) {
+      return;
+    }
     if (audioHandler.sourceMap[index] == null) {
       debugPrint('$index');
       debugPrint('tried to activate empty source');
@@ -60,8 +63,8 @@ class JingleGrid extends StatelessWidget {
                             childAspectRatio: 384 / 122,
                             children: List.generate(playerCount, (index) {
                               return Container(
-                                width: 384,
-                                height: 122,
+                                // width: 384,
+                                // height: 122,
                                 child: JingleSelector(
                                   context: context,
                                   index: index,
@@ -74,6 +77,7 @@ class JingleGrid extends StatelessWidget {
                           );
                         },
                       ),
+
                       Consumer<AudioHandler>(
                         builder: (context, editmode, child) {
                           return Container(
