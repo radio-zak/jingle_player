@@ -11,7 +11,6 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.black87,
-      // height: 64,
       child: Padding(
         padding: EdgeInsetsGeometry.directional(
           end: 32,
@@ -30,6 +29,7 @@ class TopBar extends StatelessWidget {
             Expanded(child: TimeRemainingClock()),
             Expanded(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [StudioClock(), DateDisplay()],
               ),

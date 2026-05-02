@@ -43,66 +43,43 @@ class JingleGrid extends StatelessWidget {
         },
         child: Focus(
           autofocus: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
             children: [
-              Expanded(
+              SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsetsGeometry.all(32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    spacing: 16,
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          return GridView.count(
-                            shrinkWrap: true,
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 32.0,
-                            crossAxisSpacing: 32.0,
-                            childAspectRatio: 384 / 122,
-                            children: List.generate(playerCount, (index) {
-                              return Container(
-                                // width: 384,
-                                // height: 122,
-                                child: JingleSelector(
-                                  context: context,
-                                  index: index,
-                                  onPressedAction: () async =>
-                                      handleButtonClick(context, index),
-                                  keybind: _audioPlayer.keyMap[index]!.keyLabel,
-                                ),
-                              );
-                            }),
-                          );
-                        },
-                      ),
-
-                      Consumer<AudioHandler>(
-                        builder: (context, editmode, child) {
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return GridView.extent(
+                        key: PageStorageKey('scroll_value'),
+                        padding: EdgeInsetsGeometry.all(8),
+                        scrollDirection: Axis.vertical,
+                        maxCrossAxisExtent: 344,
+                        physics: const BouncingScrollPhysics(),
+                        controller: ScrollController(),
+                        shrinkWrap: true,
+                        // crossAxisCount: 4,
+                        mainAxisSpacing: 32.0,
+                        crossAxisSpacing: 32.0,
+                        childAspectRatio: 384 / 122,
+                        children: List.generate(playerCount, (index) {
                           return Container(
-                            constraints: BoxConstraints.loose(
-                              Size.fromWidth(300),
-                            ),
-                            child: ActionButton(
-                              onPressed: () =>
-                                  editmode.switchMode(editmode.activePalette),
-                              icon: Icons.edit,
-                              label: editmode.editMode
-                                  ? 'Exit edit mode'
-                                  : 'Enter edit mode',
-                              color: editmode.editMode
-                                  ? Colors.orange
-                                  : Theme.of(context).colorScheme.primary,
+                            // width: 384,
+                            // height: 122,
+                            child: JingleSelector(
+                              context: context,
+                              index: index,
+                              onPressedAction: () async =>
+                                  handleButtonClick(context, index),
+                              keybind: _audioPlayer.keyMap[index]!.keyLabel,
                             ),
                           );
-                        },
-                      ),
-                    ],
+                        }),
+                      );
+                    },
                   ),
                 ),
               ),
-              PlayerSection(),
             ],
           ),
         ),

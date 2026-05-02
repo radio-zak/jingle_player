@@ -46,7 +46,9 @@ class JingleSelector extends StatelessWidget {
                 ? null
                 : player.editMode
                 ? Colors.orangeAccent
-                : Colors.tealAccent,
+                : player.sourceMap[index] != player.sourceFile
+                ? Colors.tealAccent
+                : Colors.redAccent,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

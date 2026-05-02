@@ -34,6 +34,8 @@ class AudioHandler extends ChangeNotifier {
   bool paletteLoading = false;
   late SharedPreferencesAsync localStorage;
 
+  bool toolbarActive = false;
+
   final keyMap = {
     0: LogicalKeyboardKey.digit1,
     1: LogicalKeyboardKey.digit2,
@@ -55,6 +57,11 @@ class AudioHandler extends ChangeNotifier {
   Map<int, Source?> sourceMap = <int, Source?>{};
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
+
+  void activateToolbar() {
+    toolbarActive = !toolbarActive;
+    notifyListeners();
+  }
 
   Future<void> initialize(int playerCount, int paletteCount) async {
     localStorage = await SharedPreferencesAsync();

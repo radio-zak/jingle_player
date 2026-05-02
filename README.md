@@ -21,6 +21,8 @@ In `Edit mode` the playout capability is disabled.
 
 This application supports `.wav` files only.
 
+Optimized for display resolutions 1600x900 and higher, beware!
+
 ## Playing files
 
 After loading files into jingle slots in `Edit mode`, select the desired jingle. This loads the file into the audio player making it primed and ready for playout.
@@ -31,6 +33,7 @@ When the file completes, the queue is cleared and the audio player is ready to a
 ## Feature roadmap
 
 - [ ] Implement event logging to file
+- [ ] Separate intensive backend tasks to isolates
 - [ ] `Immediate playback` mode - allowing users to play files immediately on jingle slot selection
 - [ ] API for integration with Bitfocus Companion
 

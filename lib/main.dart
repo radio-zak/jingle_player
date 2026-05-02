@@ -8,6 +8,8 @@ import 'package:jingle_player/audio_handler.dart';
 import 'package:jingle_player/ui/top_bar.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:jingle_player/ui/player_section.dart';
+import 'package:jingle_player/ui/toolbar.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
@@ -25,7 +27,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
-    minimumSize: Size(1200, 900),
+    minimumSize: Size(1600, 900),
     skipTaskbar: false,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -199,15 +201,32 @@ class _HomePageState extends State<HomePage> with WindowListener {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      appBar: PreferredSize(
+        preferredSize: Size(
+          MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height * 0.16,
+        ),
+        child: TopBar(title: widget.title),
+      ),
+      body: Stack(
         children: [
-          TopBar(title: widget.title),
-          Expanded(
-            child: Center(child: JingleGrid(playerCount: playerCount)),
+          Center(child: JingleGrid(playerCount: playerCount)),
+          Consumer<AudioHandler>(
+            builder: (context, player, child) {
+              switch (player.toolbarActive) {
+                case true:
+                  return Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Toolbar(),
+                  );
+                case false:
+                  return Container();
+              }
+            },
           ),
         ],
       ),
+      bottomNavigationBar: PlayerSection(),
     );
   }
 }
