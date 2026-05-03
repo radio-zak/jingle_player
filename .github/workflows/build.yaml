@@ -32,6 +32,25 @@ jobs:
         # thanks to https://github.com/actions/runner/issues/2224#issuecomment-1289925992
         run: echo $(dart run inno_bundle:build --envs --no-hf) | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 
+      - name: Fix ISS script languages
+        run: |
+          $issPath = "./build/windows/x64/installer/Release/inno-script.iss"
+          $content = Get-Content $issPath -Raw
+          # Remove any language line whose .isl file doesn't exist on disk
+          $lines = Get-Content $issPath
+          $fixed = $lines | Where-Object {
+            if ($_ -match '\.isl"') {
+              $match = [regex]::Match($_, '"([^"]+\.isl)"')
+              if ($match.Success) {
+                $path = $match.Groups[1].Value
+                Test-Path $path  # only keep line if file actually exists
+              } else { $true }
+            } else { $true }
+          }
+          $fixed | Set-Content $issPath
+          Write-Host "Final languages in ISS:"
+          $fixed | Where-Object { $_ -match '\.isl' }
+
       - name: Build installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
