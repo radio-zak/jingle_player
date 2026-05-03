@@ -8,7 +8,6 @@ class Toolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadiusGeometry.directional(
-        topStart: Radius.circular(8),
         topEnd: Radius.circular(8),
       ),
       color: Colors.black87,
@@ -24,6 +23,9 @@ class Toolbar extends StatelessWidget {
             return Container(
               constraints: BoxConstraints.loose(Size.fromWidth(200)),
               child: ActionButton(
+                hoverColor: player.editMode
+                    ? Colors.orangeAccent
+                    : Colors.tealAccent,
                 onPressed: () => player.switchMode(player.activePalette),
                 icon: Icons.edit,
                 label: player.editMode ? 'Exit edit mode' : 'Enter edit mode',

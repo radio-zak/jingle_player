@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
               switch (player.toolbarActive) {
                 case true:
                   return Align(
-                    alignment: Alignment.bottomCenter,
+                    alignment: Alignment.bottomLeft,
                     child: Toolbar(),
                   );
                 case false:

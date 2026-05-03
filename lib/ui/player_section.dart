@@ -3,6 +3,8 @@ import "package:audioplayers/audioplayers.dart";
 import "package:jingle_player/audio_handler.dart";
 import "package:provider/provider.dart";
 import 'package:jingle_player/ui/action_button.dart';
+import 'package:jingle_player/ui/palette_selector.dart';
+import 'package:jingle_player/ui/status_bar.dart';
 
 class PlayerSection extends StatelessWidget {
   const PlayerSection({super.key});
@@ -30,91 +32,19 @@ class PlayerSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       spacing: 16,
                       children: [
                         IconButton(
                           onPressed: () => player.activateToolbar(),
                           icon: Icon(Icons.menu),
                         ),
-                        Row(
-                          spacing: 16,
-                          children: List.generate(player.palettes, (int index) {
-                            final buttonLabel = (index + 1).toString();
-                            return ActionButton(
-                              label: buttonLabel,
-                              onPressed: player.editMode
-                                  ? () async {
-                                      await player.savePalette(index);
-                                    }
-                                  : () async {
-                                      await player.getPalette(index);
-                                    },
-                              color: player.editMode
-                                  ? Colors.orange
-                                  : player.activePalette == index
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.primaryFixedDim,
-                            );
-                          }),
-                        ),
+                        Flexible(child: PaletteSelector()),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        spacing: 5,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            player.sourceFileParsed != null
-                                ? '${player.sourceFileParsed}'
-                                : 'No file selected',
-                            style: TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            width: 600,
-                            child: LinearProgressIndicator(
-                              color: Theme.of(context).colorScheme.primary,
-                              value:
-                                  // (player.playerPosition != null &&
-                                  //     player.playerDuration != null &&
-                                  (player.playerPosition.inMilliseconds > 0 &&
-                                      player.playerPosition.inMilliseconds <
-                                          player.playerDuration.inMilliseconds)
-                                  ? player.playerPosition.inMilliseconds /
-                                        player.playerDuration.inMilliseconds
-                                  : 0.0,
-                            ),
-                          ),
-                          Row(
-                            spacing: 16,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                player.playerPositionString,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                player.playerDurationString,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Expanded(child: StatusBar()),
                   Expanded(
                     child: Consumer<AudioHandler>(
                       builder: (_, value, _) {
