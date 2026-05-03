@@ -17,15 +17,20 @@ dependencies:
   path_provider: "^2.1.5"
   window_manager: "^0.5.1"
   wav: "^1.5.0"
-  inno_build: "^0.4.0"
   google_fonts: ^8.0.2
 dev_dependencies:
   flutter_test:
     sdk: "flutter"
   flutter_lints: "^6.0.0"
+  inno_bundle: ^0.11.2
 flutter:
   uses-material-design: true
   assets:
     - "assets/cfg/default_config.json"
-inno_build:
-  app_id: "959a879a-4174-4389-98f0-d781b27ad8c7"
+
+inno_bundle:
+  id: 5f7bc030-46fa-11f1-89fe-17938c56c899
+  publisher: Studenckie Radio ŻAK Politechniki Łódzkiej
+  name: Jingle Player
+  url: https://github.com/radio_zak/jingle_player
+
