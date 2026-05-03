@@ -14,6 +14,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/gestures.dart';
 
 late String appTitle;
 late int playerCount;
@@ -103,6 +104,7 @@ class JinglePlayer extends StatelessWidget {
     final textGreyedColor = Color(0xFFBBBBBB);
     return MaterialApp(
       title: appTitle,
+      scrollBehavior: PlayerScrollBehavior(),
       theme: ThemeData(
         appBarTheme: AppBarThemeData(
           actionsIconTheme: IconThemeData(color: textPrimaryColor),
@@ -226,4 +228,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
       bottomNavigationBar: PlayerSection(),
     );
   }
+}
+
+class PlayerScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }

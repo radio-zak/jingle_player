@@ -10,19 +10,21 @@ class PaletteSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AudioHandler>(
       builder: (context, player, child) {
-        return Padding(
+        return Container(
           padding: EdgeInsetsGeometry.directional(
             start: 8,
             end: 32,
             top: 8,
             bottom: 8,
           ),
-          child: GridView.extent(
-            maxCrossAxisExtent: 64,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 4,
-            shrinkWrap: true,
-            childAspectRatio: 1.5,
+          child: CarouselView.weighted(
+            itemSnapping: true,
+            flexWeights: [1, 1, 1, 1],
+            // itemExtent: 64,
+            shrinkExtent: 64,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
             scrollDirection: Axis.horizontal,
             children: List.generate(player.palettes, (int index) {
               final buttonLabel = (index + 1).toString();

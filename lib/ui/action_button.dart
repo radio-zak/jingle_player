@@ -36,7 +36,9 @@ class ActionButton extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsGeometry.all(8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: icon != null
+                  ? MainAxisAlignment.spaceEvenly
+                  : MainAxisAlignment.center,
               spacing: icon != null ? 8 : 0,
               children: [
                 icon != null ? Icon(icon) : Container(),
