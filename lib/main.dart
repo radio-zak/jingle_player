@@ -27,7 +27,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
-    minimumSize: Size(1600, 900),
+    minimumSize: Size(1280, 720),
     skipTaskbar: false,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
