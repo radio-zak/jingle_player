@@ -14,7 +14,7 @@ class PlayerSection extends StatelessWidget {
       color: Colors.black87,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * 0.12,
+        height: 100,
         child: Padding(
           padding: EdgeInsetsGeometry.directional(
             end: 32,

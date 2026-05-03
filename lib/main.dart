@@ -202,10 +202,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(
-          MediaQuery.of(context).size.width,
-          MediaQuery.of(context).size.height * 0.16,
-        ),
+        preferredSize: Size(MediaQuery.of(context).size.width, 120),
         child: TopBar(title: widget.title),
       ),
       body: Stack(
