@@ -25,7 +25,7 @@ jobs:
           flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ github.run_number }}
 
       - name: Build iss script
-        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.run_number }}
+        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.ref_name }}
 
       - name: Output config into github output
         id: envs
