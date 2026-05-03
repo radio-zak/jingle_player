@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jingle_player/ui/action_button.dart';
 import 'package:jingle_player/ui/jingle_button.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:jingle_player/audio_handler.dart';
-import 'package:jingle_player/ui/player_section.dart';
 
 class JingleGrid extends StatelessWidget {
   final int playerCount;

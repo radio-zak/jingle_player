@@ -4,24 +4,21 @@ import 'package:jingle_player/ui/action_button.dart';
 import 'package:jingle_player/audio_handler.dart';
 
 class PaletteSelector extends StatelessWidget {
-  PaletteSelector({super.key});
+  const PaletteSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AudioHandler>(
-      builder: (context, player, child) {
-        return Container(
-          padding: EdgeInsetsGeometry.directional(
-            start: 8,
-            end: 32,
-            top: 8,
-            bottom: 8,
-          ),
-          child: CarouselView.weighted(
+    return Flexible(
+      fit: FlexFit.tight,
+      child: Consumer<AudioHandler>(
+        builder: (context, player, child) {
+          return CarouselView.weighted(
+            padding: EdgeInsets.all(8),
+            key: UniqueKey(),
             itemSnapping: true,
             flexWeights: [1, 1, 1, 1],
-            // itemExtent: 64,
             shrinkExtent: 64,
+            controller: CarouselController(initialItem: 1),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(8),
             ),
@@ -47,9 +44,9 @@ class PaletteSelector extends StatelessWidget {
                     : Theme.of(context).colorScheme.primaryFixedDim,
               );
             }),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

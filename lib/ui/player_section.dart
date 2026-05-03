@@ -14,7 +14,7 @@ class PlayerSection extends StatelessWidget {
     final color = Theme.of(context).colorScheme.primary;
     return Material(
       color: Colors.black87,
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 100,
         child: Padding(
@@ -24,152 +24,160 @@ class PlayerSection extends StatelessWidget {
             top: 16,
             bottom: 16,
           ),
-          child: Consumer<AudioHandler>(
-            builder: (context, player, child) {
-              return Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 16,
-                      children: [
-                        IconButton(
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                flex: 2,
+                child: Row(
+                  spacing: 8,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Consumer<AudioHandler>(
+                      builder: (context, player, child) {
+                        return IconButton(
                           onPressed: () => player.activateToolbar(),
                           icon: Icon(Icons.menu),
-                        ),
-                        Flexible(child: PaletteSelector()),
-                      ],
-                    ),
-                  ),
-                  Expanded(child: StatusBar()),
-                  Expanded(
-                    child: Consumer<AudioHandler>(
-                      builder: (_, value, _) {
-                        final playLabel = 'Play (Space)';
-                        final stopLabel = 'Stop (ESC)';
-                        final mainAxisSize = MainAxisSize.min;
-                        final mainAxisAlignment = MainAxisAlignment.end;
-                        final double spacing = 16;
-                        switch (value.audioPlayer.state) {
-                          case PlayerState.completed:
-                            return Row(
-                              mainAxisSize: mainAxisSize,
-                              mainAxisAlignment: mainAxisAlignment,
-                              spacing: spacing,
-                              children: [
-                                ActionButton(
-                                  onPressed: () => player.play(),
-                                  icon: Icons.play_arrow,
-                                  label: playLabel,
-                                  color: color,
-                                ),
-                                ActionButton(
-                                  onPressed: () => player.stop(),
-                                  icon: Icons.stop,
-                                  label: stopLabel,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            );
-                          case PlayerState.disposed:
-                            return Row(
-                              mainAxisSize: mainAxisSize,
-                              mainAxisAlignment: mainAxisAlignment,
-                              spacing: spacing,
-                              children: [
-                                ActionButton(
-                                  onPressed: () => player.play(),
-                                  icon: Icons.play_arrow,
-                                  label: playLabel,
-                                  color: color,
-                                ),
-                                ActionButton(
-                                  onPressed: () => player.stop(),
-                                  icon: Icons.stop,
-                                  label: stopLabel,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            );
-                          case PlayerState.playing:
-                            return Row(
-                              mainAxisSize: mainAxisSize,
-                              mainAxisAlignment: mainAxisAlignment,
-                              spacing: spacing,
-                              children: [
-                                ActionButton(
-                                  onPressed: () => player.play(),
-                                  icon: Icons.play_arrow,
-                                  label: playLabel,
-                                  color: Colors.red,
-                                ),
-                                ActionButton(
-                                  onPressed: () => player.stop(),
-                                  icon: Icons.stop,
-                                  label: stopLabel,
-                                  color: color,
-                                ),
-                              ],
-                            );
-                          case PlayerState.paused:
-                            return Row(
-                              mainAxisSize: mainAxisSize,
-                              mainAxisAlignment: mainAxisAlignment,
-                              spacing: spacing,
-                              children: [
-                                ActionButton(
-                                  onPressed: () => player.play(),
-                                  icon: Icons.play_arrow,
-                                  label: playLabel,
-                                  color: color,
-                                ),
-                                ActionButton(
-                                  onPressed: () => player.stop(),
-                                  icon: Icons.stop,
-                                  label: stopLabel,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            );
-                          case PlayerState.stopped:
-                            return Row(
-                              mainAxisSize: mainAxisSize,
-                              mainAxisAlignment: mainAxisAlignment,
-                              spacing: spacing,
-                              children: [
-                                ActionButton(
-                                  onPressed: () => player.play(),
-                                  icon: Icons.play_arrow,
-                                  label: playLabel,
-                                  color: player.sourceFileParsed == null
-                                      ? Theme.of(
-                                          context,
-                                        ).colorScheme.primaryFixedDim
-                                      : color,
-                                ),
-                                ActionButton(
-                                  onPressed: () => player.stop(),
-                                  icon: Icons.stop,
-                                  label: stopLabel,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            );
-                        }
+                        );
                       },
                     ),
+                    PaletteSelector(),
+                  ],
+                ),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                flex: 3,
+                child: Center(child: StatusBar()),
+              ),
+              Flexible(
+                flex: 2,
+                child: Padding(
+                  padding: EdgeInsetsGeometry.all(8),
+                  child: Consumer<AudioHandler>(
+                    builder: (context, player, child) {
+                      final playLabel = 'Play (Space)';
+                      final stopLabel = 'Stop (ESC)';
+                      final mainAxisSize = MainAxisSize.min;
+                      final mainAxisAlignment = MainAxisAlignment.end;
+                      final double spacing = 16;
+                      switch (player.audioPlayer.state) {
+                        case PlayerState.completed:
+                          return Row(
+                            mainAxisSize: mainAxisSize,
+                            mainAxisAlignment: mainAxisAlignment,
+                            spacing: spacing,
+                            children: [
+                              ActionButton(
+                                onPressed: () => player.play(),
+                                icon: Icons.play_arrow,
+                                label: playLabel,
+                                color: color,
+                              ),
+                              ActionButton(
+                                onPressed: () => player.stop(),
+                                icon: Icons.stop,
+                                label: stopLabel,
+                                color: Colors.red,
+                              ),
+                            ],
+                          );
+                        case PlayerState.disposed:
+                          return Row(
+                            mainAxisSize: mainAxisSize,
+                            mainAxisAlignment: mainAxisAlignment,
+                            spacing: spacing,
+                            children: [
+                              ActionButton(
+                                onPressed: () => player.play(),
+                                icon: Icons.play_arrow,
+                                label: playLabel,
+                                color: color,
+                              ),
+                              ActionButton(
+                                onPressed: () => player.stop(),
+                                icon: Icons.stop,
+                                label: stopLabel,
+                                color: Colors.red,
+                              ),
+                            ],
+                          );
+                        case PlayerState.playing:
+                          return Row(
+                            mainAxisSize: mainAxisSize,
+                            mainAxisAlignment: mainAxisAlignment,
+                            spacing: spacing,
+                            children: [
+                              ActionButton(
+                                onPressed: () => player.play(),
+                                icon: Icons.play_arrow,
+                                label: playLabel,
+                                color: Colors.red,
+                              ),
+                              ActionButton(
+                                onPressed: () => player.stop(),
+                                icon: Icons.stop,
+                                label: stopLabel,
+                                color: color,
+                              ),
+                            ],
+                          );
+                        case PlayerState.paused:
+                          return Row(
+                            mainAxisSize: mainAxisSize,
+                            mainAxisAlignment: mainAxisAlignment,
+                            spacing: spacing,
+                            children: [
+                              ActionButton(
+                                onPressed: () => player.play(),
+                                icon: Icons.play_arrow,
+                                label: playLabel,
+                                color: color,
+                              ),
+                              ActionButton(
+                                onPressed: () => player.stop(),
+                                icon: Icons.stop,
+                                label: stopLabel,
+                                color: Colors.red,
+                              ),
+                            ],
+                          );
+                        case PlayerState.stopped:
+                          return Row(
+                            mainAxisSize: mainAxisSize,
+                            mainAxisAlignment: mainAxisAlignment,
+                            spacing: spacing,
+                            children: [
+                              ActionButton(
+                                onPressed: () => player.play(),
+                                icon: Icons.play_arrow,
+                                label: playLabel,
+                                color: player.sourceFileParsed == null
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primaryFixedDim
+                                    : color,
+                              ),
+                              ActionButton(
+                                onPressed: () => player.stop(),
+                                icon: Icons.stop,
+                                label: stopLabel,
+                                color: Colors.red,
+                              ),
+                            ],
+                          );
+                      }
+                    },
                   ),
-                ],
-              );
-            },
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
-    //   ],
-    // );
   }
 }

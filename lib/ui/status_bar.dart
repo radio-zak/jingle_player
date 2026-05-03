@@ -11,7 +11,7 @@ class StatusBar extends StatelessWidget {
       builder: (context, player, child) {
         return Center(
           child: Column(
-            spacing: 5,
+            spacing: 4,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -22,8 +22,7 @@ class StatusBar extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(
-                width: 600,
+              Flexible(
                 child: LinearProgressIndicator(
                   color: Theme.of(context).colorScheme.primary,
                   value:
