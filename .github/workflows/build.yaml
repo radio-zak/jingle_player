@@ -22,10 +22,10 @@ jobs:
       - name: Build Windows App
         run: |
           flutter config --enable-windows-desktop
-          flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ github.run_id }}
+          flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ github.run_number }}
 
       - name: Build iss script
-        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.run_id }}
+        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.run_number }}
 
       - name: Output config into github output
         id: envs
