@@ -19,18 +19,13 @@ jobs:
       - name: Get Flutter
         uses: subosito/flutter-action@v2
 
-      - name: Generate version code
-        id: version-code
-        run: |
-          echo -n "code=$(git rev-list --count ${{ github.ref }})" >> $GITHUB_OUTPUT
-
       - name: Build Windows App
         run: |
           flutter config --enable-windows-desktop
-          flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ steps.version-code.outputs.code }}
+          flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ github.run_id }}
 
       - name: Build iss script
-        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.ref_name }}
+        run: dart run inno_bundle:build --no-app --release --no-installer --app-version ${{ github.run_id }}
 
       - name: Output config into github output
         id: envs
