@@ -202,31 +202,79 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 120),
-        child: TopBar(title: widget.title),
-      ),
-      body: Stack(
-        children: [
-          Center(child: JingleGrid(playerCount: playerCount)),
-          Consumer<AudioHandler>(
-            builder: (context, player, child) {
-              switch (player.toolbarActive) {
-                case true:
-                  return Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Toolbar(),
-                  );
-                case false:
-                  return Container();
-              }
-            },
+    final _audioPlayer = Provider.of<AudioHandler>(context, listen: true);
+    return Shortcuts(
+      shortcuts: {
+        SingleActivator(LogicalKeyboardKey.space): PlayerStartIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): PlayerStopIntent(),
+        for (MapEntry<int, LogicalKeyboardKey> k in _audioPlayer.keyMap.entries)
+          SingleActivator(k.value): ButtonPressHandler(index: k.key),
+        for (MapEntry<int, LogicalKeyboardKey> k
+            in _audioPlayer.paletteKeyMap.entries)
+          SingleActivator(k.value, shift: true): PaletteSelectHandler(
+            index: k.key,
           ),
-        ],
+      },
+      child: Actions(
+        actions: {
+          ButtonPressHandler: ButtonPressAction(audioHandler: _audioPlayer),
+          PaletteSelectHandler: PaletteSelectAction(audioHandler: _audioPlayer),
+          PlayerStartIntent: PlayerStartAction(audioHandler: _audioPlayer),
+          PlayerStopIntent: PlayerStopAction(audioHandler: _audioPlayer),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 120),
+              child: TopBar(title: widget.title),
+            ),
+            body: Stack(
+              children: [
+                Center(child: JingleGrid(playerCount: playerCount)),
+                Consumer<AudioHandler>(
+                  builder: (context, player, child) {
+                    switch (player.toolbarActive) {
+                      case true:
+                        return Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Toolbar(),
+                        );
+                      case false:
+                        return Container();
+                    }
+                  },
+                ),
+              ],
+            ),
+            bottomNavigationBar: PlayerSection(),
+          ),
+        ),
       ),
-      bottomNavigationBar: PlayerSection(),
     );
+  }
+}
+
+class ButtonPressHandler extends Intent {
+  final int index;
+  const ButtonPressHandler({required this.index});
+}
+
+class ButtonPressAction extends Action<ButtonPressHandler> {
+  AudioHandler audioHandler;
+
+  ButtonPressAction({required this.audioHandler});
+
+  @override
+  Future<void> invoke(ButtonPressHandler intent) async {
+    if (audioHandler.sourceMap[intent.index] == null) {
+      debugPrint('$intent.index');
+      debugPrint('tried to activate empty source');
+    } else if (audioHandler.editMode) {
+      debugPrint('button in edit mode - not playing');
+    } else {
+      audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);
+    }
   }
 }
 
@@ -238,4 +286,45 @@ class PlayerScrollBehavior extends MaterialScrollBehavior {
     PointerDeviceKind.mouse,
     PointerDeviceKind.trackpad,
   };
+}
+
+class PlayerStartIntent extends Intent {}
+
+class PlayerStopIntent extends Intent {}
+
+class PlayerStartAction extends Action<PlayerStartIntent> {
+  AudioHandler audioHandler;
+  PlayerStartAction({required this.audioHandler});
+
+  @override
+  Future<void> invoke(PlayerStartIntent intent) async {
+    audioHandler.play();
+  }
+}
+
+class PlayerStopAction extends Action<PlayerStopIntent> {
+  AudioHandler audioHandler;
+  PlayerStopAction({required this.audioHandler});
+
+  @override
+  Future<void> invoke(PlayerStopIntent intent) async {
+    audioHandler.stop();
+  }
+}
+
+class PaletteSelectHandler extends Intent {
+  final int index;
+  const PaletteSelectHandler({required this.index});
+}
+
+class PaletteSelectAction extends Action<PaletteSelectHandler> {
+  AudioHandler audioHandler;
+  PaletteSelectAction({required this.audioHandler});
+
+  @override
+  Future<void> invoke(PaletteSelectHandler intent) async {
+    audioHandler.editMode
+        ? await audioHandler.savePalette(intent.index)
+        : await audioHandler.getPalette(intent.index);
+  }
 }

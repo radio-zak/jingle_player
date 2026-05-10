@@ -54,6 +54,16 @@ class AudioHandler extends ChangeNotifier {
     14: LogicalKeyboardKey.keyE,
     15: LogicalKeyboardKey.keyR,
   };
+  final paletteKeyMap = {
+    0: LogicalKeyboardKey.digit1,
+    1: LogicalKeyboardKey.digit2,
+    2: LogicalKeyboardKey.digit3,
+    3: LogicalKeyboardKey.digit4,
+    4: LogicalKeyboardKey.digit5,
+    5: LogicalKeyboardKey.digit6,
+    6: LogicalKeyboardKey.digit7,
+    7: LogicalKeyboardKey.digit8,
+  };
   Map<int, Source?> sourceMap = <int, Source?>{};
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
