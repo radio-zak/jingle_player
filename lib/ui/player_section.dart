@@ -82,6 +82,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.stop,
                                 label: stopLabel,
                                 color: Colors.red,
+                                hoverColor: Colors.redAccent,
                               ),
                             ],
                           );
@@ -102,6 +103,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.stop,
                                 label: stopLabel,
                                 color: Colors.red,
+                                hoverColor: Colors.redAccent,
                               ),
                             ],
                           );
@@ -116,6 +118,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.play_arrow,
                                 label: playLabel,
                                 color: Colors.red,
+                                hoverColor: Colors.redAccent,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
@@ -142,6 +145,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.stop,
                                 label: stopLabel,
                                 color: Colors.red,
+                                hoverColor: Colors.redAccent,
                               ),
                             ],
                           );
@@ -166,6 +170,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.stop,
                                 label: stopLabel,
                                 color: Colors.red,
+                                hoverColor: Colors.redAccent,
                               ),
                             ],
                           );
