@@ -18,7 +18,8 @@ class JingleGrid extends StatelessWidget {
     } else if (audioHandler.editMode) {
       debugPrint('button in edit mode - not playing');
     } else {
-      audioHandler.loadToPlayer(audioHandler.sourceMap[index]!);
+      await audioHandler.stop();
+      await audioHandler.loadToPlayer(audioHandler.sourceMap[index]!);
     }
   }
 

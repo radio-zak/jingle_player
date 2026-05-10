@@ -273,7 +273,8 @@ class ButtonPressAction extends Action<ButtonPressHandler> {
     } else if (audioHandler.editMode) {
       debugPrint('button in edit mode - not playing');
     } else {
-      audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);
+      await audioHandler.stop();
+      await audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);
     }
   }
 }
