@@ -56,6 +56,11 @@ jobs:
         with:
           path: ./build/windows/x64/installer/Release/inno-script.iss
 
+      - uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --output CHANGELOG.md
+
       - name: Release installer
         uses: softprops/action-gh-release@v3
         with:
@@ -67,3 +72,4 @@ jobs:
           tag_name: "${{ github.ref_name }}"
           prerelease: true
           generate_release_notes: true
+          body_path: "CHANGELOG.md"
