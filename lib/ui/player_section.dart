@@ -38,9 +38,13 @@ class PlayerSection extends StatelessWidget {
                   children: [
                     Consumer<AudioHandler>(
                       builder: (context, player, child) {
-                        return IconButton(
-                          onPressed: () => player.activateToolbar(),
-                          icon: Icon(Icons.menu),
+                        return Tooltip(
+                          waitDuration: Duration(seconds: 1),
+                          message: "Options toolbar",
+                          child: IconButton(
+                            onPressed: () => player.activateToolbar(),
+                            icon: Icon(Icons.menu),
+                          ),
                         );
                       },
                     ),
@@ -63,6 +67,8 @@ class PlayerSection extends StatelessWidget {
                       final stopLabel = 'Stop (ESC)';
                       final mainAxisSize = MainAxisSize.min;
                       final mainAxisAlignment = MainAxisAlignment.end;
+                      final playTooltipMessage = "Play audio";
+                      final stopTooltipMessage = "Stop playing audio";
                       final double spacing = 16;
                       switch (player.audioPlayer.state) {
                         case PlayerState.completed:
@@ -76,6 +82,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.play_arrow,
                                 label: playLabel,
                                 color: color,
+                                tooltipMessage: playTooltipMessage,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
@@ -83,6 +90,7 @@ class PlayerSection extends StatelessWidget {
                                 label: stopLabel,
                                 color: Colors.red,
                                 hoverColor: Colors.redAccent,
+                                tooltipMessage: stopTooltipMessage,
                               ),
                             ],
                           );
@@ -97,6 +105,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.play_arrow,
                                 label: playLabel,
                                 color: color,
+                                tooltipMessage: playTooltipMessage,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
@@ -104,6 +113,7 @@ class PlayerSection extends StatelessWidget {
                                 label: stopLabel,
                                 color: Colors.red,
                                 hoverColor: Colors.redAccent,
+                                tooltipMessage: stopTooltipMessage,
                               ),
                             ],
                           );
@@ -119,12 +129,15 @@ class PlayerSection extends StatelessWidget {
                                 label: playLabel,
                                 color: Colors.red,
                                 hoverColor: Colors.redAccent,
+
+                                tooltipMessage: playTooltipMessage,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
                                 icon: Icons.stop,
                                 label: stopLabel,
                                 color: color,
+                                tooltipMessage: stopTooltipMessage,
                               ),
                             ],
                           );
@@ -139,6 +152,7 @@ class PlayerSection extends StatelessWidget {
                                 icon: Icons.play_arrow,
                                 label: playLabel,
                                 color: color,
+                                tooltipMessage: playTooltipMessage,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
@@ -146,6 +160,7 @@ class PlayerSection extends StatelessWidget {
                                 label: stopLabel,
                                 color: Colors.red,
                                 hoverColor: Colors.redAccent,
+                                tooltipMessage: stopTooltipMessage,
                               ),
                             ],
                           );
@@ -164,6 +179,7 @@ class PlayerSection extends StatelessWidget {
                                         context,
                                       ).colorScheme.primaryFixedDim
                                     : color,
+                                tooltipMessage: playTooltipMessage,
                               ),
                               ActionButton(
                                 onPressed: () => player.stop(),
@@ -171,6 +187,7 @@ class PlayerSection extends StatelessWidget {
                                 label: stopLabel,
                                 color: Colors.red,
                                 hoverColor: Colors.redAccent,
+                                tooltipMessage: stopTooltipMessage,
                               ),
                             ],
                           );

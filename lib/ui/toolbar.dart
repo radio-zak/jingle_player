@@ -23,6 +23,9 @@ class Toolbar extends StatelessWidget {
             return Container(
               constraints: BoxConstraints.loose(Size.fromWidth(200)),
               child: ActionButton(
+                tooltipMessage: player.editMode
+                    ? 'Stop editing palette and allow playout'
+                    : "Edit sounds available in a palette",
                 hoverColor: player.editMode
                     ? Colors.orangeAccent
                     : Colors.tealAccent,

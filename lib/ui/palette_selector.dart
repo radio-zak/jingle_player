@@ -43,6 +43,9 @@ class PaletteSelector extends StatelessWidget {
                   children: List.generate(player.palettes, (int index) {
                     final buttonLabel = (index + 1).toString();
                     return ActionButton(
+                      tooltipMessage: player.editMode
+                          ? 'Save to this palette'
+                          : 'Switch to this palette',
                       label: buttonLabel,
                       hoverColor: player.editMode
                           ? Colors.orangeAccent
@@ -54,7 +57,7 @@ class PaletteSelector extends StatelessWidget {
                           : () async {
                               await player.getPalette(index);
                             },
-                      color: player.editMode
+                      color: player.editMode && player.activePalette == index
                           ? Colors.orange
                           : player.activePalette == index
                           ? Theme.of(context).colorScheme.primary
