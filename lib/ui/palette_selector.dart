@@ -44,8 +44,8 @@ class PaletteSelector extends StatelessWidget {
                     final buttonLabel = (index + 1).toString();
                     return ActionButton(
                       tooltipMessage: player.editMode
-                          ? 'Save to this palette'
-                          : 'Switch to this palette',
+                          ? 'Save to palette $buttonLabel'
+                          : 'Switch to palette $buttonLabel',
                       label: buttonLabel,
                       hoverColor: player.editMode
                           ? Colors.orangeAccent
