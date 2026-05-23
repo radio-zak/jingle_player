@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jingle_player/ui/action_button.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/audio_handler.dart';
 
@@ -45,7 +46,7 @@ class JingleSelector extends StatelessWidget {
             hoverColor: player.sourceMap[index] == null
                 ? null
                 : player.editMode
-                ? Colors.orangeAccent
+                ? Colors.orange
                 : player.sourceMap[index] != player.sourceFile
                 ? Colors.tealAccent
                 : Colors.redAccent,
@@ -55,7 +56,6 @@ class JingleSelector extends StatelessWidget {
                 Container(
                   width: 64,
                   color: Colors.black54,
-
                   child: Padding(
                     padding: EdgeInsetsGeometry.directional(
                       top: 12,
@@ -110,29 +110,25 @@ class JingleSelector extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 spacing: 8,
                                 children: [
-                                  Container(
-                                    height: 24,
+                                  ActionButton(
+                                    tooltipMessage:
+                                        "Select wave file from disk for playout",
+                                    hoverColor: Colors.grey,
                                     color: Colors.black87,
-                                    child: TextButton(
-                                      onPressed: () async =>
-                                          await player.setButtonSource(index),
-                                      child: Text(
-                                        'Pick file',
-                                        style: TextTheme.of(context).bodySmall,
-                                      ),
-                                    ),
+                                    onPressed: () async =>
+                                        await player.setButtonSource(index),
+                                    label: 'Pick file',
+                                    isSmall: true,
                                   ),
-                                  Container(
-                                    height: 24,
+                                  ActionButton(
+                                    tooltipMessage:
+                                        "Removes file from slot, rendering this button inactive",
+                                    hoverColor: Colors.grey,
                                     color: Colors.black87,
-                                    child: TextButton(
-                                      onPressed: () =>
-                                          player.clearButtonSource(index),
-                                      child: Text(
-                                        'Clear slot',
-                                        style: TextTheme.of(context).bodySmall,
-                                      ),
-                                    ),
+                                    onPressed: () =>
+                                        player.clearButtonSource(index),
+                                    label: "Clear slot",
+                                    isSmall: true,
                                   ),
                                 ],
                               )

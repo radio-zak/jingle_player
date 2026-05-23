@@ -8,6 +8,7 @@ class ActionButton extends StatelessWidget {
   final Color? hoverColor;
   final double? width;
   final double? height;
+  final bool isSmall;
   final String? tooltipMessage;
   const ActionButton({
     this.icon,
@@ -17,6 +18,7 @@ class ActionButton extends StatelessWidget {
     this.color,
     this.width,
     this.height,
+    this.isSmall = false,
     this.tooltipMessage,
     super.key,
   });
@@ -25,7 +27,6 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       waitDuration: const Duration(seconds: 1),
-      padding: EdgeInsetsGeometry.all(4),
       message: tooltipMessage,
       child: Material(
         color: color,
@@ -40,7 +41,9 @@ class ActionButton extends StatelessWidget {
             width: width,
             height: height,
             child: Padding(
-              padding: EdgeInsetsGeometry.all(8),
+              padding: isSmall
+                  ? EdgeInsetsGeometry.all(4)
+                  : EdgeInsetsGeometry.all(12),
               child: Row(
                 mainAxisAlignment: icon != null
                     ? MainAxisAlignment.spaceEvenly
@@ -48,7 +51,12 @@ class ActionButton extends StatelessWidget {
                 spacing: icon != null ? 8 : 0,
                 children: [
                   icon != null ? Icon(icon) : Container(),
-                  Text(label, style: Theme.of(context).textTheme.bodyLarge),
+                  Text(
+                    label,
+                    style: isSmall
+                        ? Theme.of(context).textTheme.bodySmall
+                        : Theme.of(context).textTheme.bodyLarge,
+                  ),
                 ],
               ),
             ),
