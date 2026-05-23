@@ -5,11 +5,12 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
+import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wav/wav.dart';
 
 class AudioHandler extends ChangeNotifier {
-  Source? sourceFile;
+  DeviceFileSource? sourceFile;
   String? sourceFileParsed;
   Duration? fileDuration = Duration.zero;
   String? fileDurationString = Duration.zero.toString();
@@ -64,7 +65,7 @@ class AudioHandler extends ChangeNotifier {
     6: LogicalKeyboardKey.digit7,
     7: LogicalKeyboardKey.digit8,
   };
-  Map<int, Source?> sourceMap = <int, Source?>{};
+  Map<int, DeviceFileSource?> sourceMap = <int, DeviceFileSource?>{};
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
 
@@ -154,14 +155,13 @@ class AudioHandler extends ChangeNotifier {
         stop();
         playerPosition = Duration.zero;
         playerPositionString = parseDuration(playerPosition);
-        notifyListeners();
       }
     });
   }
 
-  String parseFileName(fileName) {
-    String removePaths = fileName?.path.split('/').last;
-    String removeExtension = removePaths.split('.').first;
+  String parseFileName(String fileName) {
+    String removePaths = path.split(fileName).last;
+    String removeExtension = path.withoutExtension(removePaths);
     return removeExtension;
   }
 
@@ -170,10 +170,12 @@ class AudioHandler extends ChangeNotifier {
     return durationString;
   }
 
-  Future<void> loadToPlayer(Source source) async {
+  Future<void> loadToPlayer(DeviceFileSource source) async {
     await audioPlayer.setSource(source);
     sourceFile = source;
-    sourceFileParsed = parseFileName(sourceFile);
+    if (sourceFile is DeviceFileSource) {
+      sourceFileParsed = parseFileName(source.path);
+    }
     playerDuration = await audioPlayer.getDuration() ?? Duration.zero;
     playerDurationString = parseDuration(playerDuration);
     initStreams();
@@ -210,7 +212,7 @@ class AudioHandler extends ChangeNotifier {
     List<String> sourceList = [];
     List<String> titleList = titleMap.values.toList();
 
-    List<Source?> prepareMap = sourceMap.values.toList();
+    List<DeviceFileSource?> prepareMap = sourceMap.values.toList();
     for (final s in prepareMap) {
       if (s is DeviceFileSource) {
         sourceList.add(s.path);
