@@ -76,7 +76,7 @@ Future<void> loadConfigFromFile(String configPath) async {
 }
 
 Future<void> loadDefaultConfig() async {
-  await GlobalConfiguration().loadFromAsset("default_config");
+  await GlobalConfiguration().loadFromAsset("default_config.json");
   appTitle = GlobalConfiguration().getValue("appTitle");
   playerCount = GlobalConfiguration().getValue("playerCount");
   paletteCount = GlobalConfiguration().getValue("paletteCount");
