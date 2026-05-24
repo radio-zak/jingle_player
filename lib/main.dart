@@ -15,6 +15,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
+import 'package:toastification/toastification.dart';
 
 late String appTitle;
 late int playerCount;
@@ -102,69 +103,71 @@ class JinglePlayer extends StatelessWidget {
     final primaryDimmedColor = Color.fromARGB(255, 54, 54, 54);
     final textPrimaryColor = Colors.white;
     final textGreyedColor = Color(0xFFBBBBBB);
-    return MaterialApp(
-      title: appTitle,
-      scrollBehavior: PlayerScrollBehavior(),
-      theme: ThemeData(
-        appBarTheme: AppBarThemeData(
-          actionsIconTheme: IconThemeData(color: textPrimaryColor),
-          iconTheme: IconThemeData(color: textPrimaryColor),
-          backgroundColor: surfaceColor,
-          foregroundColor: surfaceColor,
+    return ToastificationWrapper(
+      child: MaterialApp(
+        title: appTitle,
+        scrollBehavior: PlayerScrollBehavior(),
+        theme: ThemeData(
+          appBarTheme: AppBarThemeData(
+            actionsIconTheme: IconThemeData(color: textPrimaryColor),
+            iconTheme: IconThemeData(color: textPrimaryColor),
+            backgroundColor: surfaceColor,
+            foregroundColor: surfaceColor,
+          ),
+          tabBarTheme: TabBarThemeData(
+            indicatorColor: primaryColor,
+            labelStyle: TextStyle(
+              color: primaryColor,
+              fontWeight: FontWeight.normal,
+            ),
+            labelColor: primaryColor,
+            unselectedLabelStyle: TextStyle(
+              color: textGreyedColor,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          colorScheme: ColorScheme(
+            surface: surfaceColor,
+            onSurface: textPrimaryColor,
+            primary: primaryColor,
+            onPrimary: textPrimaryColor,
+            secondary: textGreyedColor,
+            onSecondary: textPrimaryColor,
+            primaryFixedDim: primaryDimmedColor,
+            tertiary: textGreyedColor,
+            brightness: Brightness.dark,
+            onError: Colors.red,
+            error: Colors.red,
+          ),
+          textTheme: TextTheme(
+            displayLarge: GoogleFonts.sora(),
+            displayMedium: GoogleFonts.sora(),
+            titleLarge: GoogleFonts.sora(fontWeight: FontWeight.bold),
+            titleMedium: GoogleFonts.sora(fontWeight: FontWeight.bold),
+            titleSmall: GoogleFonts.sora(fontWeight: FontWeight.bold),
+            displaySmall: GoogleFonts.sora(),
+            labelLarge: GoogleFonts.sora(
+              fontWeight: FontWeight.bold,
+              color: textGreyedColor,
+            ),
+            labelMedium: GoogleFonts.sora(
+              fontWeight: FontWeight.bold,
+              color: textGreyedColor,
+            ),
+            labelSmall: GoogleFonts.sora(
+              fontWeight: FontWeight.bold,
+              color: textGreyedColor,
+            ),
+            headlineLarge: GoogleFonts.sora(),
+            headlineMedium: GoogleFonts.sora(),
+            headlineSmall: GoogleFonts.sora(fontSize: 16),
+            bodyLarge: GoogleFonts.sora(),
+            bodyMedium: GoogleFonts.sora(),
+            bodySmall: GoogleFonts.sora(),
+          ),
         ),
-        tabBarTheme: TabBarThemeData(
-          indicatorColor: primaryColor,
-          labelStyle: TextStyle(
-            color: primaryColor,
-            fontWeight: FontWeight.normal,
-          ),
-          labelColor: primaryColor,
-          unselectedLabelStyle: TextStyle(
-            color: textGreyedColor,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        colorScheme: ColorScheme(
-          surface: surfaceColor,
-          onSurface: textPrimaryColor,
-          primary: primaryColor,
-          onPrimary: textPrimaryColor,
-          secondary: textGreyedColor,
-          onSecondary: textPrimaryColor,
-          primaryFixedDim: primaryDimmedColor,
-          tertiary: textGreyedColor,
-          brightness: Brightness.dark,
-          onError: Colors.red,
-          error: Colors.red,
-        ),
-        textTheme: TextTheme(
-          displayLarge: GoogleFonts.sora(),
-          displayMedium: GoogleFonts.sora(),
-          titleLarge: GoogleFonts.sora(fontWeight: FontWeight.bold),
-          titleMedium: GoogleFonts.sora(fontWeight: FontWeight.bold),
-          titleSmall: GoogleFonts.sora(fontWeight: FontWeight.bold),
-          displaySmall: GoogleFonts.sora(),
-          labelLarge: GoogleFonts.sora(
-            fontWeight: FontWeight.bold,
-            color: textGreyedColor,
-          ),
-          labelMedium: GoogleFonts.sora(
-            fontWeight: FontWeight.bold,
-            color: textGreyedColor,
-          ),
-          labelSmall: GoogleFonts.sora(
-            fontWeight: FontWeight.bold,
-            color: textGreyedColor,
-          ),
-          headlineLarge: GoogleFonts.sora(),
-          headlineMedium: GoogleFonts.sora(),
-          headlineSmall: GoogleFonts.sora(fontSize: 16),
-          bodyLarge: GoogleFonts.sora(),
-          bodyMedium: GoogleFonts.sora(),
-          bodySmall: GoogleFonts.sora(),
-        ),
+        home: HomePage(title: appTitle),
       ),
-      home: HomePage(title: appTitle),
     );
   }
 }

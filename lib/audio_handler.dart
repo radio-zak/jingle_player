@@ -7,6 +7,7 @@ import 'dart:isolate';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 import 'package:wav/wav.dart';
 
 class AudioHandler extends ChangeNotifier {
@@ -224,6 +225,16 @@ class AudioHandler extends ChangeNotifier {
     String encodedTitleMap = jsonEncode(titleList);
     await localStorage.setString('palette-$id-sources', encodedSourceMap);
     await localStorage.setString('palette-$id-titles', encodedTitleMap);
+    final displayPaletteId = id + 1;
+    toastification.show(
+      title: Text("Palette $displayPaletteId saved!"),
+      autoCloseDuration: Duration(seconds: 2),
+      alignment: Alignment.topLeft,
+      primaryColor: Colors.teal,
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+      style: ToastificationStyle.minimal,
+    );
   }
 
   Future<void> loadPaletteFromStorage(int id) async {
