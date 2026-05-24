@@ -10,7 +10,7 @@ class Toolbar extends StatelessWidget {
       borderRadius: BorderRadiusGeometry.directional(
         topEnd: Radius.circular(8),
       ),
-      color: Colors.black87,
+      color: Colors.black,
       child: Padding(
         padding: EdgeInsetsGeometry.directional(
           end: 32,
