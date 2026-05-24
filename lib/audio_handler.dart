@@ -70,7 +70,7 @@ class AudioHandler extends ChangeNotifier {
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
 
-  void activateToolbar() {
+  void toggleToolbar() {
     toolbarActive = !toolbarActive;
     notifyListeners();
   }

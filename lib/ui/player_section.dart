@@ -40,10 +40,14 @@ class PlayerSection extends StatelessWidget {
                       builder: (context, player, child) {
                         return Tooltip(
                           waitDuration: Duration(seconds: 1),
-                          message: "Options toolbar",
+                          message: player.toolbarActive
+                              ? "Show options toolbar"
+                              : "Close options toolbar",
                           child: IconButton(
-                            onPressed: () => player.activateToolbar(),
-                            icon: Icon(Icons.menu),
+                            onPressed: () => player.toggleToolbar(),
+                            icon: player.toolbarActive
+                                ? Icon(Icons.close)
+                                : Icon(Icons.menu),
                           ),
                         );
                       },
