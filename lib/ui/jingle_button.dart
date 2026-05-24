@@ -50,27 +50,31 @@ class JingleSelector extends StatelessWidget {
                 : player.sourceMap[index] != player.sourceFile
                 ? Colors.tealAccent
                 : Colors.redAccent,
-            child: Row(
+            child: Flex(
+              direction: Axis.horizontal,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  width: 64,
-                  color: Colors.black54,
-                  child: Padding(
-                    padding: EdgeInsetsGeometry.directional(
-                      top: 12,
-                      bottom: 12,
-                      start: 16,
-                      end: 16,
-                    ),
-                    child: Text(
-                      _name,
-                      textAlign: TextAlign.center,
-                      style: TextTheme.of(context).headlineLarge,
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    color: Colors.black54,
+                    child: Padding(
+                      padding: EdgeInsetsGeometry.directional(
+                        top: 12,
+                        bottom: 12,
+                        start: 16,
+                        end: 16,
+                      ),
+                      child: Text(
+                        _name,
+                        textAlign: TextAlign.center,
+                        style: TextTheme.of(context).headlineLarge,
+                      ),
                     ),
                   ),
                 ),
-                Container(
+                Flexible(
+                  flex: 4,
                   child: Padding(
                     padding: EdgeInsetsGeometry.directional(
                       top: 12,
@@ -78,70 +82,64 @@ class JingleSelector extends StatelessWidget {
                       start: 16,
                       end: 16,
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      mainAxisSize: MainAxisSize.max,
+                    child: Flex(
+                      direction: Axis.vertical,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints.tightFor(
-                                width: 180,
-                                height: 36,
-                              ),
-                              child: Text(
-                                overflow: TextOverflow.ellipsis,
-                                player.paletteLoading
-                                    ? 'Loading...'
-                                    : player.titleMap[index]!,
-                                style: TextTheme.of(context).titleLarge,
-                              ),
-                            ),
-                          ],
+                        Flexible(
+                          flex: 2,
+                          fit: FlexFit.tight,
+                          child: Text(
+                            overflow: TextOverflow.ellipsis,
+                            player.paletteLoading
+                                ? 'Loading...'
+                                : player.titleMap[index]!,
+                            style: TextTheme.of(context).titleLarge,
+                          ),
                         ),
-                        player.editMode
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                spacing: 8,
-                                children: [
-                                  ActionButton(
-                                    tooltipMessage:
-                                        "Select wave file from disk for playout",
-                                    hoverColor: Colors.grey,
-                                    color: Colors.black87,
-                                    onPressed: () async =>
-                                        await player.setButtonSource(index),
-                                    label: 'Pick file',
-                                    isSmall: true,
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: player.editMode
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  spacing: 8,
+                                  children: [
+                                    ActionButton(
+                                      tooltipMessage:
+                                          "Select wave file from disk for playout",
+                                      hoverColor: Colors.grey,
+                                      color: Colors.black87,
+                                      onPressed: () async =>
+                                          await player.setButtonSource(index),
+                                      label: 'Pick file',
+                                      isSmall: true,
+                                    ),
+                                    ActionButton(
+                                      tooltipMessage:
+                                          "Removes file from slot, rendering this button inactive",
+                                      hoverColor: Colors.grey,
+                                      color: Colors.black87,
+                                      onPressed: () =>
+                                          player.clearButtonSource(index),
+                                      label: "Clear slot",
+                                      isSmall: true,
+                                    ),
+                                  ],
+                                )
+                              : player.paletteLoading
+                              ? LinearProgressIndicator(minHeight: 8)
+                              : Text(
+                                  player.parseDuration(
+                                    player.durationMap[index],
                                   ),
-                                  ActionButton(
-                                    tooltipMessage:
-                                        "Removes file from slot, rendering this button inactive",
-                                    hoverColor: Colors.grey,
-                                    color: Colors.black87,
-                                    onPressed: () =>
-                                        player.clearButtonSource(index),
-                                    label: "Clear slot",
-                                    isSmall: true,
-                                  ),
-                                ],
-                              )
-                            : player.paletteLoading
-                            ? Container(
-                                height: 20,
-                                width: 184,
-                                child: LinearProgressIndicator(),
-                              )
-                            : Text(
-                                player.parseDuration(player.durationMap[index]),
-                                style: TextTheme.of(context).bodyLarge,
-                              ),
+                                  style: TextTheme.of(context).bodyLarge,
+                                ),
+                        ),
                       ],
                     ),
                   ),
