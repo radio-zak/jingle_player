@@ -16,7 +16,7 @@ class TimeRemainingClock extends StatelessWidget {
           : player.sourceFileParsed == null
           ? Theme.of(context).colorScheme.primaryFixedDim
           : Theme.of(context).colorScheme.primary,
-      padding: EdgeInsetsGeometry.all(16),
+      padding: EdgeInsetsGeometry.all(8),
       child: Align(
         alignment: FractionalOffset.center,
         child: Consumer<AudioHandler>(
