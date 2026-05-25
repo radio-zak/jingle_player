@@ -221,6 +221,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
       shortcuts: {
         SingleActivator(LogicalKeyboardKey.space): PlayerStartIntent(),
         SingleActivator(LogicalKeyboardKey.escape): PlayerStopIntent(),
+        SingleActivator(LogicalKeyboardKey.keyE, control: true):
+            EditModeHandler(),
         for (MapEntry<int, LogicalKeyboardKey> k in _audioPlayer.keyMap.entries)
           SingleActivator(k.value): ButtonPressHandler(index: k.key),
         for (MapEntry<int, LogicalKeyboardKey> k
@@ -235,6 +237,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
           PaletteSelectHandler: PaletteSelectAction(audioHandler: _audioPlayer),
           PlayerStartIntent: PlayerStartAction(audioHandler: _audioPlayer),
           PlayerStopIntent: PlayerStopAction(audioHandler: _audioPlayer),
+          EditModeHandler: EditModeAction(audioHandler: _audioPlayer),
         },
         child: Focus(
           autofocus: true,
@@ -341,5 +344,18 @@ class PaletteSelectAction extends Action<PaletteSelectHandler> {
     audioHandler.editMode
         ? await audioHandler.savePalette(intent.index)
         : await audioHandler.getPalette(intent.index);
+  }
+}
+
+class EditModeHandler extends Intent {}
+
+class EditModeAction extends Action<EditModeHandler> {
+  AudioHandler audioHandler;
+  EditModeAction({required this.audioHandler});
+
+  @override
+  void invoke(EditModeHandler intent) {
+    int activePalette = audioHandler.activePalette;
+    audioHandler.switchMode(activePalette);
   }
 }
