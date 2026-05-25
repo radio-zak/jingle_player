@@ -25,6 +25,7 @@ String filesPath = '';
 late Map<String, dynamic> configMap;
 String configPath = './config.json';
 String logLevel = "info";
+late String logPath;
 
 void main() async {
   AudioLogger.logLevel = AudioLogLevel.error;
@@ -40,6 +41,7 @@ void main() async {
     await windowManager.focus();
   });
   await loadConfig(configPath);
+  await initializeMediaDirectory(filesPath);
   runApp(
     MultiProvider(
       providers: [
@@ -54,37 +56,36 @@ void main() async {
 
 Future<void> loadConfig(String configPath) async {
   var configFile = await File(configPath).exists();
+  final appDocsDir = await getApplicationSupportDirectory();
+  logPath = appDocsDir.path;
   if (!configFile) {
-    logger.i("Using default configuration");
-    logger.i('Setting log level to $logLevel');
-    setLogLevel(logLevel);
-    await initializeMediaDirectory(filesPath);
-    return;
+    await initializeLogger(logPath, logLevel).then((_) {
+      logger.i("Using default configuration");
+      logger.i("Log level: $logLevel. Log dir: $logPath");
+    });
+  } else {
+    var appConfig = await File(configPath).readAsString();
+    Map<String, dynamic> configMap = await jsonDecode(appConfig);
+    if (configMap.containsKey('logLevel')) {
+      logLevel = configMap['logLevel'];
+    }
+    if (configMap.containsKey('logPath')) {
+      logPath = configMap['logPath'];
+    }
+    if (logPath == "") {
+      logPath = appDocsDir.path;
+    }
+    await initializeLogger(logPath, logLevel);
+    paletteCount = configMap['paletteCount'];
+    appTitle = configMap['appTitle'];
+    playerCount = configMap['playerCount'];
+    logger.i("Using configuration from file: $configPath");
+    logger.i("Log level: $logLevel. Log dir: $logPath");
+    if (configMap.containsKey('filesPath')) {
+      filesPath = configMap['filesPath'];
+      logger.i("Found media directory in config file: $filesPath");
+    }
   }
-  try {
-    logger.i('Loading configuration file $configPath');
-    await loadConfigFromFile(configPath);
-  } catch (e) {
-    logger.e('$e');
-  }
-}
-
-Future<void> loadConfigFromFile(String configPath) async {
-  var appConfig = await File(configPath).readAsString();
-  Map<String, dynamic> configMap = await jsonDecode(appConfig);
-  paletteCount = configMap['paletteCount'];
-  appTitle = configMap['appTitle'];
-  playerCount = configMap['playerCount'];
-  if (configMap.containsKey('filesPath')) {
-    logger.i("Found media directory in config file");
-    filesPath = configMap['filesPath'];
-  }
-  if (configMap.containsKey('logLevel')) {
-    logLevel = configMap['logLevel'];
-  }
-  logger.i('Setting log level to $logLevel');
-  setLogLevel(logLevel);
-  await initializeMediaDirectory(filesPath);
 }
 
 Future<void> initializeMediaDirectory(String mediaPath) async {
@@ -92,13 +93,11 @@ Future<void> initializeMediaDirectory(String mediaPath) async {
   String createPath;
   final appDocsDir = await getApplicationSupportDirectory();
   if (mediaPath != '') {
-    logger.i("Initializing media directory in location $mediaPath");
     logger.i(
       "Initializing media directory in the configured location $mediaPath",
     );
     createPath = mediaPath;
   } else {
-    logger.i("Initializing media directory in default location");
     logger.i("Initializing media directory in the default location");
     createPath = path.join(appDocsDir.path, "media");
     filesPath = createPath;
