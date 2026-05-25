@@ -37,7 +37,7 @@ class AudioHandler extends ChangeNotifier {
   int activePalette = 0;
   bool paletteLoading = false;
   String filesPath = "";
-  late SharedPreferencesAsync localStorage;
+  late SharedPreferencesWithCache localStorage;
 
   bool toolbarActive = false;
 
@@ -84,7 +84,9 @@ class AudioHandler extends ChangeNotifier {
     int paletteCount,
     String mediaDir,
   ) async {
-    localStorage = await SharedPreferencesAsync();
+    localStorage = await SharedPreferencesWithCache.create(
+      cacheOptions: SharedPreferencesWithCacheOptions(),
+    );
     List.generate(playerCount, (index) {
       sourceMap.addAll({index: null});
       titleMap.addAll({index: 'No file selected'});
@@ -124,7 +126,9 @@ class AudioHandler extends ChangeNotifier {
         playerLoading[index] = true;
         notifyListeners();
         try {
-          await File(pickedFile).copy(fileLocation);
+          await Isolate.run(() async {
+            await File(pickedFile).copy(fileLocation);
+          });
         } catch (e) {
           logger.e('$e');
           toastification.show(
@@ -156,8 +160,11 @@ class AudioHandler extends ChangeNotifier {
       }
       sourceMap[index] = DeviceFileSource(fileLocation, mimeType: 'audio/wav');
       titleMap[index] = result.names.first!.split('.').first;
-      final wav = await Wav.readFile(fileLocation);
-      durationMap[index] = Duration(seconds: wav.duration.toInt()).toString();
+      final duration = await Isolate.run(() async {
+        final wav = await Wav.readFile(fileLocation);
+        return wav.duration.toInt();
+      });
+      durationMap[index] = Duration(seconds: duration).toString();
       playerLoading[index] = false;
     }
     notifyListeners();
@@ -352,10 +359,11 @@ class AudioHandler extends ChangeNotifier {
           durationMap.addAll({i: ''});
         } else {
           sourceMap.addAll({i: DeviceFileSource(decodedMap[i])});
-          final wav = await Wav.readFile(decodedMap[i]);
-          durationMap.addAll({
-            i: Duration(seconds: wav.duration.toInt()).toString(),
+          final duration = await Isolate.run(() async {
+            final wav = await Wav.readFile(decodedMap[i]);
+            return wav.duration.toInt();
           });
+          durationMap.addAll({i: Duration(seconds: duration).toString()});
         }
       }
     }
