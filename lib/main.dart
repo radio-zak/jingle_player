@@ -227,7 +227,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
           SingleActivator(k.value): ButtonPressHandler(index: k.key),
         for (MapEntry<int, LogicalKeyboardKey> k
             in _audioPlayer.paletteKeyMap.entries)
-          SingleActivator(k.value, shift: true): PaletteSelectHandler(
+          SingleActivator(k.value, control: true): PaletteSelectHandler(
             index: k.key,
           ),
       },
