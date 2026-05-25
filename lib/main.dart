@@ -1,14 +1,12 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:global_configuration/global_configuration.dart';
 import 'package:jingle_player/ui/jingle_grid.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/audio_handler.dart';
 import 'package:jingle_player/ui/top_bar.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter/foundation.dart';
 import 'package:jingle_player/ui/player_section.dart';
 import 'package:jingle_player/ui/toolbar.dart';
 import 'dart:io';
@@ -92,6 +90,7 @@ Future<void> initializeMediaDirectory(String mediaPath) async {
   } else {
     debugPrint("Initializing media directory in the default location");
     createPath = path.join(appDocsDir.path, "media");
+    filesPath = createPath;
   }
   mediaDirExists = await Directory(createPath).exists();
   if (!mediaDirExists) {
@@ -102,7 +101,7 @@ Future<void> initializeMediaDirectory(String mediaPath) async {
       debugPrint("An error occured when initializing media directory: $e");
     }
   }
-  debugPrint("Media directory available");
+  debugPrint("Media directory available: $createPath");
 }
 
 class JinglePlayer extends StatelessWidget {
@@ -205,6 +204,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   Future<void> initializePlayers() async {
     audioPlayer = Provider.of<AudioHandler>(context, listen: false);
+    debugPrint("Initializing audio player");
     await audioPlayer.initialize(playerCount, paletteCount, filesPath);
     await audioPlayer.getPalette(audioPlayer.activePalette);
   }
