@@ -27,7 +27,7 @@ late Map<String, dynamic> configMap;
 String configPath = './config.json';
 
 void main() async {
-  AudioLogger.logLevel = AudioLogLevel.info;
+  AudioLogger.logLevel = AudioLogLevel.error;
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
