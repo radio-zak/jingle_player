@@ -92,6 +92,9 @@ class AudioHandler extends ChangeNotifier {
     });
     palettes = paletteCount;
     filesPath = mediaDir;
+    debugPrint(
+      "Initialized audio player with params: playerCount: $playerCount, paletteCount: $paletteCount, mediaDir: $mediaDir",
+    );
   }
 
   Future<void> setButtonSource(int index) async {
@@ -120,6 +123,7 @@ class AudioHandler extends ChangeNotifier {
           autoCloseDuration: Duration(seconds: 2),
         );
         playerLoading[index] = true;
+        notifyListeners();
         try {
           await File(pickedFile).copy(fileLocation);
         } catch (e) {
@@ -134,8 +138,11 @@ class AudioHandler extends ChangeNotifier {
             alignment: Alignment.topLeft,
           );
           playerLoading[index] = false;
+          notifyListeners();
+          return;
         }
         playerLoading[index] = false;
+        notifyListeners();
       } else {
         debugPrint("Selected existing file from media directory");
         toastification.show(
@@ -152,6 +159,7 @@ class AudioHandler extends ChangeNotifier {
       titleMap[index] = result.names.first!.split('.').first;
       final wav = await Wav.readFile(fileLocation);
       durationMap[index] = Duration(seconds: wav.duration.toInt()).toString();
+      playerLoading[index] = false;
     }
     notifyListeners();
   }
