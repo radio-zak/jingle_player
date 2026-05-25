@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
+import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
@@ -34,6 +35,7 @@ class AudioHandler extends ChangeNotifier {
   int palettes = 4;
   int activePalette = 0;
   bool paletteLoading = false;
+  String filesPath = path.absolute("./media");
   late SharedPreferencesAsync localStorage;
 
   bool toolbarActive = false;
@@ -69,6 +71,7 @@ class AudioHandler extends ChangeNotifier {
   Map<int, DeviceFileSource?> sourceMap = <int, DeviceFileSource?>{};
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
+  Map<int, bool> playerLoading = {};
 
   void toggleToolbar() {
     toolbarActive = !toolbarActive;
@@ -80,6 +83,7 @@ class AudioHandler extends ChangeNotifier {
     List.generate(playerCount, (index) {
       sourceMap.addAll({index: null});
       titleMap.addAll({index: 'No file selected'});
+      playerLoading.addAll({index: false});
       return index;
     });
     palettes = paletteCount;
@@ -91,12 +95,58 @@ class AudioHandler extends ChangeNotifier {
       type: FileType.custom,
     );
     if (result != null) {
-      sourceMap[index] = DeviceFileSource(
-        result.paths.first!,
-        mimeType: 'audio/wav',
+      final fileLocation = path.join(
+        path.canonicalize(path.absolute(filesPath)),
+        path.split(result.paths.first!).last,
       );
+      final sourceFileName = path.basename(fileLocation);
+      final pickedFile = await File(result.paths.first!).resolveSymbolicLinks();
+      final destinationFileName = path.basename(pickedFile);
+      var existingFile = await File(fileLocation).exists();
+      if (!existingFile) {
+        debugPrint(
+          "Selected file does not exist in media directory, copying...",
+        );
+        toastification.show(
+          title: Text("Copying file to media directory"),
+          alignment: Alignment.topLeft,
+          type: ToastificationType.info,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          style: ToastificationStyle.minimal,
+          autoCloseDuration: Duration(seconds: 2),
+        );
+        playerLoading[index] = true;
+        try {
+          await File(pickedFile).copy(fileLocation);
+        } catch (e) {
+          debugPrint('$e');
+          toastification.show(
+            title: Text("An error occured"),
+            description: Text("$e"),
+            type: ToastificationType.error,
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            style: ToastificationStyle.minimal,
+            alignment: Alignment.topLeft,
+          );
+        }
+        playerLoading[index] = false;
+      } else {
+        debugPrint("Selected existing file from media directory");
+        toastification.show(
+          title: Text("Selected existing file from media directory"),
+          alignment: Alignment.topLeft,
+          type: ToastificationType.info,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          style: ToastificationStyle.minimal,
+          autoCloseDuration: Duration(seconds: 2),
+        );
+      }
+      sourceMap[index] = DeviceFileSource(fileLocation, mimeType: 'audio/wav');
       titleMap[index] = result.names.first!.split('.').first;
-      final wav = await Wav.readFile(result.paths.first!);
+      final wav = await Wav.readFile(fileLocation);
       durationMap[index] = Duration(seconds: wav.duration.toInt()).toString();
     }
     notifyListeners();

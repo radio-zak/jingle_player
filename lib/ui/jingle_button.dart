@@ -94,6 +94,8 @@ class JingleSelector extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             player.paletteLoading
                                 ? 'Loading...'
+                                : player.playerLoading[index]!
+                                ? 'Loading'
                                 : player.titleMap[index]!,
                             style: TextTheme.of(context).titleLarge,
                           ),
@@ -101,7 +103,9 @@ class JingleSelector extends StatelessWidget {
                         Flexible(
                           flex: 1,
                           fit: FlexFit.tight,
-                          child: player.editMode
+                          child: player.playerLoading[index]!
+                              ? LinearProgressIndicator(minHeight: 8)
+                              : player.editMode
                               ? Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:

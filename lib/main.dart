@@ -20,6 +20,7 @@ import 'package:toastification/toastification.dart';
 late String appTitle;
 late int playerCount;
 late int paletteCount;
+late String filesPath;
 late Map<String, dynamic> configMap;
 String configPath = 'config.json';
 
@@ -56,6 +57,7 @@ Future<void> loadConfig(String configPath) async {
   } else {
     var configFile = await File(configPath).exists();
     if (!configFile) {
+      debugPrint("Creating default configuration file");
       await initializeConfigFile(configPath);
     }
     debugPrint('Loading configuration file');
@@ -74,6 +76,8 @@ Future<void> loadConfigFromFile(String configPath) async {
   paletteCount = configMap['paletteCount'];
   appTitle = configMap['appTitle'];
   playerCount = configMap['playerCount'];
+  filesPath = configMap['filesPath'];
+  await initializeMediaDirectory(filesPath);
 }
 
 Future<void> loadDefaultConfig() async {
@@ -81,6 +85,8 @@ Future<void> loadDefaultConfig() async {
   appTitle = GlobalConfiguration().getValue("appTitle");
   playerCount = GlobalConfiguration().getValue("playerCount");
   paletteCount = GlobalConfiguration().getValue("paletteCount");
+  filesPath = GlobalConfiguration().getValue("filesPath");
+  await initializeMediaDirectory(filesPath);
 }
 
 Future<void> initializeConfigFile(String configPath) async {
@@ -92,6 +98,15 @@ Future<void> initializeConfigFile(String configPath) async {
   await File(configPath).create();
   await File(configPath).writeAsBytes(bytes);
   debugPrint('Config file created in $configPath');
+}
+
+Future<void> initializeMediaDirectory(String mediaPath) async {
+  debugPrint("Creating media directory");
+  try {
+    await Directory(mediaPath).create(recursive: true);
+  } catch (e) {
+    debugPrint("An error occured when initializing media directory: $e");
+  }
 }
 
 class JinglePlayer extends StatelessWidget {
