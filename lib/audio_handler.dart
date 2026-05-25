@@ -10,6 +10,7 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import 'package:wav/wav.dart';
+import 'package:jingle_player/logger.dart';
 
 class AudioHandler extends ChangeNotifier {
   DeviceFileSource? sourceFile;
@@ -92,7 +93,7 @@ class AudioHandler extends ChangeNotifier {
     });
     palettes = paletteCount;
     filesPath = mediaDir;
-    debugPrint(
+    logger.i(
       "Initialized audio player with params: playerCount: $playerCount, paletteCount: $paletteCount, mediaDir: $mediaDir",
     );
   }
@@ -110,9 +111,7 @@ class AudioHandler extends ChangeNotifier {
       final pickedFile = await File(result.paths.first!).resolveSymbolicLinks();
       var existingFile = await File(fileLocation).exists();
       if (!existingFile) {
-        debugPrint(
-          "Selected file does not exist in media directory, copying...",
-        );
+        logger.i("Selected file does not exist in media directory, copying...");
         toastification.show(
           title: Text("Copying file to media directory"),
           alignment: Alignment.topLeft,
@@ -127,7 +126,7 @@ class AudioHandler extends ChangeNotifier {
         try {
           await File(pickedFile).copy(fileLocation);
         } catch (e) {
-          debugPrint('$e');
+          logger.e('$e');
           toastification.show(
             title: Text("An error occured"),
             description: Text("$e"),
@@ -144,7 +143,7 @@ class AudioHandler extends ChangeNotifier {
         playerLoading[index] = false;
         notifyListeners();
       } else {
-        debugPrint("Selected existing file from media directory");
+        logger.i("Selected existing file from media directory");
         toastification.show(
           title: Text("Selected existing file from media directory"),
           alignment: Alignment.topLeft,
@@ -184,7 +183,7 @@ class AudioHandler extends ChangeNotifier {
 
   void initStreams() {
     _durationSubscription = audioPlayer.onDurationChanged.listen((duration) {
-      debugPrint('got duration: $duration');
+      logger.i('got duration: $duration');
       playerDuration = duration;
       playerDurationString = parseDuration(duration);
       notifyListeners();
@@ -243,25 +242,25 @@ class AudioHandler extends ChangeNotifier {
     playerDurationString = parseDuration(playerDuration);
     initStreams();
     notifyListeners();
-    debugPrint('source set!');
+    logger.d('source set!');
   }
 
   Future<void> play() async {
-    debugPrint('play invoked');
+    logger.d('play invoked');
     if (sourceFile == null) {
-      debugPrint('empty source!');
+      logger.d('empty source!');
     } else {
       await audioPlayer.resume();
     }
   }
 
   Future<void> pause() async {
-    debugPrint('pause invoked');
+    logger.d('pause invoked');
     await audioPlayer.pause();
   }
 
   Future<void> stop() async {
-    debugPrint('stop invoked');
+    logger.d('stop invoked');
     await audioPlayer.release();
     sourceFile = null;
     sourceFileParsed = null;

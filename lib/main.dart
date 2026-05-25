@@ -16,6 +16,7 @@ import 'package:path/path.dart' as path;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
 import 'package:toastification/toastification.dart';
+import 'package:jingle_player/logger.dart';
 
 String appTitle = "Jingle Player";
 int playerCount = 16;
@@ -23,6 +24,7 @@ int paletteCount = 8;
 String filesPath = '';
 late Map<String, dynamic> configMap;
 String configPath = './config.json';
+String logLevel = "info";
 
 void main() async {
   AudioLogger.logLevel = AudioLogLevel.error;
@@ -53,15 +55,17 @@ void main() async {
 Future<void> loadConfig(String configPath) async {
   var configFile = await File(configPath).exists();
   if (!configFile) {
-    debugPrint("Using default configuration");
+    logger.i("Using default configuration");
+    logger.i('Setting log level to $logLevel');
+    setLogLevel(logLevel);
     await initializeMediaDirectory(filesPath);
     return;
   }
   try {
-    debugPrint('Loading configuration file $configPath');
+    logger.i('Loading configuration file $configPath');
     await loadConfigFromFile(configPath);
   } catch (e) {
-    debugPrint('$e');
+    logger.e('$e');
   }
 }
 
@@ -72,9 +76,14 @@ Future<void> loadConfigFromFile(String configPath) async {
   appTitle = configMap['appTitle'];
   playerCount = configMap['playerCount'];
   if (configMap.containsKey('filesPath')) {
-    debugPrint("Found media directory in config file");
+    logger.i("Found media directory in config file");
     filesPath = configMap['filesPath'];
   }
+  if (configMap.containsKey('logLevel')) {
+    logLevel = configMap['logLevel'];
+  }
+  logger.i('Setting log level to $logLevel');
+  setLogLevel(logLevel);
   await initializeMediaDirectory(filesPath);
 }
 
@@ -83,25 +92,28 @@ Future<void> initializeMediaDirectory(String mediaPath) async {
   String createPath;
   final appDocsDir = await getApplicationSupportDirectory();
   if (mediaPath != '') {
-    debugPrint(
+    logger.i("Initializing media directory in location $mediaPath");
+    logger.i(
       "Initializing media directory in the configured location $mediaPath",
     );
     createPath = mediaPath;
   } else {
-    debugPrint("Initializing media directory in the default location");
+    logger.i("Initializing media directory in default location");
+    logger.i("Initializing media directory in the default location");
     createPath = path.join(appDocsDir.path, "media");
     filesPath = createPath;
   }
   mediaDirExists = await Directory(createPath).exists();
   if (!mediaDirExists) {
-    debugPrint("Creating media directory $createPath");
+    logger.i("Creating media directory $createPath");
+    logger.i("Creating media directory $createPath");
     try {
       await Directory(createPath).create(recursive: true);
     } catch (e) {
-      debugPrint("An error occured when initializing media directory: $e");
+      logger.e("An error occured when initializing media directory: $e");
     }
   }
-  debugPrint("Media directory available: $createPath");
+  logger.i("Media directory available: $createPath");
 }
 
 class JinglePlayer extends StatelessWidget {
@@ -204,7 +216,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   Future<void> initializePlayers() async {
     audioPlayer = Provider.of<AudioHandler>(context, listen: false);
-    debugPrint("Initializing audio player");
+    logger.i("Initializing audio player");
     await audioPlayer.initialize(playerCount, paletteCount, filesPath);
     await audioPlayer.getPalette(audioPlayer.activePalette);
   }
@@ -285,10 +297,10 @@ class ButtonPressAction extends Action<ButtonPressHandler> {
   @override
   Future<void> invoke(ButtonPressHandler intent) async {
     if (audioHandler.sourceMap[intent.index] == null) {
-      debugPrint('$intent.index');
-      debugPrint('tried to activate empty source');
+      logger.d('$intent.index');
+      logger.d('tried to activate empty source');
     } else if (audioHandler.editMode) {
-      debugPrint('button in edit mode - not playing');
+      logger.d('button in edit mode - not playing');
     } else {
       await audioHandler.stop();
       await audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);

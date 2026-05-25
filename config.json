@@ -1,5 +1,6 @@
 {
   "appTitle": "ŻAK Jinglownica",
   "paletteCount": 8,
-  "playerCount": 16
+  "playerCount": 16,
+  "logLevel": "debug"
 }
