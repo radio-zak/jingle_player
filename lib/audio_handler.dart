@@ -121,7 +121,7 @@ class AudioHandler extends ChangeNotifier {
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           style: ToastificationStyle.minimal,
-          autoCloseDuration: Duration(seconds: 2),
+          autoCloseDuration: Duration(seconds: 5),
         );
         playerLoading[index] = true;
         notifyListeners();
@@ -155,7 +155,7 @@ class AudioHandler extends ChangeNotifier {
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           style: ToastificationStyle.minimal,
-          autoCloseDuration: Duration(seconds: 2),
+          autoCloseDuration: Duration(seconds: 5),
         );
       }
       sourceMap[index] = DeviceFileSource(fileLocation, mimeType: 'audio/wav');
@@ -296,7 +296,7 @@ class AudioHandler extends ChangeNotifier {
     final displayPaletteId = id + 1;
     toastification.show(
       title: Text("Palette $displayPaletteId saved!"),
-      autoCloseDuration: Duration(seconds: 2),
+      autoCloseDuration: Duration(seconds: 5),
       alignment: Alignment.topLeft,
       primaryColor: Colors.teal,
       backgroundColor: Colors.black,
