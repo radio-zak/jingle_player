@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:jingle_player/ui/jingle_grid.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/audio_handler.dart';
 import 'package:jingle_player/ui/top_bar.dart';
@@ -13,16 +14,17 @@ import 'package:jingle_player/ui/toolbar.dart';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:path/path.dart' as path;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
 import 'package:toastification/toastification.dart';
 
-late String appTitle;
-late int playerCount;
-late int paletteCount;
-late String filesPath;
+String appTitle = "Jingle Player";
+int playerCount = 16;
+int paletteCount = 8;
+String filesPath = '';
 late Map<String, dynamic> configMap;
-String configPath = 'config.json';
+String configPath = './config.json';
 
 void main() async {
   AudioLogger.logLevel = AudioLogLevel.info;
@@ -51,22 +53,17 @@ void main() async {
 }
 
 Future<void> loadConfig(String configPath) async {
-  if (kDebugMode) {
-    debugPrint('Using default configuration from asset directory');
-    loadDefaultConfig();
-  } else {
-    var configFile = await File(configPath).exists();
-    if (!configFile) {
-      debugPrint("Creating default configuration file");
-      await initializeConfigFile(configPath);
-    }
-    debugPrint('Loading configuration file');
-    try {
-      await loadConfigFromFile(configPath);
-    } catch (e) {
-      debugPrint('$e');
-      await loadDefaultConfig();
-    }
+  var configFile = await File(configPath).exists();
+  if (!configFile) {
+    debugPrint("Using default configuration");
+    await initializeMediaDirectory(filesPath);
+    return;
+  }
+  try {
+    debugPrint('Loading configuration file $configPath');
+    await loadConfigFromFile(configPath);
+  } catch (e) {
+    debugPrint('$e');
   }
 }
 
@@ -76,37 +73,36 @@ Future<void> loadConfigFromFile(String configPath) async {
   paletteCount = configMap['paletteCount'];
   appTitle = configMap['appTitle'];
   playerCount = configMap['playerCount'];
-  filesPath = configMap['filesPath'];
+  if (configMap.containsKey('filesPath')) {
+    debugPrint("Found media directory in config file");
+    filesPath = configMap['filesPath'];
+  }
   await initializeMediaDirectory(filesPath);
-}
-
-Future<void> loadDefaultConfig() async {
-  await GlobalConfiguration().loadFromAsset("default_config.json");
-  appTitle = GlobalConfiguration().getValue("appTitle");
-  playerCount = GlobalConfiguration().getValue("playerCount");
-  paletteCount = GlobalConfiguration().getValue("paletteCount");
-  filesPath = GlobalConfiguration().getValue("filesPath");
-  await initializeMediaDirectory(filesPath);
-}
-
-Future<void> initializeConfigFile(String configPath) async {
-  debugPrint('Creating default configuration file');
-  ByteData configAssetData = await rootBundle.load(
-    'assets/cfg/default_config.json',
-  );
-  List<int> bytes = configAssetData.buffer.asUint8List();
-  await File(configPath).create();
-  await File(configPath).writeAsBytes(bytes);
-  debugPrint('Config file created in $configPath');
 }
 
 Future<void> initializeMediaDirectory(String mediaPath) async {
-  debugPrint("Creating media directory");
-  try {
-    await Directory(mediaPath).create(recursive: true);
-  } catch (e) {
-    debugPrint("An error occured when initializing media directory: $e");
+  bool mediaDirExists;
+  String createPath;
+  final appDocsDir = await getApplicationSupportDirectory();
+  if (mediaPath != '') {
+    debugPrint(
+      "Initializing media directory in the configured location $mediaPath",
+    );
+    createPath = mediaPath;
+  } else {
+    debugPrint("Initializing media directory in the default location");
+    createPath = path.join(appDocsDir.path, "media");
   }
+  mediaDirExists = await Directory(createPath).exists();
+  if (!mediaDirExists) {
+    debugPrint("Creating media directory $createPath");
+    try {
+      await Directory(createPath).create(recursive: true);
+    } catch (e) {
+      debugPrint("An error occured when initializing media directory: $e");
+    }
+  }
+  debugPrint("Media directory available");
 }
 
 class JinglePlayer extends StatelessWidget {
@@ -209,7 +205,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   Future<void> initializePlayers() async {
     audioPlayer = Provider.of<AudioHandler>(context, listen: false);
-    await audioPlayer.initialize(playerCount, paletteCount);
+    await audioPlayer.initialize(playerCount, paletteCount, filesPath);
     await audioPlayer.getPalette(audioPlayer.activePalette);
   }
 
