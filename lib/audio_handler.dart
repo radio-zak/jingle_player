@@ -35,7 +35,7 @@ class AudioHandler extends ChangeNotifier {
   int palettes = 4;
   int activePalette = 0;
   bool paletteLoading = false;
-  String filesPath = path.absolute("./media");
+  String filesPath = "";
   late SharedPreferencesAsync localStorage;
 
   bool toolbarActive = false;
@@ -78,7 +78,11 @@ class AudioHandler extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> initialize(int playerCount, int paletteCount) async {
+  Future<void> initialize(
+    int playerCount,
+    int paletteCount,
+    String mediaDir,
+  ) async {
     localStorage = await SharedPreferencesAsync();
     List.generate(playerCount, (index) {
       sourceMap.addAll({index: null});
@@ -87,6 +91,7 @@ class AudioHandler extends ChangeNotifier {
       return index;
     });
     palettes = paletteCount;
+    filesPath = mediaDir;
   }
 
   Future<void> setButtonSource(int index) async {
@@ -99,9 +104,7 @@ class AudioHandler extends ChangeNotifier {
         path.canonicalize(path.absolute(filesPath)),
         path.split(result.paths.first!).last,
       );
-      final sourceFileName = path.basename(fileLocation);
       final pickedFile = await File(result.paths.first!).resolveSymbolicLinks();
-      final destinationFileName = path.basename(pickedFile);
       var existingFile = await File(fileLocation).exists();
       if (!existingFile) {
         debugPrint(
@@ -130,6 +133,7 @@ class AudioHandler extends ChangeNotifier {
             style: ToastificationStyle.minimal,
             alignment: Alignment.topLeft,
           );
+          playerLoading[index] = false;
         }
         playerLoading[index] = false;
       } else {
@@ -327,15 +331,34 @@ class AudioHandler extends ChangeNotifier {
         sourceMap.addAll({i: null});
         durationMap.addAll({i: ''});
       } else {
-        sourceMap.addAll({i: DeviceFileSource(decodedMap[i])});
-        final wav = await Wav.readFile(decodedMap[i]);
-        durationMap.addAll({
-          i: Duration(seconds: wav.duration.toInt()).toString(),
-        });
+        final existFileCheck = await File(decodedMap[i]).exists();
+        if (!existFileCheck) {
+          toastification.show(
+            type: ToastificationType.error,
+            title: Text(
+              "File in the saved palette does not exist in the media directory",
+            ),
+            description: Text(decodedMap[i]),
+            alignment: Alignment.topLeft,
+          );
+          sourceMap.addAll({i: null});
+          durationMap.addAll({i: ''});
+        } else {
+          sourceMap.addAll({i: DeviceFileSource(decodedMap[i])});
+          final wav = await Wav.readFile(decodedMap[i]);
+          durationMap.addAll({
+            i: Duration(seconds: wav.duration.toInt()).toString(),
+          });
+        }
       }
     }
     for (var i = 0; i < decodedTitles.length; i++) {
-      titleMap.addAll({i: decodedTitles[i]});
+      final existFileCheck = await File(decodedMap[i]).exists();
+      if (!existFileCheck) {
+        titleMap.addAll({i: 'No file selected'});
+      } else {
+        titleMap.addAll({i: decodedTitles[i]});
+      }
     }
     paletteLoading = false;
     notifyListeners();
