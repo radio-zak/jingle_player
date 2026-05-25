@@ -36,19 +36,31 @@ class StatusBar extends StatelessWidget {
                       : 0.0,
                 ),
               ),
-              Row(
-                spacing: 16,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    player.playerPositionString,
-                    style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                  ),
-                  Text(
-                    player.playerDurationString,
-                    style: const TextStyle(fontSize: 16.0, color: Colors.white),
-                  ),
-                ],
+              IntrinsicHeight(
+                child: Row(
+                  spacing: 16,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text(
+                      player.playerPositionString,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    player.sourceFileParsed != null
+                        ? Center(
+                            child: VerticalDivider(
+                              color: Colors.white,
+                              // thickness: 2,
+                              // width: 4,
+                            ),
+                          )
+                        : Container(),
+                    Text(
+                      player.playerDurationString,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
