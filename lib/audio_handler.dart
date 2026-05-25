@@ -190,7 +190,7 @@ class AudioHandler extends ChangeNotifier {
 
   void initStreams() {
     _durationSubscription = audioPlayer.onDurationChanged.listen((duration) {
-      logger.i('got duration: $duration');
+      logger.d('got duration: $duration');
       playerDuration = duration;
       playerDurationString = parseDuration(duration);
       notifyListeners();
