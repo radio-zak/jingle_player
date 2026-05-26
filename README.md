@@ -11,9 +11,11 @@ This application stores its main configuration in a `config.json` file stored in
 - `appTitle` (string): the title of the application, shown on the top bar. Defaults to "Jingle Player".
 - `playerCount` (int): the number of jingle slots shown in app. Maximum supported number is 16. Defaults to 16.
 - `paletteCount` (int): the number of user-configurable jingle palettes. Maximum supported number is 8. Defaults to 16.
-- `mediaDir` (string): the directory where media files for playout are stored. Defaults to ApplicationSupport directory for each platform (`AppData\Roadming` for Windows, `/.local/share` for Linux)
+- `mediaDir` (string): the directory where media files for playout are stored. Defaults to ApplicationSupport directory for each platform (`AppData\Roadming` for Windows, `/.local/share` for Linux). WARNING - remember to escape backslashes on Windows (so for example for path `C:\media` the resulting entry should be `C:\\media`).
 - `logDir` (string): the directory for log files. Defaults to ApplicationSupport directory.
 - `logLevel` (string): how verbose should the logs be. Supported values are "error", "info" and "debug". Default is info.
+
+Remember to provide paths that are writable by the application without administrative privileges - failure to do so will result in a White Screen of Death on startup.
 
 ## Keyboard shortcuts
 
