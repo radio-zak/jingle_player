@@ -2,5 +2,7 @@
   "appTitle": "Jingle Player",
   "paletteCount": 8,
   "playerCount": 16,
-  "filesPath": "./media"
+  "mediaDir": "./media",
+  "logDir": "./log",
+  "logLevel": "info"
 }
