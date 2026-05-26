@@ -21,6 +21,7 @@ jobs:
 
       - name: Build Windows App
         run: |
+          flutter --version
           flutter config --enable-windows-desktop
           flutter build windows --build-name ${{ github.ref_name }} --build-number ${{ github.run_number }}
 
