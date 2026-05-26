@@ -21,7 +21,7 @@ import 'package:jingle_player/logger.dart';
 String appTitle = "Jingle Player";
 int playerCount = 16;
 int paletteCount = 8;
-String filesPath = '';
+String mediaDir = '';
 late Map<String, dynamic> configMap;
 String configPath = './config.json';
 String logLevel = "info";
@@ -41,7 +41,7 @@ void main() async {
     await windowManager.focus();
   });
   await loadConfig(configPath);
-  await initializeMediaDirectory(filesPath);
+  await initializeMediaDirectory(mediaDir);
   runApp(
     MultiProvider(
       providers: [
@@ -81,9 +81,9 @@ Future<void> loadConfig(String configPath) async {
     playerCount = configMap['playerCount'];
     logger.i("Using configuration from file: $configPath");
     logger.i("Log level: $logLevel. Log dir: $logPath");
-    if (configMap.containsKey('filesPath')) {
-      filesPath = configMap['filesPath'];
-      logger.i("Found media directory in config file: $filesPath");
+    if (configMap.containsKey('mediaDir')) {
+      mediaDir = configMap['mediaDir'];
+      logger.i("Found media directory in config file: $mediaDir");
     }
   }
 }
@@ -100,7 +100,7 @@ Future<void> initializeMediaDirectory(String mediaPath) async {
   } else {
     logger.i("Initializing media directory in the default location");
     createPath = path.join(appDocsDir.path, "media");
-    filesPath = createPath;
+    mediaDir = createPath;
   }
   mediaDirExists = await Directory(createPath).exists();
   if (!mediaDirExists) {
@@ -216,7 +216,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   Future<void> initializePlayers() async {
     audioPlayer = Provider.of<AudioHandler>(context, listen: false);
     logger.i("Initializing audio player");
-    await audioPlayer.initialize(playerCount, paletteCount, filesPath);
+    await audioPlayer.initialize(playerCount, paletteCount, mediaDir);
     await audioPlayer.getPalette(audioPlayer.activePalette);
   }
 
