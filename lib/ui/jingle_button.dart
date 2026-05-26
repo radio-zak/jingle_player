@@ -95,7 +95,7 @@ class JingleSelector extends StatelessWidget {
                             player.paletteLoading
                                 ? 'Loading...'
                                 : player.playerLoading[index]!
-                                ? 'Loading'
+                                ? 'Loading...'
                                 : player.titleMap[index]!,
                             style: TextTheme.of(context).titleLarge,
                           ),
