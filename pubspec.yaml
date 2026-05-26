@@ -35,7 +35,3 @@ inno_bundle:
   publisher: Studenckie Radio ŻAK Politechniki Łódzkiej
   name: Jingle Player
   url: https://github.com/radio_zak/jingle_player
-  files:
-    - path: assets/cfg/default_config_windows.json
-      name: config.json
-      required: true
