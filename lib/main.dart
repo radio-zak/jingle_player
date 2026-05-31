@@ -31,20 +31,23 @@ void main() async {
 
   final FileOperationService fileOps = FileOperationService();
   final ApplicationConfig config = await ApplicationConfig.init(fileOps);
-  final LoggingService logger = LoggingService.initialize(config);
+  final LoggingService logger = await LoggingService.initialize(
+    config,
+    fileOps,
+  );
   await AudioHandler.init(logger, fileOps, config);
 
   AudioLogger.logLevel = AudioLogLevel.error;
 
-  logger.i("Services initialized");
+  logger.print.i("Services initialized");
   try {
     await ApplicationConfig().initializeMediaDirectory();
-    logger.i("Initialized media directory");
+    logger.print.i("Initialized media directory");
   } catch (e) {
-    logger.e("Error initializing media directory: $e");
+    logger.print.e("Error initializing media directory: $e");
   }
 
-  logger.i(
+  logger.print.i(
     "Using configuration: players: ${config.players}, palettes: ${config.palettes}, media directory: ${config.mediaDir}, log level: ${config.logLevel}, log path: ${config.logPath} ",
   );
 
@@ -242,10 +245,10 @@ class ButtonPressAction extends Action<ButtonPressHandler> {
   @override
   Future<void> invoke(ButtonPressHandler intent) async {
     if (audioHandler.sourceMap[intent.index] == null) {
-      logger.d('$intent.index');
-      logger.d('tried to activate empty source');
+      logger.print.d('$intent.index');
+      logger.print.d('tried to activate empty source');
     } else if (audioHandler.editMode) {
-      // logger.d('button in edit mode - not playing');
+      // logger.print.d('button in edit mode - not playing');
     } else {
       await audioHandler.stop();
       await audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);

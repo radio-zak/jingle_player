@@ -1,49 +1,13 @@
 import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:jingle_player/config.dart";
+import "package:jingle_player/file_ops.dart";
 import "package:logger/logger.dart";
 import "package:path/path.dart" as path;
 
-class LoggingService extends Logger {
-  final ApplicationConfig config;
-  final String logLevel;
-  final String logPath;
-  LoggingService.internal({
-    required this.config,
-    required this.logPath,
-    required this.logLevel,
-  }) {
-    if (kReleaseMode) {
-      Logger(
-        filter: ProductionFilter(),
-        printer: PrettyPrinter(
-          methodCount: 0,
-          dateTimeFormat: DateTimeFormat.dateAndTime,
-          noBoxingByDefault: true,
-          printEmojis: false,
-        ),
-        output: MultiOutput([
-          FileOutput(
-            file: File(path.join(logPath, 'player.log')),
-            overrideExisting: true,
-          ),
-          ConsoleOutput(),
-        ]),
-      );
-    } else {
-      Logger(
-        filter: DevelopmentFilter(),
-        printer: PrettyPrinter(
-          methodCount: 0,
-          dateTimeFormat: DateTimeFormat.dateAndTime,
-          noBoxingByDefault: true,
-          printEmojis: false,
-        ),
-        output: ConsoleOutput(),
-      );
-    }
-    Logger.level = Level.values.byName(logLevel);
-  }
+class LoggingService {
+  Logger print;
+  LoggingService.internal({required this.print});
 
   static LoggingService? _instance;
 
@@ -56,13 +20,46 @@ class LoggingService extends Logger {
     return _instance!;
   }
 
-  static LoggingService initialize(ApplicationConfig config) {
+  static Future<LoggingService> initialize(
+    ApplicationConfig config,
+    FileOperationService fileOps,
+  ) async {
     if (_instance != null) return _instance!;
 
+    await fileOps.createDir(config.logPath!);
+
+    Logger defaultLogSettings = Logger(
+      filter: DevelopmentFilter(),
+      level: Level.values.byName(config.logLevel!),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        dateTimeFormat: DateTimeFormat.dateAndTime,
+        noBoxingByDefault: true,
+        printEmojis: false,
+      ),
+      output: ConsoleOutput(),
+    );
+
+    Logger productionLogSettings = Logger(
+      filter: ProductionFilter(),
+      level: Level.values.byName(config.logLevel!),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        dateTimeFormat: DateTimeFormat.dateAndTime,
+        noBoxingByDefault: true,
+        printEmojis: false,
+      ),
+      output: MultiOutput([
+        FileOutput(
+          file: File(path.join(config.logPath!, 'player.log')),
+          overrideExisting: true,
+        ),
+        ConsoleOutput(),
+      ]),
+    );
+
     _instance = LoggingService.internal(
-      config: config,
-      logPath: config.logPath!,
-      logLevel: config.logLevel!,
+      print: kReleaseMode ? productionLogSettings : defaultLogSettings,
     );
     return _instance!;
   }
