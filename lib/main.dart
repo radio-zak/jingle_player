@@ -2,33 +2,21 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jingle_player/ui/jingle_grid.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/audio_handler.dart';
 import 'package:jingle_player/ui/top_bar.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:jingle_player/ui/player_section.dart';
 import 'package:jingle_player/ui/toolbar.dart';
-import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
-import 'package:path/path.dart' as path;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/gestures.dart';
 import 'package:toastification/toastification.dart';
 import 'package:jingle_player/logger.dart';
-
-String appTitle = "Jingle Player";
-int playerCount = 16;
-int paletteCount = 8;
-String mediaDir = '';
-late Map<String, dynamic> configMap;
-String configPath = './config.json';
-String logLevel = "info";
-late String logPath;
+import 'package:jingle_player/config.dart';
+import 'package:jingle_player/file_ops.dart';
 
 void main() async {
-  AudioLogger.logLevel = AudioLogLevel.error;
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
@@ -40,13 +28,34 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
-  await loadConfig(configPath);
-  await initializeMediaDirectory(mediaDir);
+
+  final FileOperationService fileOps = FileOperationService();
+  final ApplicationConfig config = await ApplicationConfig.init(fileOps);
+  final LoggingService logger = LoggingService.initialize(config);
+  await AudioHandler.init(logger, fileOps, config);
+
+  AudioLogger.logLevel = AudioLogLevel.error;
+
+  logger.i("Services initialized");
+  try {
+    await ApplicationConfig().initializeMediaDirectory();
+    logger.i("Initialized media directory");
+  } catch (e) {
+    logger.e("Error initializing media directory: $e");
+  }
+
+  logger.i(
+    "Using configuration: players: ${config.players}, palettes: ${config.palettes}, media directory: ${config.mediaDir}, log level: ${config.logLevel}, log path: ${config.logPath} ",
+  );
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AudioHandler>(
           create: (context) => AudioHandler(),
+        ),
+        ChangeNotifierProvider<ApplicationConfig>(
+          create: (context) => ApplicationConfig(),
         ),
       ],
       child: const JinglePlayer(),
@@ -54,71 +63,12 @@ void main() async {
   );
 }
 
-Future<void> loadConfig(String configPath) async {
-  var configFile = await File(configPath).exists();
-  final appDocsDir = await getApplicationSupportDirectory();
-  logPath = appDocsDir.path;
-  if (!configFile) {
-    await initializeLogger(logPath, logLevel).then((_) {
-      logger.i("Using default configuration");
-      logger.i("Log level: $logLevel. Log dir: $logPath");
-    });
-  } else {
-    var appConfig = await File(configPath).readAsString();
-    Map<String, dynamic> configMap = await jsonDecode(appConfig);
-    if (configMap.containsKey('logLevel')) {
-      logLevel = configMap['logLevel'];
-    }
-    if (configMap.containsKey('logPath')) {
-      logPath = configMap['logPath'];
-    }
-    if (logPath == "") {
-      logPath = appDocsDir.path;
-    }
-    await initializeLogger(logPath, logLevel);
-    paletteCount = configMap['paletteCount'];
-    appTitle = configMap['appTitle'];
-    playerCount = configMap['playerCount'];
-    logger.i("Using configuration from file: $configPath");
-    logger.i("Log level: $logLevel. Log dir: $logPath");
-    if (configMap.containsKey('mediaDir')) {
-      mediaDir = configMap['mediaDir'];
-      logger.i("Found media directory in config file: $mediaDir");
-    }
-  }
-}
-
-Future<void> initializeMediaDirectory(String mediaPath) async {
-  bool mediaDirExists;
-  String createPath;
-  final appDocsDir = await getApplicationSupportDirectory();
-  if (mediaPath != '') {
-    logger.i(
-      "Initializing media directory in the configured location $mediaPath",
-    );
-    createPath = mediaPath;
-  } else {
-    logger.i("Initializing media directory in the default location");
-    createPath = path.join(appDocsDir.path, "media");
-    mediaDir = createPath;
-  }
-  mediaDirExists = await Directory(createPath).exists();
-  if (!mediaDirExists) {
-    logger.i("Creating media directory $createPath");
-    logger.i("Creating media directory $createPath");
-    try {
-      await Directory(createPath).create(recursive: true);
-    } catch (e) {
-      logger.e("An error occured when initializing media directory: $e");
-    }
-  }
-  logger.i("Media directory available: $createPath");
-}
-
 class JinglePlayer extends StatelessWidget {
   const JinglePlayer({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final config = context.read<ApplicationConfig>();
     final surfaceColor = Color.fromARGB(255, 34, 34, 34);
     final primaryColor = Colors.teal;
     final primaryDimmedColor = Color.fromARGB(255, 54, 54, 54);
@@ -126,7 +76,7 @@ class JinglePlayer extends StatelessWidget {
     final textGreyedColor = Color(0xFFBBBBBB);
     return ToastificationWrapper(
       child: MaterialApp(
-        title: appTitle,
+        title: config.appTitle,
         scrollBehavior: PlayerScrollBehavior(),
         theme: ThemeData(
           appBarTheme: AppBarThemeData(
@@ -187,7 +137,7 @@ class JinglePlayer extends StatelessWidget {
             bodySmall: GoogleFonts.sora(),
           ),
         ),
-        home: HomePage(title: appTitle),
+        home: HomePage(title: config.appTitle),
       ),
     );
   }
@@ -203,21 +153,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WindowListener {
   late AudioHandler audioPlayer;
+  final config = ApplicationConfig();
+  LoggingService logger = LoggingService();
 
   @override
   void initState() {
-    initializePlayers();
     setState(() {
       super.initState();
       windowManager.addListener(this);
     });
-  }
-
-  Future<void> initializePlayers() async {
-    audioPlayer = Provider.of<AudioHandler>(context, listen: false);
-    logger.i("Initializing audio player");
-    await audioPlayer.initialize(playerCount, paletteCount, mediaDir);
-    await audioPlayer.getPalette(audioPlayer.activePalette);
   }
 
   @override
@@ -227,6 +171,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    final config = context.read<ApplicationConfig>();
     final _audioPlayer = Provider.of<AudioHandler>(context, listen: true);
     return Shortcuts(
       shortcuts: {
@@ -234,10 +179,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
         SingleActivator(LogicalKeyboardKey.escape): PlayerStopIntent(),
         SingleActivator(LogicalKeyboardKey.keyE, control: true):
             EditModeHandler(),
-        for (MapEntry<int, LogicalKeyboardKey> k in _audioPlayer.keyMap.entries)
+        for (MapEntry<int, LogicalKeyboardKey> k in config.keyMap.entries)
           SingleActivator(k.value): ButtonPressHandler(index: k.key),
         for (MapEntry<int, LogicalKeyboardKey> k
-            in _audioPlayer.paletteKeyMap.entries)
+            in config.paletteKeyMap.entries)
           SingleActivator(k.value, control: true): PaletteSelectHandler(
             index: k.key,
           ),
@@ -259,7 +204,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
             ),
             body: Stack(
               children: [
-                Center(child: JingleGrid(playerCount: playerCount)),
+                Center(child: JingleGrid(playerCount: config.players)),
                 Consumer<AudioHandler>(
                   builder: (context, player, child) {
                     switch (player.toolbarActive) {
@@ -290,6 +235,7 @@ class ButtonPressHandler extends Intent {
 
 class ButtonPressAction extends Action<ButtonPressHandler> {
   AudioHandler audioHandler;
+  LoggingService logger = LoggingService();
 
   ButtonPressAction({required this.audioHandler});
 
@@ -299,7 +245,7 @@ class ButtonPressAction extends Action<ButtonPressHandler> {
       logger.d('$intent.index');
       logger.d('tried to activate empty source');
     } else if (audioHandler.editMode) {
-      logger.d('button in edit mode - not playing');
+      // logger.d('button in edit mode - not playing');
     } else {
       await audioHandler.stop();
       await audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);

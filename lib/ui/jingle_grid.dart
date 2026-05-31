@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jingle_player/config.dart';
 import 'package:jingle_player/ui/jingle_button.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/audio_handler.dart';
@@ -25,7 +26,7 @@ class JingleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _audioPlayer = Provider.of<AudioHandler>(context, listen: true);
+    final _config = Provider.of<ApplicationConfig>(context, listen: true);
     return Stack(
       children: [
         SingleChildScrollView(
@@ -54,7 +55,7 @@ class JingleGrid extends StatelessWidget {
                         index: index,
                         onPressedAction: () async =>
                             handleButtonClick(context, index),
-                        keybind: _audioPlayer.keyMap[index]!.keyLabel,
+                        keybind: _config.keyMap[index]!.keyLabel,
                       ),
                     );
                   }),

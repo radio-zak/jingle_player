@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
@@ -9,8 +8,9 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
-import 'package:wav/wav.dart';
 import 'package:jingle_player/logger.dart';
+import 'package:jingle_player/config.dart';
+import 'package:jingle_player/file_ops.dart';
 
 class AudioHandler extends ChangeNotifier {
   DeviceFileSource? sourceFile;
@@ -33,85 +33,89 @@ class AudioHandler extends ChangeNotifier {
 
   AudioCache audioCache = AudioCache.instance = AudioCache();
   bool editMode = false;
-  int palettes = 4;
   int activePalette = 0;
   bool paletteLoading = false;
-  String filesPath = "";
-  late SharedPreferencesWithCache localStorage;
+  SharedPreferencesWithCache localStorage;
 
   bool toolbarActive = false;
 
-  final keyMap = {
-    0: LogicalKeyboardKey.digit1,
-    1: LogicalKeyboardKey.digit2,
-    2: LogicalKeyboardKey.digit3,
-    3: LogicalKeyboardKey.digit4,
-    4: LogicalKeyboardKey.digit5,
-    5: LogicalKeyboardKey.digit6,
-    6: LogicalKeyboardKey.digit7,
-    7: LogicalKeyboardKey.digit8,
-    8: LogicalKeyboardKey.digit9,
-    9: LogicalKeyboardKey.digit0,
-    10: LogicalKeyboardKey.minus,
-    11: LogicalKeyboardKey.equal,
-    12: LogicalKeyboardKey.keyQ,
-    13: LogicalKeyboardKey.keyW,
-    14: LogicalKeyboardKey.keyE,
-    15: LogicalKeyboardKey.keyR,
-  };
-  final paletteKeyMap = {
-    0: LogicalKeyboardKey.digit1,
-    1: LogicalKeyboardKey.digit2,
-    2: LogicalKeyboardKey.digit3,
-    3: LogicalKeyboardKey.digit4,
-    4: LogicalKeyboardKey.digit5,
-    5: LogicalKeyboardKey.digit6,
-    6: LogicalKeyboardKey.digit7,
-    7: LogicalKeyboardKey.digit8,
-  };
+  LoggingService logger;
+  ApplicationConfig config;
+  FileOperationService fileOps;
+
   Map<int, DeviceFileSource?> sourceMap = <int, DeviceFileSource?>{};
   Map<int, String> titleMap = {};
   Map<int, String> durationMap = {};
   Map<int, bool> playerLoading = {};
+
+  AudioHandler.internal({
+    required this.logger,
+    required this.config,
+    required this.fileOps,
+    required this.localStorage,
+    required this.sourceMap,
+    required this.titleMap,
+    required this.playerLoading,
+  }) {
+    getPalette(0);
+  }
+
+  static AudioHandler? _instance;
+
+  factory AudioHandler() {
+    if (_instance == null) {
+      throw StateError(
+        'AppConfig must be initialized by calling await AppConfig.init() before use.',
+      );
+    }
+    return _instance!;
+  }
+
+  static Future<AudioHandler> init(logger, fileOps, config) async {
+    if (_instance != null) return _instance!;
+
+    Map<int, DeviceFileSource?> sourceMap = <int, DeviceFileSource?>{};
+    Map<int, String> titleMap = {};
+    Map<int, bool> playerLoading = {};
+    SharedPreferencesWithCache localStorage;
+    localStorage = await SharedPreferencesWithCache.create(
+      cacheOptions: SharedPreferencesWithCacheOptions(),
+    );
+    List.generate(config.players, (index) {
+      sourceMap.addAll({index: null});
+      titleMap.addAll({index: 'No file selected'});
+      playerLoading.addAll({index: false});
+      return index;
+    });
+    logger.i(
+      "Initialized audio player with params: playerCount: ${config.players}, paletteCount: ${config.palettes}, mediaDir: ${config.mediaDir}",
+    );
+    _instance = AudioHandler.internal(
+      logger: logger,
+      fileOps: fileOps,
+      config: config,
+      localStorage: localStorage,
+      sourceMap: sourceMap,
+      titleMap: titleMap,
+      playerLoading: playerLoading,
+    );
+    return _instance!;
+  }
 
   void toggleToolbar() {
     toolbarActive = !toolbarActive;
     notifyListeners();
   }
 
-  Future<void> initialize(
-    int playerCount,
-    int paletteCount,
-    String mediaDir,
-  ) async {
-    localStorage = await SharedPreferencesWithCache.create(
-      cacheOptions: SharedPreferencesWithCacheOptions(),
-    );
-    List.generate(playerCount, (index) {
-      sourceMap.addAll({index: null});
-      titleMap.addAll({index: 'No file selected'});
-      playerLoading.addAll({index: false});
-      return index;
-    });
-    palettes = paletteCount;
-    filesPath = mediaDir;
-    logger.i(
-      "Initialized audio player with params: playerCount: $playerCount, paletteCount: $paletteCount, mediaDir: $mediaDir",
-    );
-  }
-
   Future<void> setButtonSource(int index) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: ['wav'],
-      type: FileType.custom,
-    );
+    final result = await fileOps.pickFileFromDisk();
     if (result != null) {
       final fileLocation = path.join(
-        path.canonicalize(path.absolute(filesPath)),
+        path.canonicalize(path.absolute(config.mediaDir!)),
         path.split(result.paths.first!).last,
       );
       final pickedFile = await File(result.paths.first!).resolveSymbolicLinks();
-      var existingFile = await File(fileLocation).exists();
+      final existingFile = await fileOps.checkFileExists(fileLocation);
       if (!existingFile) {
         logger.i("Selected file does not exist in media directory, copying...");
         toastification.show(
@@ -126,9 +130,7 @@ class AudioHandler extends ChangeNotifier {
         playerLoading[index] = true;
         notifyListeners();
         try {
-          await Isolate.run(() async {
-            await File(pickedFile).copy(fileLocation);
-          });
+          await fileOps.copyFile(pickedFile, fileLocation);
         } catch (e) {
           logger.e('$e');
           toastification.show(
@@ -160,10 +162,7 @@ class AudioHandler extends ChangeNotifier {
       }
       sourceMap[index] = DeviceFileSource(fileLocation, mimeType: 'audio/wav');
       titleMap[index] = result.names.first!.split('.').first;
-      final duration = await Isolate.run(() async {
-        final wav = await Wav.readFile(fileLocation);
-        return wav.duration.toInt();
-      });
+      final duration = await fileOps.calculateDurationFromWav(fileLocation);
       durationMap[index] = Duration(seconds: duration).toString();
       playerLoading[index] = false;
     }
@@ -359,10 +358,9 @@ class AudioHandler extends ChangeNotifier {
           durationMap.addAll({i: ''});
         } else {
           sourceMap.addAll({i: DeviceFileSource(decodedMap[i])});
-          final duration = await Isolate.run(() async {
-            final wav = await Wav.readFile(decodedMap[i]);
-            return wav.duration.toInt();
-          });
+          final duration = await fileOps.calculateDurationFromWav(
+            decodedMap[i],
+          );
           durationMap.addAll({i: Duration(seconds: duration).toString()});
         }
       }

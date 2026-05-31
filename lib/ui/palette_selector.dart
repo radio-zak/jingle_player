@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jingle_player/config.dart';
 import 'package:provider/provider.dart';
 import 'package:jingle_player/ui/action_button.dart';
 import 'package:jingle_player/audio_handler.dart';
@@ -8,6 +9,7 @@ class PaletteSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final config = Provider.of<ApplicationConfig>(context, listen: true);
     return Flexible(
       fit: FlexFit.tight,
       child: Consumer<AudioHandler>(
@@ -40,7 +42,7 @@ class PaletteSelector extends StatelessWidget {
                   ),
                   enableSplash: false, // makes children clickable
                   scrollDirection: Axis.horizontal,
-                  children: List.generate(player.palettes, (int index) {
+                  children: List.generate(config.palettes, (int index) {
                     final buttonLabel = (index + 1).toString();
                     return ActionButton(
                       tooltipMessage: player.editMode
