@@ -5,7 +5,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:intl/intl.dart';
 
 class TimeRemainingClock extends StatelessWidget {
-  const TimeRemainingClock({super.key});
+  TimeRemainingClock({super.key});
+
+  String calculateEndTime(Duration fileDuration) {
+    return DateFormat.Hms().format(DateTime.now().add(fileDuration));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,7 @@ class TimeRemainingClock extends StatelessWidget {
               return Flex(
                 direction: Axis.vertical,
                 mainAxisSize: MainAxisSize.min,
+                spacing: 2,
                 children: [
                   Flexible(
                     flex: 1,
@@ -46,8 +51,8 @@ class TimeRemainingClock extends StatelessWidget {
                     child: Text(
                       player.audioPlayer.state != PlayerState.playing
                           ? Duration.zero.toString().split('.').first
-                          : 'placeholder',
-                      style: Theme.of(context).textTheme.displaySmall,
+                          : calculateEndTime(player.timeRemaining),
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                   ),
                 ],
