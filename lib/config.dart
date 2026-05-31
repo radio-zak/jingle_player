@@ -34,6 +34,9 @@ class ApplicationConfig extends ChangeNotifier {
 
   static ApplicationConfig? _instance;
 
+  @visibleForTesting
+  static void reset() => _instance = null;
+
   factory ApplicationConfig() {
     if (_instance == null) {
       throw StateError(
@@ -79,9 +82,13 @@ class ApplicationConfig extends ChangeNotifier {
     final String defaultAppTitle = "Jingle Player ";
     final int defaultPaletteCount = 8;
     final int defaultPlayerCount = 16;
-    final String defaultMediaDir = path.join(appDocsDir.path, "./media");
+    final String defaultMediaDir = path.normalize(
+      path.join(appDocsDir.path, "./media"),
+    );
     final String defaultLogLevel = "info";
-    final String defaultLogPath = path.join(appDocsDir.path, "./log");
+    final String defaultLogPath = path.normalize(
+      path.join(appDocsDir.path, "./log"),
+    );
 
     var configExists = await fileOps.checkFileExists("./config.json");
     if (!configExists) {
