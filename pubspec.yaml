@@ -20,6 +20,7 @@ dependencies:
   google_fonts: ^8.0.2
   toastification: ^3.2.0
   logger: ^2.7.0
+  mocktail: ^1.0.5
 dev_dependencies:
   flutter_test:
     sdk: "flutter"
