@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./pb";
+
+service AudioService {
+    rpc StreamPlaybackStatus (StatusRequest) returns (stream AudioStatus);
+    rpc TriggerCommand (CommandRequest) returns (ActionResponse);
+}
+
+message StatusRequest {}
+
+message AudioStatus {
+    int32 active_slot = 1;
+    string state = 2;
+    double time_remaining_seconds = 3;
+}
+
+message CommandRequest {
+    int32 slot_id = 1;
+    string action = 2;
+}
+
+message ActionResponse {
+    bool success = 1;
+    string message = 2;
+}
+
