@@ -5,7 +5,7 @@ import "package:path_provider/path_provider.dart";
 import "package:path/path.dart" as path;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jingle_player/file_ops.dart';
+import 'file_ops.dart';
 
 class ApplicationConfig extends ChangeNotifier {
   String configFilePath = "./config.json";

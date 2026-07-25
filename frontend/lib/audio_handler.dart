@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:jingle_player/control/control.pbgrpc.dart';
+import 'package:jingle_player/grpc.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
@@ -7,9 +9,9 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
-import 'package:jingle_player/logger.dart';
-import 'package:jingle_player/config.dart';
-import 'package:jingle_player/file_ops.dart';
+import 'logger.dart';
+import 'config.dart';
+import 'file_ops.dart';
 
 class AudioHandler extends ChangeNotifier {
   DeviceFileSource? sourceFile;
@@ -221,7 +223,7 @@ class AudioHandler extends ChangeNotifier {
         notifyListeners();
       }
       if (state == PlayerState.completed) {
-        stop();
+        // stop();
         playerPosition = Duration.zero;
         playerPositionString = parseDuration(playerPosition);
       }
@@ -252,30 +254,23 @@ class AudioHandler extends ChangeNotifier {
     logger.print.d('source set!');
   }
 
-  Future<void> play() async {
-    logger.print.d('play invoked');
-    if (sourceFile == null) {
-      logger.print.d('empty source!');
-    } else {
-      await audioPlayer.resume();
-    }
-  }
+  // Future<void> play() async {
+  //   logger.print.d('play invoked');
+  //   final request = CommandRequest(slotId: 0, action: "PLAY");
+  //   server.triggerCommand(request);
+  // }
 
   Future<void> pause() async {
     logger.print.d('pause invoked');
     await audioPlayer.pause();
   }
 
-  Future<void> stop() async {
-    logger.print.d('stop invoked');
-    await audioPlayer.release();
-    sourceFile = null;
-    sourceFileParsed = null;
-    fileDuration = null;
-    playerDurationString = parseDuration(fileDuration);
-    playerPositionString = parseDuration(null);
-    notifyListeners();
-  }
+  // Future<void> stop() async {
+  //   logger.print.d('stop invoked');
+  //   final request = CommandRequest(slotId: 0, action: "STOP");
+  //   server.triggerCommand(request);
+  //   notifyListeners();
+  // }
 
   Future<void> savePalette(int id) async {
     List<String> sourceList = [];
@@ -314,7 +309,7 @@ class AudioHandler extends ChangeNotifier {
   Future<void> getPalette(int id) async {
     paletteLoading = true;
     notifyListeners();
-    await stop();
+    // await stop();
 
     activePalette = id;
     final encodedSourceMap = await localStorage.getString(
@@ -376,5 +371,69 @@ class AudioHandler extends ChangeNotifier {
     }
     paletteLoading = false;
     notifyListeners();
+  }
+}
+
+class AudioProvider extends ChangeNotifier {
+  final GrpcClient client;
+  StreamSubscription<AudioStatus>? audioStatus;
+
+  String playbackStatus = "STOPPED";
+  int activeSlotID = 0;
+  double timeRemaining = 0.0;
+  bool isConnected = false;
+  String? errorMessage;
+
+  AudioProvider(this.client) {
+    connectToBackend();
+  }
+  void connectToBackend() {
+    errorMessage = null;
+    audioStatus?.cancel();
+
+    audioStatus = client.getAudioStatus().listen(
+      (status) {
+        playbackStatus = status.state;
+        activeSlotID = status.activeSlot;
+        timeRemaining = status.timeRemainingSeconds;
+        isConnected = true;
+        notifyListeners();
+      },
+      onError: (error) {
+        isConnected = false;
+        errorMessage = error.toString();
+        notifyListeners();
+      },
+      onDone: () {
+        isConnected = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> play() async {
+    try {
+      final request = CommandRequest(slotId: 0, action: "PLAY");
+      await client.triggerCommand(request);
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> stop() async {
+    try {
+      final request = CommandRequest(slotId: 0, action: "STOP");
+      await client.triggerCommand(request);
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    audioStatus?.cancel();
+    super.dispose();
   }
 }

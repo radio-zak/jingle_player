@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:jingle_player/config.dart';
-import 'package:jingle_player/ui/jingle_button.dart';
+import '../config.dart';
+import 'jingle_button.dart';
 import 'package:provider/provider.dart';
-import 'package:jingle_player/audio_handler.dart';
+import '../audio_handler.dart';
 
 class JingleGrid extends StatelessWidget {
   final int playerCount;
   const JingleGrid({required this.playerCount, super.key});
 
   Future<void> handleButtonClick(BuildContext context, int index) async {
-    final audioHandler = Provider.of<AudioHandler>(context, listen: false);
-    if (audioHandler.paletteLoading) {
-      return;
-    }
-    if (audioHandler.sourceMap[index] == null) {
-      debugPrint('$index');
-      debugPrint('tried to activate empty source');
-    } else if (audioHandler.editMode) {
-      debugPrint('button in edit mode - not playing');
-    } else {
-      await audioHandler.stop();
-      await audioHandler.loadToPlayer(audioHandler.sourceMap[index]!);
-    }
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    return;
+    // if (audioHandler.paletteLoading) {
+    //   return;
+    // }
+    // if (audioHandler.sourceMap[index] == null) {
+    //   debugPrint('$index');
+    //   debugPrint('tried to activate empty source');
+    // } else if (audioHandler.editMode) {
+    //   debugPrint('button in edit mode - not playing');
+    // } else {
+    //   await audioHandler.stop();
+    //   await audioHandler.loadToPlayer(audioHandler.sourceMap[index]!);
+    // }
   }
 
   @override

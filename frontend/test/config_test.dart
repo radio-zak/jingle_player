@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:jingle_player/config.dart';
-import 'package:jingle_player/file_ops.dart';
+import '../lib/config.dart';
+import '../lib/file_ops.dart';
 
 class MockFileOperationService extends Mock implements FileOperationService {}
 

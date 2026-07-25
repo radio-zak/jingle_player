@@ -1,0 +1,16 @@
+info:
+  name: Play slot 0
+  type: grpc
+  seq: 1
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/TriggerCommand
+  methodType: unary
+  protoFilePath: ../control.proto
+  message: |-
+    {
+      "slot_id": 0,
+      "action": "PLAY"
+    }
+  auth: inherit

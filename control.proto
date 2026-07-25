@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./pb";
+
+service AudioService {
+    rpc StreamPlaybackStatus (AudioStatusRequest) returns (stream AudioStatus);
+    rpc PaletteGetCommand (PaletteGetRequest) returns (PaletteGetResponse);
+    rpc PaletteSelectCommand (PaletteSelectRequest) returns (PaletteSelectResponse);
+    rpc PaletteSaveCommand (PaletteSaveRequest) returns (PaletteSaveResponse);
+    rpc PlaybackCommand (PlaybackRequest) returns (PlaybackResponse);
+}
+
+message AudioStatusRequest {}
+
+message AudioStatus {
+    int32 active_slot = 1;
+    string state = 2;
+    double time_remaining_seconds = 3;
+}
+
+message PlaybackRequest {
+    string action = 1;
+}
+
+message PlaybackResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message PaletteGetRequest {}
+
+message PaletteItem {
+    map<int32, string> properties = 1;
+}
+
+message PaletteContents {
+    map<int32, PlayerSlot> properties = 1; 
+}
+
+message AudioFile {
+    int32 id = 1;
+    string file_name = 2;
+    string file_path = 3;
+    double duration = 4;
+}
+
+message PlayerSlot {
+    int32 id = 1;
+    AudioFile file = 2;
+    bool is_active = 3;
+}
+
+message PaletteGetResponse {
+    bool success = 1;
+    string message = 2;
+    repeated PaletteItem palettes = 3;
+}
+
+message PaletteSelectRequest {
+    int32 id = 1;
+}
+
+message PaletteSelectResponse {
+    bool success = 1;
+    string message = 2;
+    PaletteItem palette = 3;
+}

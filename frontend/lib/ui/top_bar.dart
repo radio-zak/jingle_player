@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jingle_player/ui/date_display.dart';
-import 'package:jingle_player/ui/clock.dart';
-import 'package:jingle_player/ui/time_remaining.dart';
+import 'date_display.dart';
+import 'clock.dart';
+import 'time_remaining.dart';
 
 class TopBar extends StatelessWidget {
   final String title;

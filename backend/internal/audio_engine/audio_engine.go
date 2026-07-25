@@ -27,11 +27,16 @@ type Player struct {
 }
 
 type PlayerSlot struct {
+	ID        int32
+	AudioFile AudioFile
+	IsActive  bool
+}
+
+type AudioFile struct {
 	ID       int32
 	FileName string
 	FilePath string
 	Duration time.Duration
-	IsActive bool
 }
 
 type PlaybackState string
@@ -63,9 +68,7 @@ func InitPlayer() (*Player, error) {
 		p.slots[id] = &PlayerSlot{ID: id}
 	}
 
-	p.slots[0] = &PlayerSlot{ID: 0,
-		FileName: "test",
-		FilePath: "/home/kzielinski/Studio/Projects/Spaghet/170847__eliasheuninck__steam-train-horn-03.wav"}
+	p.slots[0] = &PlayerSlot{ID: 0, AudioFile: AudioFile{ID: 0, FileName: "test", FilePath: "/home/kzielinski/Studio/Projects/Spaghet/170847__eliasheuninck__steam-train-horn-03.wav"}}
 
 	go p.broadcastPlayerState()
 	return p, nil
@@ -153,7 +156,7 @@ func (p *Player) PlayAudio(slotID int32) error {
 
 func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	slot := *p.slots[slotID]
-	f, err := os.Open(slot.FilePath)
+	f, err := os.Open(slot.AudioFile.FilePath)
 	if err != nil {
 		fmt.Printf("Failed to load file from disk.")
 		return err

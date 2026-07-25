@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jingle_player/audio_handler.dart';
+import '../audio_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:intl/intl.dart';

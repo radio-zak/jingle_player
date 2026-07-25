@@ -1,0 +1,12 @@
+info:
+  name: StreamStatus
+  type: grpc
+  seq: 2
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/StreamPlaybackStatus
+  methodType: server-streaming
+  protoFilePath: ../control.proto
+  message: "{}"
+  auth: inherit

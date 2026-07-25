@@ -1,7 +1,7 @@
-import 'package:jingle_player/audio_handler.dart';
+import '../audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:jingle_player/ui/action_button.dart';
+import 'action_button.dart';
 
 class Toolbar extends StatelessWidget {
   @override

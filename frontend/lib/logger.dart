@@ -1,7 +1,7 @@
 import "dart:io";
 import "package:flutter/foundation.dart";
-import "package:jingle_player/config.dart";
-import "package:jingle_player/file_ops.dart";
+import "config.dart";
+import "file_ops.dart";
 import "package:logger/logger.dart";
 import "package:path/path.dart" as path;
 

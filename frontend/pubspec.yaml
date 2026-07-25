@@ -21,6 +21,8 @@ dependencies:
   toastification: ^3.2.0
   logger: ^2.7.0
   mocktail: ^1.0.5
+  grpc: ^5.1.0
+  protobuf: ^6.0.0
 dev_dependencies:
   flutter_test:
     sdk: "flutter"
@@ -28,8 +30,6 @@ dev_dependencies:
   inno_bundle: ^0.11.2
 flutter:
   uses-material-design: true
-  assets:
-    - "assets/cfg/default_config.json"
 
 inno_bundle:
   id: 5f7bc030-46fa-11f1-89fe-17938c56c899
