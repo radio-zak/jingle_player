@@ -1,0 +1,14 @@
+info:
+  name: ListPalettes
+  type: grpc
+  seq: 3
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/ListPalettes
+  methodType: unary
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: "{}"
+  auth: inherit

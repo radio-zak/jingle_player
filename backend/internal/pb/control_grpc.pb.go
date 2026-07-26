@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.19.6
-// source: internal/pb/control.proto
+// source: control.proto
 
 package pb
 
@@ -19,16 +19,40 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AudioService_StreamPlaybackStatus_FullMethodName = "/pb.AudioService/StreamPlaybackStatus"
-	AudioService_TriggerCommand_FullMethodName       = "/pb.AudioService/TriggerCommand"
+	AudioService_StreamPlaybackStatus_FullMethodName      = "/pb.AudioService/StreamPlaybackStatus"
+	AudioService_PlaybackCommand_FullMethodName           = "/pb.AudioService/PlaybackCommand"
+	AudioService_ListPalettes_FullMethodName              = "/pb.AudioService/ListPalettes"
+	AudioService_GetPalette_FullMethodName                = "/pb.AudioService/GetPalette"
+	AudioService_UpdatePalette_FullMethodName             = "/pb.AudioService/UpdatePalette"
+	AudioService_CreatePalette_FullMethodName             = "/pb.AudioService/CreatePalette"
+	AudioService_DeletePalette_FullMethodName             = "/pb.AudioService/DeletePalette"
+	AudioService_ListAudioFiles_FullMethodName            = "/pb.AudioService/ListAudioFiles"
+	AudioService_GetAudioFile_FullMethodName              = "/pb.AudioService/GetAudioFile"
+	AudioService_CreateAudioFile_FullMethodName           = "/pb.AudioService/CreateAudioFile"
+	AudioService_UpdateAudioFile_FullMethodName           = "/pb.AudioService/UpdateAudioFile"
+	AudioService_DeleteAudioFile_FullMethodName           = "/pb.AudioService/DeleteAudioFile"
+	AudioService_AssignAudioFileToSlot_FullMethodName     = "/pb.AudioService/AssignAudioFileToSlot"
+	AudioService_UnassignAudioFileFromSlot_FullMethodName = "/pb.AudioService/UnassignAudioFileFromSlot"
 )
 
 // AudioServiceClient is the client API for AudioService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AudioServiceClient interface {
-	StreamPlaybackStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AudioStatus], error)
-	TriggerCommand(ctx context.Context, in *CommandRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	StreamPlaybackStatus(ctx context.Context, in *AudioStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AudioStatus], error)
+	PlaybackCommand(ctx context.Context, in *PlaybackRequest, opts ...grpc.CallOption) (*PlaybackResponse, error)
+	ListPalettes(ctx context.Context, in *PaletteListRequest, opts ...grpc.CallOption) (*PaletteListResponse, error)
+	GetPalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteGetResponse, error)
+	UpdatePalette(ctx context.Context, in *Palette, opts ...grpc.CallOption) (*Palette, error)
+	CreatePalette(ctx context.Context, in *Palette, opts ...grpc.CallOption) (*Palette, error)
+	DeletePalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteDeleteResponse, error)
+	ListAudioFiles(ctx context.Context, in *ListAudioFileRequest, opts ...grpc.CallOption) (*AudioFileList, error)
+	GetAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*GetAudioFileResponse, error)
+	CreateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFile, error)
+	UpdateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFile, error)
+	DeleteAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*AudioFileDeleteResponse, error)
+	AssignAudioFileToSlot(ctx context.Context, in *AssignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error)
+	UnassignAudioFileFromSlot(ctx context.Context, in *UnassignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error)
 }
 
 type audioServiceClient struct {
@@ -39,13 +63,13 @@ func NewAudioServiceClient(cc grpc.ClientConnInterface) AudioServiceClient {
 	return &audioServiceClient{cc}
 }
 
-func (c *audioServiceClient) StreamPlaybackStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AudioStatus], error) {
+func (c *audioServiceClient) StreamPlaybackStatus(ctx context.Context, in *AudioStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AudioStatus], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &AudioService_ServiceDesc.Streams[0], AudioService_StreamPlaybackStatus_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[StatusRequest, AudioStatus]{ClientStream: stream}
+	x := &grpc.GenericClientStream[AudioStatusRequest, AudioStatus]{ClientStream: stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -58,10 +82,130 @@ func (c *audioServiceClient) StreamPlaybackStatus(ctx context.Context, in *Statu
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AudioService_StreamPlaybackStatusClient = grpc.ServerStreamingClient[AudioStatus]
 
-func (c *audioServiceClient) TriggerCommand(ctx context.Context, in *CommandRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+func (c *audioServiceClient) PlaybackCommand(ctx context.Context, in *PlaybackRequest, opts ...grpc.CallOption) (*PlaybackResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ActionResponse)
-	err := c.cc.Invoke(ctx, AudioService_TriggerCommand_FullMethodName, in, out, cOpts...)
+	out := new(PlaybackResponse)
+	err := c.cc.Invoke(ctx, AudioService_PlaybackCommand_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) ListPalettes(ctx context.Context, in *PaletteListRequest, opts ...grpc.CallOption) (*PaletteListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PaletteListResponse)
+	err := c.cc.Invoke(ctx, AudioService_ListPalettes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) GetPalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteGetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PaletteGetResponse)
+	err := c.cc.Invoke(ctx, AudioService_GetPalette_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) UpdatePalette(ctx context.Context, in *Palette, opts ...grpc.CallOption) (*Palette, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Palette)
+	err := c.cc.Invoke(ctx, AudioService_UpdatePalette_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) CreatePalette(ctx context.Context, in *Palette, opts ...grpc.CallOption) (*Palette, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Palette)
+	err := c.cc.Invoke(ctx, AudioService_CreatePalette_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) DeletePalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteDeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PaletteDeleteResponse)
+	err := c.cc.Invoke(ctx, AudioService_DeletePalette_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) ListAudioFiles(ctx context.Context, in *ListAudioFileRequest, opts ...grpc.CallOption) (*AudioFileList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AudioFileList)
+	err := c.cc.Invoke(ctx, AudioService_ListAudioFiles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) GetAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*GetAudioFileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAudioFileResponse)
+	err := c.cc.Invoke(ctx, AudioService_GetAudioFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) CreateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFile, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AudioFile)
+	err := c.cc.Invoke(ctx, AudioService_CreateAudioFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) UpdateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFile, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AudioFile)
+	err := c.cc.Invoke(ctx, AudioService_UpdateAudioFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) DeleteAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*AudioFileDeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AudioFileDeleteResponse)
+	err := c.cc.Invoke(ctx, AudioService_DeleteAudioFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) AssignAudioFileToSlot(ctx context.Context, in *AssignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlayerSlot)
+	err := c.cc.Invoke(ctx, AudioService_AssignAudioFileToSlot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *audioServiceClient) UnassignAudioFileFromSlot(ctx context.Context, in *UnassignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlayerSlot)
+	err := c.cc.Invoke(ctx, AudioService_UnassignAudioFileFromSlot_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +216,20 @@ func (c *audioServiceClient) TriggerCommand(ctx context.Context, in *CommandRequ
 // All implementations must embed UnimplementedAudioServiceServer
 // for forward compatibility.
 type AudioServiceServer interface {
-	StreamPlaybackStatus(*StatusRequest, grpc.ServerStreamingServer[AudioStatus]) error
-	TriggerCommand(context.Context, *CommandRequest) (*ActionResponse, error)
+	StreamPlaybackStatus(*AudioStatusRequest, grpc.ServerStreamingServer[AudioStatus]) error
+	PlaybackCommand(context.Context, *PlaybackRequest) (*PlaybackResponse, error)
+	ListPalettes(context.Context, *PaletteListRequest) (*PaletteListResponse, error)
+	GetPalette(context.Context, *PaletteID) (*PaletteGetResponse, error)
+	UpdatePalette(context.Context, *Palette) (*Palette, error)
+	CreatePalette(context.Context, *Palette) (*Palette, error)
+	DeletePalette(context.Context, *PaletteID) (*PaletteDeleteResponse, error)
+	ListAudioFiles(context.Context, *ListAudioFileRequest) (*AudioFileList, error)
+	GetAudioFile(context.Context, *AudioFileID) (*GetAudioFileResponse, error)
+	CreateAudioFile(context.Context, *AudioFile) (*AudioFile, error)
+	UpdateAudioFile(context.Context, *AudioFile) (*AudioFile, error)
+	DeleteAudioFile(context.Context, *AudioFileID) (*AudioFileDeleteResponse, error)
+	AssignAudioFileToSlot(context.Context, *AssignAudioFileRequest) (*PlayerSlot, error)
+	UnassignAudioFileFromSlot(context.Context, *UnassignAudioFileRequest) (*PlayerSlot, error)
 	mustEmbedUnimplementedAudioServiceServer()
 }
 
@@ -84,11 +240,47 @@ type AudioServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAudioServiceServer struct{}
 
-func (UnimplementedAudioServiceServer) StreamPlaybackStatus(*StatusRequest, grpc.ServerStreamingServer[AudioStatus]) error {
+func (UnimplementedAudioServiceServer) StreamPlaybackStatus(*AudioStatusRequest, grpc.ServerStreamingServer[AudioStatus]) error {
 	return status.Error(codes.Unimplemented, "method StreamPlaybackStatus not implemented")
 }
-func (UnimplementedAudioServiceServer) TriggerCommand(context.Context, *CommandRequest) (*ActionResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method TriggerCommand not implemented")
+func (UnimplementedAudioServiceServer) PlaybackCommand(context.Context, *PlaybackRequest) (*PlaybackResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PlaybackCommand not implemented")
+}
+func (UnimplementedAudioServiceServer) ListPalettes(context.Context, *PaletteListRequest) (*PaletteListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPalettes not implemented")
+}
+func (UnimplementedAudioServiceServer) GetPalette(context.Context, *PaletteID) (*PaletteGetResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPalette not implemented")
+}
+func (UnimplementedAudioServiceServer) UpdatePalette(context.Context, *Palette) (*Palette, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePalette not implemented")
+}
+func (UnimplementedAudioServiceServer) CreatePalette(context.Context, *Palette) (*Palette, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePalette not implemented")
+}
+func (UnimplementedAudioServiceServer) DeletePalette(context.Context, *PaletteID) (*PaletteDeleteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePalette not implemented")
+}
+func (UnimplementedAudioServiceServer) ListAudioFiles(context.Context, *ListAudioFileRequest) (*AudioFileList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAudioFiles not implemented")
+}
+func (UnimplementedAudioServiceServer) GetAudioFile(context.Context, *AudioFileID) (*GetAudioFileResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAudioFile not implemented")
+}
+func (UnimplementedAudioServiceServer) CreateAudioFile(context.Context, *AudioFile) (*AudioFile, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateAudioFile not implemented")
+}
+func (UnimplementedAudioServiceServer) UpdateAudioFile(context.Context, *AudioFile) (*AudioFile, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateAudioFile not implemented")
+}
+func (UnimplementedAudioServiceServer) DeleteAudioFile(context.Context, *AudioFileID) (*AudioFileDeleteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAudioFile not implemented")
+}
+func (UnimplementedAudioServiceServer) AssignAudioFileToSlot(context.Context, *AssignAudioFileRequest) (*PlayerSlot, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignAudioFileToSlot not implemented")
+}
+func (UnimplementedAudioServiceServer) UnassignAudioFileFromSlot(context.Context, *UnassignAudioFileRequest) (*PlayerSlot, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnassignAudioFileFromSlot not implemented")
 }
 func (UnimplementedAudioServiceServer) mustEmbedUnimplementedAudioServiceServer() {}
 func (UnimplementedAudioServiceServer) testEmbeddedByValue()                      {}
@@ -112,30 +304,246 @@ func RegisterAudioServiceServer(s grpc.ServiceRegistrar, srv AudioServiceServer)
 }
 
 func _AudioService_StreamPlaybackStatus_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StatusRequest)
+	m := new(AudioStatusRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(AudioServiceServer).StreamPlaybackStatus(m, &grpc.GenericServerStream[StatusRequest, AudioStatus]{ServerStream: stream})
+	return srv.(AudioServiceServer).StreamPlaybackStatus(m, &grpc.GenericServerStream[AudioStatusRequest, AudioStatus]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AudioService_StreamPlaybackStatusServer = grpc.ServerStreamingServer[AudioStatus]
 
-func _AudioService_TriggerCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommandRequest)
+func _AudioService_PlaybackCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlaybackRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AudioServiceServer).TriggerCommand(ctx, in)
+		return srv.(AudioServiceServer).PlaybackCommand(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AudioService_TriggerCommand_FullMethodName,
+		FullMethod: AudioService_PlaybackCommand_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AudioServiceServer).TriggerCommand(ctx, req.(*CommandRequest))
+		return srv.(AudioServiceServer).PlaybackCommand(ctx, req.(*PlaybackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_ListPalettes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PaletteListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).ListPalettes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_ListPalettes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).ListPalettes(ctx, req.(*PaletteListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_GetPalette_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PaletteID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).GetPalette(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_GetPalette_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).GetPalette(ctx, req.(*PaletteID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_UpdatePalette_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Palette)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).UpdatePalette(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_UpdatePalette_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).UpdatePalette(ctx, req.(*Palette))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_CreatePalette_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Palette)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).CreatePalette(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_CreatePalette_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).CreatePalette(ctx, req.(*Palette))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_DeletePalette_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PaletteID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).DeletePalette(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_DeletePalette_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).DeletePalette(ctx, req.(*PaletteID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_ListAudioFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAudioFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).ListAudioFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_ListAudioFiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).ListAudioFiles(ctx, req.(*ListAudioFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_GetAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AudioFileID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).GetAudioFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_GetAudioFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).GetAudioFile(ctx, req.(*AudioFileID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_CreateAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AudioFile)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).CreateAudioFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_CreateAudioFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).CreateAudioFile(ctx, req.(*AudioFile))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_UpdateAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AudioFile)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).UpdateAudioFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_UpdateAudioFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).UpdateAudioFile(ctx, req.(*AudioFile))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_DeleteAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AudioFileID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).DeleteAudioFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_DeleteAudioFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).DeleteAudioFile(ctx, req.(*AudioFileID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_AssignAudioFileToSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignAudioFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).AssignAudioFileToSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_AssignAudioFileToSlot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).AssignAudioFileToSlot(ctx, req.(*AssignAudioFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AudioService_UnassignAudioFileFromSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnassignAudioFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).UnassignAudioFileFromSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_UnassignAudioFileFromSlot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).UnassignAudioFileFromSlot(ctx, req.(*UnassignAudioFileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -148,8 +556,56 @@ var AudioService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AudioServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "TriggerCommand",
-			Handler:    _AudioService_TriggerCommand_Handler,
+			MethodName: "PlaybackCommand",
+			Handler:    _AudioService_PlaybackCommand_Handler,
+		},
+		{
+			MethodName: "ListPalettes",
+			Handler:    _AudioService_ListPalettes_Handler,
+		},
+		{
+			MethodName: "GetPalette",
+			Handler:    _AudioService_GetPalette_Handler,
+		},
+		{
+			MethodName: "UpdatePalette",
+			Handler:    _AudioService_UpdatePalette_Handler,
+		},
+		{
+			MethodName: "CreatePalette",
+			Handler:    _AudioService_CreatePalette_Handler,
+		},
+		{
+			MethodName: "DeletePalette",
+			Handler:    _AudioService_DeletePalette_Handler,
+		},
+		{
+			MethodName: "ListAudioFiles",
+			Handler:    _AudioService_ListAudioFiles_Handler,
+		},
+		{
+			MethodName: "GetAudioFile",
+			Handler:    _AudioService_GetAudioFile_Handler,
+		},
+		{
+			MethodName: "CreateAudioFile",
+			Handler:    _AudioService_CreateAudioFile_Handler,
+		},
+		{
+			MethodName: "UpdateAudioFile",
+			Handler:    _AudioService_UpdateAudioFile_Handler,
+		},
+		{
+			MethodName: "DeleteAudioFile",
+			Handler:    _AudioService_DeleteAudioFile_Handler,
+		},
+		{
+			MethodName: "AssignAudioFileToSlot",
+			Handler:    _AudioService_AssignAudioFileToSlot_Handler,
+		},
+		{
+			MethodName: "UnassignAudioFileFromSlot",
+			Handler:    _AudioService_UnassignAudioFileFromSlot_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -159,5 +615,5 @@ var AudioService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "internal/pb/control.proto",
+	Metadata: "control.proto",
 }

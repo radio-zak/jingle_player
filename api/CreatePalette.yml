@@ -1,0 +1,13 @@
+info:
+  name: CreatePalette
+  type: grpc
+  seq: 4
+
+grpc:
+  url: localhost:6969
+  method: ""
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: "{}"
+  auth: inherit

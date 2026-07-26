@@ -1,0 +1,20 @@
+info:
+  name: CreateAudioFile
+  type: grpc
+  seq: 5
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/CreateAudioFile
+  methodType: unary
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: |-
+        {
+          "id": 1,
+          "file_name": "Chala",
+          "file_path": "/home/studio/data/chala.mp3",
+          "duration": 782.6925446102905
+        }
+  auth: inherit

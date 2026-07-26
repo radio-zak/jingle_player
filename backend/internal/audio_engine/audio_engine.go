@@ -22,14 +22,13 @@ type Player struct {
 	AudioStatus
 	listeners      map[chan AudioStatus]struct{}
 	mu             sync.RWMutex
-	slots          map[int32]*PlayerSlot
+	Slots          map[int32]*PlayerSlot
 	cancelPlayback context.CancelFunc
 }
 
 type PlayerSlot struct {
 	ID        int32
 	AudioFile AudioFile
-	IsActive  bool
 }
 
 type AudioFile struct {
@@ -61,14 +60,14 @@ func InitPlayer() (*Player, error) {
 	}
 	p := &Player{init: true, sampleRate: 44100, channels: 2, bitDepth: 16, bufferSize: 4096,
 		AudioStatus: AudioStatus{ActiveSlot: 0, State: StateStopped, TimeRemaining: 0},
-		listeners:   make(map[chan AudioStatus]struct{}), slots: make(map[int32]*PlayerSlot)}
+		listeners:   make(map[chan AudioStatus]struct{}), Slots: make(map[int32]*PlayerSlot)}
 
 	for i := 1; i <= numSlots; i++ {
 		id := int32(i)
-		p.slots[id] = &PlayerSlot{ID: id}
+		p.Slots[id] = &PlayerSlot{ID: id}
 	}
 
-	p.slots[0] = &PlayerSlot{ID: 0, AudioFile: AudioFile{ID: 0, FileName: "test", FilePath: "/home/kzielinski/Studio/Projects/Spaghet/170847__eliasheuninck__steam-train-horn-03.wav"}}
+	p.Slots[0] = &PlayerSlot{ID: 0, AudioFile: AudioFile{ID: 0, FileName: "test", FilePath: "/home/kzielinski/Studio/Projects/Spaghet/170847__eliasheuninck__steam-train-horn-03.wav"}}
 
 	go p.broadcastPlayerState()
 	return p, nil
@@ -155,7 +154,7 @@ func (p *Player) PlayAudio(slotID int32) error {
 }
 
 func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
-	slot := *p.slots[slotID]
+	slot := *p.Slots[slotID]
 	f, err := os.Open(slot.AudioFile.FilePath)
 	if err != nil {
 		fmt.Printf("Failed to load file from disk.")

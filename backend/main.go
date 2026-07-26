@@ -1,24 +1,39 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"jingle_player_backend/internal/audio_engine"
 	"jingle_player_backend/internal/control"
+	"jingle_player_backend/internal/db"
 	"jingle_player_backend/internal/pb"
 	"net"
 	"os"
-	"strconv"
 
 	"github.com/gordonklaus/portaudio"
 	"google.golang.org/grpc"
+	_ "modernc.org/sqlite"
 )
 
-func main() {
-	fmt.Println("Hello world!")
+//go:embed db/schema.sql
+var ddl string
 
-	readConfigFromDisk()
+func main() {
+	ctx := context.Background()
+	datastore, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		panic(err)
+	}
+	defer datastore.Close()
+
+	if _, err := datastore.ExecContext(ctx, ddl); err != nil {
+		panic(err)
+	}
+
+	queries := db.New(datastore)
 
 	audio, err := audio_engine.InitPlayer()
 	if err != nil {
@@ -40,7 +55,7 @@ func main() {
 		return
 	}
 	grpcs := grpc.NewServer()
-	handler := control.NewAudioGRPCServer(audio)
+	handler := control.NewAudioGRPCServer(audio, queries)
 	pb.RegisterAudioServiceServer(grpcs, handler)
 
 	fmt.Println("Listening on port :6969")
@@ -50,40 +65,6 @@ func main() {
 		return
 	}
 
-}
-
-type AppConfig struct {
-	AppTitle       string `json:"appTitle"`
-	PlayerCount    int    `json:"playerCount"`
-	PaletteCount   int    `json:"paletteCount"`
-	MediaDirectory string `json:"mediaDirectory"`
-}
-
-func readConfigFromDisk() {
-	jsonFile, err := os.Open("./config.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Reading config file from disk")
-
-	byteValue, err := io.ReadAll(jsonFile)
-	if err != nil {
-		fmt.Println("Error reading file", err)
-		return
-	}
-	var config AppConfig
-
-	err = json.Unmarshal(byteValue, &config)
-	if err != nil {
-		fmt.Println("Failed unmarshaling json", err)
-		return
-	}
-	fmt.Println(config)
-	fmt.Println("App title: " + config.AppTitle)
-	fmt.Println("Palette count: " + strconv.Itoa(config.PaletteCount))
-	fmt.Println("Media dir: " + config.MediaDirectory)
-
-	defer jsonFile.Close()
 }
 
 type JSONDevice struct {

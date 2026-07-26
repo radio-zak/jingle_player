@@ -4,6 +4,10 @@
 
 package db
 
+import (
+	"database/sql"
+)
+
 type AudioFile struct {
 	ID       int64
 	Name     string
@@ -14,20 +18,20 @@ type AudioFile struct {
 type Palette struct {
 	ID         int64
 	Name       string
-	Slot0File  interface{}
-	Slot1File  interface{}
-	Slot2File  interface{}
-	Slot3File  interface{}
-	Slot4File  interface{}
-	Slot5File  interface{}
-	Slot6File  interface{}
-	Slot7File  interface{}
-	Slot8File  interface{}
-	Slot9File  interface{}
-	Slot10File interface{}
-	Slot11File interface{}
-	Slot12File interface{}
-	Slot13File interface{}
-	Slot14File interface{}
-	Slot15File interface{}
+	Slot0File  sql.NullInt64
+	Slot1File  sql.NullInt64
+	Slot2File  sql.NullInt64
+	Slot3File  sql.NullInt64
+	Slot4File  sql.NullInt64
+	Slot5File  sql.NullInt64
+	Slot6File  sql.NullInt64
+	Slot7File  sql.NullInt64
+	Slot8File  sql.NullInt64
+	Slot9File  sql.NullInt64
+	Slot10File sql.NullInt64
+	Slot11File sql.NullInt64
+	Slot12File sql.NullInt64
+	Slot13File sql.NullInt64
+	Slot14File sql.NullInt64
+	Slot15File sql.NullInt64
 }

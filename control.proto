@@ -5,65 +5,87 @@ package pb;
 option go_package = "./pb";
 
 service AudioService {
-    rpc StreamPlaybackStatus (AudioStatusRequest) returns (stream AudioStatus);
-    rpc PaletteGetCommand (PaletteGetRequest) returns (PaletteGetResponse);
-    rpc PaletteSelectCommand (PaletteSelectRequest) returns (PaletteSelectResponse);
-    rpc PaletteSaveCommand (PaletteSaveRequest) returns (PaletteSaveResponse);
-    rpc PlaybackCommand (PlaybackRequest) returns (PlaybackResponse);
+  rpc StreamPlaybackStatus(AudioStatusRequest) returns (stream AudioStatus);
+  rpc PlaybackCommand(PlaybackRequest) returns (PlaybackResponse);
+  rpc ListPalettes(PaletteListRequest) returns (PaletteListResponse);
+  rpc GetPalette(PaletteID) returns (PaletteGetResponse);
+  rpc UpdatePalette(Palette) returns (Palette);
+  rpc CreatePalette(Palette) returns (Palette);
+  rpc DeletePalette(PaletteID) returns (PaletteDeleteResponse);
+  rpc ListAudioFiles(ListAudioFileRequest) returns (AudioFileList);
+  rpc GetAudioFile(AudioFileID) returns (GetAudioFileResponse);
+  rpc CreateAudioFile(AudioFile) returns (AudioFile);
+  rpc UpdateAudioFile(AudioFile) returns (AudioFile);
+  rpc DeleteAudioFile(AudioFileID) returns (AudioFileDeleteResponse);
+  rpc AssignAudioFileToSlot(AssignAudioFileRequest) returns (PlayerSlot);
+  rpc UnassignAudioFileFromSlot(UnassignAudioFileRequest) returns (PlayerSlot);
 }
 
 message AudioStatusRequest {}
 
 message AudioStatus {
-    int32 active_slot = 1;
-    string state = 2;
-    double time_remaining_seconds = 3;
+  int32 active_slot = 1;
+  string state = 2;
+  double time_remaining_seconds = 3;
 }
 
-message PlaybackRequest {
-    string action = 1;
-}
+message PlaybackRequest { string action = 1; }
 
 message PlaybackResponse {
-    bool success = 1;
-    string message = 2;
+  bool success = 1;
+  string message = 2;
 }
 
-message PaletteGetRequest {}
-
-message PaletteItem {
-    map<int32, string> properties = 1;
+message Palette {
+  int32 id = 1;
+  string name = 2;
+  repeated PlayerSlot slots = 3;
 }
 
-message PaletteContents {
-    map<int32, PlayerSlot> properties = 1; 
-}
+message PaletteID { int32 id = 1; }
 
 message AudioFile {
-    int32 id = 1;
-    string file_name = 2;
-    string file_path = 3;
-    double duration = 4;
+  int32 id = 1;
+  string file_name = 2;
+  string file_path = 3;
+  double duration = 4;
 }
 
 message PlayerSlot {
-    int32 id = 1;
-    AudioFile file = 2;
-    bool is_active = 3;
+  int32 id = 1;
+  AudioFile file = 2;
+}
+
+message PaletteListRequest {}
+
+message PaletteListResponse {
+  bool success = 1;
+  repeated Palette palettes = 2;
 }
 
 message PaletteGetResponse {
-    bool success = 1;
-    string message = 2;
-    repeated PaletteItem palettes = 3;
+  bool success = 1;
+  Palette palette = 2;
 }
 
-message PaletteSelectRequest {
-    int32 id = 1;
+message PaletteDeleteResponse { bool success = 1; }
+
+message AudioFileList { repeated AudioFile audio_files = 1; }
+
+message ListAudioFileRequest {}
+
+message AudioFileID { int32 id = 1; }
+
+message GetAudioFileResponse {
+  bool success = 1;
+  AudioFile audio_file = 2;
 }
 
-message PaletteSelectResponse {
-    bool success = 1;
-    string message = 2;
-    PaletteItem palette = 3;
+message AudioFileDeleteResponse { bool success = 1; }
+
+message AssignAudioFileRequest {
+  int32 slot_id = 1;
+  int32 file_id = 2;
 }
+
+message UnassignAudioFileRequest { int32 slot_id = 1; }
