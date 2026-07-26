@@ -1,0 +1,17 @@
+info:
+  name: GetAudioFile
+  type: grpc
+  seq: 7
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/GetAudioFile
+  methodType: unary
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: |-
+        {
+          "id": 1
+        }
+  auth: inherit
