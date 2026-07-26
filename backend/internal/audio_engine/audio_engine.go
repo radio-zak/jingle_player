@@ -51,14 +51,14 @@ type AudioStatus struct {
 	TimeRemaining float64
 }
 
-func InitPlayer() (*Player, error) {
+func InitPlayer(sampleRate int, bufferSize int) (*Player, error) {
 	var numSlots = 16
 
 	err := portaudio.Initialize()
 	if err != nil {
 		return nil, err
 	}
-	p := &Player{init: true, sampleRate: 44100, channels: 2, bitDepth: 16, bufferSize: 4096,
+	p := &Player{init: true, sampleRate: uint32(sampleRate), channels: 2, bitDepth: 16, bufferSize: bufferSize,
 		AudioStatus: AudioStatus{ActiveSlot: 0, State: StateStopped, TimeRemaining: 0},
 		listeners:   make(map[chan AudioStatus]struct{}), Slots: make(map[int32]*PlayerSlot)}
 

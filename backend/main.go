@@ -7,11 +7,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"jingle_player_backend/internal/audio_engine"
+	"jingle_player_backend/internal/config"
 	"jingle_player_backend/internal/control"
 	"jingle_player_backend/internal/db"
 	"jingle_player_backend/internal/pb"
+	"log"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/gordonklaus/portaudio"
 	"google.golang.org/grpc"
@@ -22,9 +25,16 @@ import (
 var ddl string
 
 func main() {
-	ctx := context.Background()
-	datastore, err := sql.Open("sqlite", ":memory:")
+	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
+		log.Fatalf("Failed opening config file: %v", err)
+		panic(err)
+	}
+
+	ctx := context.Background()
+	datastore, err := sql.Open(cfg.Database.Driver, ":memory:")
+	if err != nil {
+		log.Fatalf("Failed opening database with driver %v: %v", cfg.Database.Driver, err)
 		panic(err)
 	}
 	defer datastore.Close()
@@ -35,8 +45,9 @@ func main() {
 
 	queries := db.New(datastore)
 
-	audio, err := audio_engine.InitPlayer()
+	audio, err := audio_engine.InitPlayer(cfg.Audio.SampleRate, cfg.Audio.BufferSize)
 	if err != nil {
+		log.Fatalf("Failed initializing audio engine: %v", err)
 		panic(err)
 	}
 
@@ -49,16 +60,17 @@ func main() {
 	// 	return
 	// }
 	// deviceInfoToJSON(dev)
-	listener, err := net.Listen("tcp", ":6969")
+	listenAddr := strings.Join([]string{cfg.Server.Host, cfg.Server.Port}, ":")
+	listener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
-		fmt.Println("Failed to listen on port :6969", err)
-		return
+		log.Fatalf("Failed to listen on address %v: %v", listenAddr, err)
+		panic(err)
 	}
 	grpcs := grpc.NewServer()
 	handler := control.NewAudioGRPCServer(audio, queries)
 	pb.RegisterAudioServiceServer(grpcs, handler)
 
-	fmt.Println("Listening on port :6969")
+	fmt.Println("Listening on", listenAddr)
 	err = grpcs.Serve(listener)
 	if err != nil {
 		fmt.Println("Failed to create gRPC server on port :6969", err)
