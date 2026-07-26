@@ -12,9 +12,8 @@ grpc:
     - title: message 1
       message: |-
         {
-          "id": 1,
-          "file_name": "Chala",
-          "file_path": "/home/studio/data/chala.mp3",
+          "file_name": "Challa",
+          "file_path": "/home/studio/data/challa.mp3",
           "duration": 782.6925446102905
         }
   auth: inherit

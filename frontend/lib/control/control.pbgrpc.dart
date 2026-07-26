@@ -62,14 +62,14 @@ class AudioServiceClient extends $grpc.Client {
     return $createUnaryCall(_$getPalette, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.Palette> updatePalette(
+  $grpc.ResponseFuture<$0.PaletteResponse> updatePalette(
     $0.Palette request, {
     $grpc.CallOptions? options,
   }) {
     return $createUnaryCall(_$updatePalette, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.Palette> createPalette(
+  $grpc.ResponseFuture<$0.PaletteResponse> createPalette(
     $0.Palette request, {
     $grpc.CallOptions? options,
   }) {
@@ -81,6 +81,13 @@ class AudioServiceClient extends $grpc.Client {
     $grpc.CallOptions? options,
   }) {
     return $createUnaryCall(_$deletePalette, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.PaletteActivateResponse> activatePalette(
+    $0.PaletteID request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$activatePalette, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.AudioFileList> listAudioFiles(
@@ -97,14 +104,14 @@ class AudioServiceClient extends $grpc.Client {
     return $createUnaryCall(_$getAudioFile, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.AudioFile> createAudioFile(
+  $grpc.ResponseFuture<$0.AudioFileResponse> createAudioFile(
     $0.AudioFile request, {
     $grpc.CallOptions? options,
   }) {
     return $createUnaryCall(_$createAudioFile, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.AudioFile> updateAudioFile(
+  $grpc.ResponseFuture<$0.AudioFileResponse> updateAudioFile(
     $0.AudioFile request, {
     $grpc.CallOptions? options,
   }) {
@@ -155,19 +162,26 @@ class AudioServiceClient extends $grpc.Client {
           '/pb.AudioService/GetPalette',
           ($0.PaletteID value) => value.writeToBuffer(),
           $0.PaletteGetResponse.fromBuffer);
-  static final _$updatePalette = $grpc.ClientMethod<$0.Palette, $0.Palette>(
-      '/pb.AudioService/UpdatePalette',
-      ($0.Palette value) => value.writeToBuffer(),
-      $0.Palette.fromBuffer);
-  static final _$createPalette = $grpc.ClientMethod<$0.Palette, $0.Palette>(
-      '/pb.AudioService/CreatePalette',
-      ($0.Palette value) => value.writeToBuffer(),
-      $0.Palette.fromBuffer);
+  static final _$updatePalette =
+      $grpc.ClientMethod<$0.Palette, $0.PaletteResponse>(
+          '/pb.AudioService/UpdatePalette',
+          ($0.Palette value) => value.writeToBuffer(),
+          $0.PaletteResponse.fromBuffer);
+  static final _$createPalette =
+      $grpc.ClientMethod<$0.Palette, $0.PaletteResponse>(
+          '/pb.AudioService/CreatePalette',
+          ($0.Palette value) => value.writeToBuffer(),
+          $0.PaletteResponse.fromBuffer);
   static final _$deletePalette =
       $grpc.ClientMethod<$0.PaletteID, $0.PaletteDeleteResponse>(
           '/pb.AudioService/DeletePalette',
           ($0.PaletteID value) => value.writeToBuffer(),
           $0.PaletteDeleteResponse.fromBuffer);
+  static final _$activatePalette =
+      $grpc.ClientMethod<$0.PaletteID, $0.PaletteActivateResponse>(
+          '/pb.AudioService/ActivatePalette',
+          ($0.PaletteID value) => value.writeToBuffer(),
+          $0.PaletteActivateResponse.fromBuffer);
   static final _$listAudioFiles =
       $grpc.ClientMethod<$0.ListAudioFileRequest, $0.AudioFileList>(
           '/pb.AudioService/ListAudioFiles',
@@ -179,15 +193,15 @@ class AudioServiceClient extends $grpc.Client {
           ($0.AudioFileID value) => value.writeToBuffer(),
           $0.GetAudioFileResponse.fromBuffer);
   static final _$createAudioFile =
-      $grpc.ClientMethod<$0.AudioFile, $0.AudioFile>(
+      $grpc.ClientMethod<$0.AudioFile, $0.AudioFileResponse>(
           '/pb.AudioService/CreateAudioFile',
           ($0.AudioFile value) => value.writeToBuffer(),
-          $0.AudioFile.fromBuffer);
+          $0.AudioFileResponse.fromBuffer);
   static final _$updateAudioFile =
-      $grpc.ClientMethod<$0.AudioFile, $0.AudioFile>(
+      $grpc.ClientMethod<$0.AudioFile, $0.AudioFileResponse>(
           '/pb.AudioService/UpdateAudioFile',
           ($0.AudioFile value) => value.writeToBuffer(),
-          $0.AudioFile.fromBuffer);
+          $0.AudioFileResponse.fromBuffer);
   static final _$deleteAudioFile =
       $grpc.ClientMethod<$0.AudioFileID, $0.AudioFileDeleteResponse>(
           '/pb.AudioService/DeleteAudioFile',
@@ -241,20 +255,20 @@ abstract class AudioServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.PaletteID.fromBuffer(value),
         ($0.PaletteGetResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.Palette, $0.Palette>(
+    $addMethod($grpc.ServiceMethod<$0.Palette, $0.PaletteResponse>(
         'UpdatePalette',
         updatePalette_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.Palette.fromBuffer(value),
-        ($0.Palette value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.Palette, $0.Palette>(
+        ($0.PaletteResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Palette, $0.PaletteResponse>(
         'CreatePalette',
         createPalette_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.Palette.fromBuffer(value),
-        ($0.Palette value) => value.writeToBuffer()));
+        ($0.PaletteResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.PaletteID, $0.PaletteDeleteResponse>(
         'DeletePalette',
         deletePalette_Pre,
@@ -262,6 +276,13 @@ abstract class AudioServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.PaletteID.fromBuffer(value),
         ($0.PaletteDeleteResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.PaletteID, $0.PaletteActivateResponse>(
+        'ActivatePalette',
+        activatePalette_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.PaletteID.fromBuffer(value),
+        ($0.PaletteActivateResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.ListAudioFileRequest, $0.AudioFileList>(
         'ListAudioFiles',
         listAudioFiles_Pre,
@@ -277,20 +298,20 @@ abstract class AudioServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.AudioFileID.fromBuffer(value),
         ($0.GetAudioFileResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFile>(
+    $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFileResponse>(
         'CreateAudioFile',
         createAudioFile_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.AudioFile.fromBuffer(value),
-        ($0.AudioFile value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFile>(
+        ($0.AudioFileResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFileResponse>(
         'UpdateAudioFile',
         updateAudioFile_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.AudioFile.fromBuffer(value),
-        ($0.AudioFile value) => value.writeToBuffer()));
+        ($0.AudioFileResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.AudioFileID, $0.AudioFileDeleteResponse>(
         'DeleteAudioFile',
         deleteAudioFile_Pre,
@@ -351,20 +372,20 @@ abstract class AudioServiceBase extends $grpc.Service {
   $async.Future<$0.PaletteGetResponse> getPalette(
       $grpc.ServiceCall call, $0.PaletteID request);
 
-  $async.Future<$0.Palette> updatePalette_Pre(
+  $async.Future<$0.PaletteResponse> updatePalette_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.Palette> $request) async {
     return updatePalette($call, await $request);
   }
 
-  $async.Future<$0.Palette> updatePalette(
+  $async.Future<$0.PaletteResponse> updatePalette(
       $grpc.ServiceCall call, $0.Palette request);
 
-  $async.Future<$0.Palette> createPalette_Pre(
+  $async.Future<$0.PaletteResponse> createPalette_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.Palette> $request) async {
     return createPalette($call, await $request);
   }
 
-  $async.Future<$0.Palette> createPalette(
+  $async.Future<$0.PaletteResponse> createPalette(
       $grpc.ServiceCall call, $0.Palette request);
 
   $async.Future<$0.PaletteDeleteResponse> deletePalette_Pre(
@@ -373,6 +394,14 @@ abstract class AudioServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.PaletteDeleteResponse> deletePalette(
+      $grpc.ServiceCall call, $0.PaletteID request);
+
+  $async.Future<$0.PaletteActivateResponse> activatePalette_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.PaletteID> $request) async {
+    return activatePalette($call, await $request);
+  }
+
+  $async.Future<$0.PaletteActivateResponse> activatePalette(
       $grpc.ServiceCall call, $0.PaletteID request);
 
   $async.Future<$0.AudioFileList> listAudioFiles_Pre($grpc.ServiceCall $call,
@@ -391,20 +420,20 @@ abstract class AudioServiceBase extends $grpc.Service {
   $async.Future<$0.GetAudioFileResponse> getAudioFile(
       $grpc.ServiceCall call, $0.AudioFileID request);
 
-  $async.Future<$0.AudioFile> createAudioFile_Pre(
+  $async.Future<$0.AudioFileResponse> createAudioFile_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.AudioFile> $request) async {
     return createAudioFile($call, await $request);
   }
 
-  $async.Future<$0.AudioFile> createAudioFile(
+  $async.Future<$0.AudioFileResponse> createAudioFile(
       $grpc.ServiceCall call, $0.AudioFile request);
 
-  $async.Future<$0.AudioFile> updateAudioFile_Pre(
+  $async.Future<$0.AudioFileResponse> updateAudioFile_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.AudioFile> $request) async {
     return updateAudioFile($call, await $request);
   }
 
-  $async.Future<$0.AudioFile> updateAudioFile(
+  $async.Future<$0.AudioFileResponse> updateAudioFile(
       $grpc.ServiceCall call, $0.AudioFile request);
 
   $async.Future<$0.AudioFileDeleteResponse> deleteAudioFile_Pre(

@@ -10,6 +10,32 @@ import (
 	"database/sql"
 )
 
+const audioFileNameExists = `-- name: AudioFileNameExists :one
+SELECT EXISTS(
+    SELECT 1 FROM audio_files WHERE name = ?
+) AS name_exists
+`
+
+func (q *Queries) AudioFileNameExists(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, audioFileNameExists, name)
+	var name_exists int64
+	err := row.Scan(&name_exists)
+	return name_exists, err
+}
+
+const audioFilePathExists = `-- name: AudioFilePathExists :one
+SELECT EXISTS(
+    SELECT 1 FROM audio_files WHERE path = ?
+) AS name_exists
+`
+
+func (q *Queries) AudioFilePathExists(ctx context.Context, path string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, audioFilePathExists, path)
+	var name_exists int64
+	err := row.Scan(&name_exists)
+	return name_exists, err
+}
+
 const createAudioFile = `-- name: CreateAudioFile :one
 INSERT INTO audio_files (
   name, path, duration
@@ -179,6 +205,207 @@ func (q *Queries) GetPalette(ctx context.Context, id int64) (Palette, error) {
 	return i, err
 }
 
+const getPaletteWithAudioFiles = `-- name: GetPaletteWithAudioFiles :one
+SELECT 
+    p.id AS palette_id,
+    p.name AS palette_name,
+
+    -- Slot 0 (Index 0)
+    a0.id AS slot_0_id, a0.name AS slot_0_name, a0.path AS slot_0_path, a0.duration AS slot_0_duration,
+    -- Slot 1 (Index 1)
+    a1.id AS slot_1_id, a1.name AS slot_1_name, a1.path AS slot_1_path, a1.duration AS slot_1_duration,
+    -- Slot 2 (Index 2)
+    a2.id AS slot_2_id, a2.name AS slot_2_name, a2.path AS slot_2_path, a2.duration AS slot_2_duration,
+    -- Slot 3 (Index 3)
+    a3.id AS slot_3_id, a3.name AS slot_3_name, a3.path AS slot_3_path, a3.duration AS slot_3_duration,
+    -- Slot 4 (Index 4)
+    a4.id AS slot_4_id, a4.name AS slot_4_name, a4.path AS slot_4_path, a4.duration AS slot_4_duration,
+    -- Slot 5 (Index 5)
+    a5.id AS slot_5_id, a5.name AS slot_5_name, a5.path AS slot_5_path, a5.duration AS slot_5_duration,
+    -- Slot 6 (Index 6)
+    a6.id AS slot_6_id, a6.name AS slot_6_name, a6.path AS slot_6_path, a6.duration AS slot_6_duration,
+    -- Slot 7 (Index 7)
+    a7.id AS slot_7_id, a7.name AS slot_7_name, a7.path AS slot_7_path, a7.duration AS slot_7_duration,
+    -- Slot 8 (Index 8)
+    a8.id AS slot_8_id, a8.name AS slot_8_name, a8.path AS slot_8_path, a8.duration AS slot_8_duration,
+    -- Slot 9 (Index 9)
+    a9.id AS slot_9_id, a9.name AS slot_9_name, a9.path AS slot_9_path, a9.duration AS slot_9_duration,
+    -- Slot 10 (Index 10)
+    a10.id AS slot_10_id, a10.name AS slot_10_name, a10.path AS slot_10_path, a10.duration AS slot_10_duration,
+    -- Slot 11 (Index 11)
+    a11.id AS slot_11_id, a11.name AS slot_11_name, a11.path AS slot_11_path, a11.duration AS slot_11_duration,
+    -- Slot 12 (Index 12)
+    a12.id AS slot_12_id, a12.name AS slot_12_name, a12.path AS slot_12_path, a12.duration AS slot_12_duration,
+    -- Slot 13 (Index 13)
+    a13.id AS slot_13_id, a13.name AS slot_13_name, a13.path AS slot_13_path, a13.duration AS slot_13_duration,
+    -- Slot 14 (Index 14)
+    a14.id AS slot_14_id, a14.name AS slot_14_name, a14.path AS slot_14_path, a14.duration AS slot_14_duration,
+    -- Slot 15 (Index 15)
+    a15.id AS slot_15_id, a15.name AS slot_15_name, a15.path AS slot_15_path, a15.duration AS slot_15_duration
+
+FROM palettes p
+LEFT JOIN audio_files a0  ON p.slot_0_file  = a0.id
+LEFT JOIN audio_files a1  ON p.slot_1_file  = a1.id
+LEFT JOIN audio_files a2  ON p.slot_2_file  = a2.id
+LEFT JOIN audio_files a3  ON p.slot_3_file  = a3.id
+LEFT JOIN audio_files a4  ON p.slot_4_file  = a4.id
+LEFT JOIN audio_files a5  ON p.slot_5_file  = a5.id
+LEFT JOIN audio_files a6  ON p.slot_6_file  = a6.id
+LEFT JOIN audio_files a7  ON p.slot_7_file  = a7.id
+LEFT JOIN audio_files a8  ON p.slot_8_file  = a8.id
+LEFT JOIN audio_files a9  ON p.slot_9_file  = a9.id
+LEFT JOIN audio_files a10 ON p.slot_10_file = a10.id
+LEFT JOIN audio_files a11 ON p.slot_11_file = a11.id
+LEFT JOIN audio_files a12 ON p.slot_12_file = a12.id
+LEFT JOIN audio_files a13 ON p.slot_13_file = a13.id
+LEFT JOIN audio_files a14 ON p.slot_14_file = a14.id
+LEFT JOIN audio_files a15 ON p.slot_15_file = a15.id
+WHERE p.id = ? LIMIT 1
+`
+
+type GetPaletteWithAudioFilesRow struct {
+	PaletteID      int64
+	PaletteName    string
+	Slot0ID        sql.NullInt64
+	Slot0Name      sql.NullString
+	Slot0Path      sql.NullString
+	Slot0Duration  sql.NullFloat64
+	Slot1ID        sql.NullInt64
+	Slot1Name      sql.NullString
+	Slot1Path      sql.NullString
+	Slot1Duration  sql.NullFloat64
+	Slot2ID        sql.NullInt64
+	Slot2Name      sql.NullString
+	Slot2Path      sql.NullString
+	Slot2Duration  sql.NullFloat64
+	Slot3ID        sql.NullInt64
+	Slot3Name      sql.NullString
+	Slot3Path      sql.NullString
+	Slot3Duration  sql.NullFloat64
+	Slot4ID        sql.NullInt64
+	Slot4Name      sql.NullString
+	Slot4Path      sql.NullString
+	Slot4Duration  sql.NullFloat64
+	Slot5ID        sql.NullInt64
+	Slot5Name      sql.NullString
+	Slot5Path      sql.NullString
+	Slot5Duration  sql.NullFloat64
+	Slot6ID        sql.NullInt64
+	Slot6Name      sql.NullString
+	Slot6Path      sql.NullString
+	Slot6Duration  sql.NullFloat64
+	Slot7ID        sql.NullInt64
+	Slot7Name      sql.NullString
+	Slot7Path      sql.NullString
+	Slot7Duration  sql.NullFloat64
+	Slot8ID        sql.NullInt64
+	Slot8Name      sql.NullString
+	Slot8Path      sql.NullString
+	Slot8Duration  sql.NullFloat64
+	Slot9ID        sql.NullInt64
+	Slot9Name      sql.NullString
+	Slot9Path      sql.NullString
+	Slot9Duration  sql.NullFloat64
+	Slot10ID       sql.NullInt64
+	Slot10Name     sql.NullString
+	Slot10Path     sql.NullString
+	Slot10Duration sql.NullFloat64
+	Slot11ID       sql.NullInt64
+	Slot11Name     sql.NullString
+	Slot11Path     sql.NullString
+	Slot11Duration sql.NullFloat64
+	Slot12ID       sql.NullInt64
+	Slot12Name     sql.NullString
+	Slot12Path     sql.NullString
+	Slot12Duration sql.NullFloat64
+	Slot13ID       sql.NullInt64
+	Slot13Name     sql.NullString
+	Slot13Path     sql.NullString
+	Slot13Duration sql.NullFloat64
+	Slot14ID       sql.NullInt64
+	Slot14Name     sql.NullString
+	Slot14Path     sql.NullString
+	Slot14Duration sql.NullFloat64
+	Slot15ID       sql.NullInt64
+	Slot15Name     sql.NullString
+	Slot15Path     sql.NullString
+	Slot15Duration sql.NullFloat64
+}
+
+func (q *Queries) GetPaletteWithAudioFiles(ctx context.Context, id int64) (GetPaletteWithAudioFilesRow, error) {
+	row := q.db.QueryRowContext(ctx, getPaletteWithAudioFiles, id)
+	var i GetPaletteWithAudioFilesRow
+	err := row.Scan(
+		&i.PaletteID,
+		&i.PaletteName,
+		&i.Slot0ID,
+		&i.Slot0Name,
+		&i.Slot0Path,
+		&i.Slot0Duration,
+		&i.Slot1ID,
+		&i.Slot1Name,
+		&i.Slot1Path,
+		&i.Slot1Duration,
+		&i.Slot2ID,
+		&i.Slot2Name,
+		&i.Slot2Path,
+		&i.Slot2Duration,
+		&i.Slot3ID,
+		&i.Slot3Name,
+		&i.Slot3Path,
+		&i.Slot3Duration,
+		&i.Slot4ID,
+		&i.Slot4Name,
+		&i.Slot4Path,
+		&i.Slot4Duration,
+		&i.Slot5ID,
+		&i.Slot5Name,
+		&i.Slot5Path,
+		&i.Slot5Duration,
+		&i.Slot6ID,
+		&i.Slot6Name,
+		&i.Slot6Path,
+		&i.Slot6Duration,
+		&i.Slot7ID,
+		&i.Slot7Name,
+		&i.Slot7Path,
+		&i.Slot7Duration,
+		&i.Slot8ID,
+		&i.Slot8Name,
+		&i.Slot8Path,
+		&i.Slot8Duration,
+		&i.Slot9ID,
+		&i.Slot9Name,
+		&i.Slot9Path,
+		&i.Slot9Duration,
+		&i.Slot10ID,
+		&i.Slot10Name,
+		&i.Slot10Path,
+		&i.Slot10Duration,
+		&i.Slot11ID,
+		&i.Slot11Name,
+		&i.Slot11Path,
+		&i.Slot11Duration,
+		&i.Slot12ID,
+		&i.Slot12Name,
+		&i.Slot12Path,
+		&i.Slot12Duration,
+		&i.Slot13ID,
+		&i.Slot13Name,
+		&i.Slot13Path,
+		&i.Slot13Duration,
+		&i.Slot14ID,
+		&i.Slot14Name,
+		&i.Slot14Path,
+		&i.Slot14Duration,
+		&i.Slot15ID,
+		&i.Slot15Name,
+		&i.Slot15Path,
+		&i.Slot15Duration,
+	)
+	return i, err
+}
+
 const listAudioFiles = `-- name: ListAudioFiles :many
 SELECT id, name, path, duration FROM audio_files
 ORDER BY name
@@ -257,6 +484,19 @@ func (q *Queries) ListPalettes(ctx context.Context) ([]Palette, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const paletteNameExists = `-- name: PaletteNameExists :one
+SELECT EXISTS(
+  SELECT 1 FROM palettes WHERE name = ?
+) AS name_exists
+`
+
+func (q *Queries) PaletteNameExists(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, paletteNameExists, name)
+	var name_exists int64
+	err := row.Scan(&name_exists)
+	return name_exists, err
 }
 
 const updateAudioFile = `-- name: UpdateAudioFile :exec

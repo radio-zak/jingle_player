@@ -9,13 +9,14 @@ service AudioService {
   rpc PlaybackCommand(PlaybackRequest) returns (PlaybackResponse);
   rpc ListPalettes(PaletteListRequest) returns (PaletteListResponse);
   rpc GetPalette(PaletteID) returns (PaletteGetResponse);
-  rpc UpdatePalette(Palette) returns (Palette);
-  rpc CreatePalette(Palette) returns (Palette);
+  rpc UpdatePalette(Palette) returns (PaletteResponse);
+  rpc CreatePalette(Palette) returns (PaletteResponse);
   rpc DeletePalette(PaletteID) returns (PaletteDeleteResponse);
+  rpc ActivatePalette(PaletteID) returns (PaletteActivateResponse);
   rpc ListAudioFiles(ListAudioFileRequest) returns (AudioFileList);
   rpc GetAudioFile(AudioFileID) returns (GetAudioFileResponse);
-  rpc CreateAudioFile(AudioFile) returns (AudioFile);
-  rpc UpdateAudioFile(AudioFile) returns (AudioFile);
+  rpc CreateAudioFile(AudioFile) returns (AudioFileResponse);
+  rpc UpdateAudioFile(AudioFile) returns (AudioFileResponse);
   rpc DeleteAudioFile(AudioFileID) returns (AudioFileDeleteResponse);
   rpc AssignAudioFileToSlot(AssignAudioFileRequest) returns (PlayerSlot);
   rpc UnassignAudioFileFromSlot(UnassignAudioFileRequest) returns (PlayerSlot);
@@ -42,13 +43,32 @@ message Palette {
   repeated PlayerSlot slots = 3;
 }
 
+message PaletteResponse {
+  bool success = 1;
+  string message = 2;
+  int32 id = 3;
+  string name = 4;
+}
+
 message PaletteID { int32 id = 1; }
+
+message ActivatePalette { int32 id = 1; }
+
+message PaletteActivateResponse { bool success = 1; }
 
 message AudioFile {
   int32 id = 1;
   string file_name = 2;
   string file_path = 3;
   double duration = 4;
+}
+
+message AudioFileResponse {
+  bool success = 1;
+  string message = 2;
+  string file_name = 3;
+  string file_path = 4;
+  double duration = 5;
 }
 
 message PlayerSlot {

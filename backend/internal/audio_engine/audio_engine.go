@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"jingle_player_backend/internal/db"
 	"os"
 	"sync"
 	"time"
@@ -28,15 +29,15 @@ type Player struct {
 
 type PlayerSlot struct {
 	ID        int32
-	AudioFile AudioFile
+	AudioFile db.AudioFile
 }
 
-type AudioFile struct {
-	ID       int32
-	FileName string
-	FilePath string
-	Duration time.Duration
-}
+// type AudioFile struct {
+// 	ID       int32
+// 	FileName string
+// 	FilePath string
+// 	Duration time.Duration
+// }
 
 type PlaybackState string
 
@@ -62,12 +63,10 @@ func InitPlayer(sampleRate int, bufferSize int) (*Player, error) {
 		AudioStatus: AudioStatus{ActiveSlot: 0, State: StateStopped, TimeRemaining: 0},
 		listeners:   make(map[chan AudioStatus]struct{}), Slots: make(map[int32]*PlayerSlot)}
 
-	for i := 1; i <= numSlots; i++ {
+	for i := 0; i <= numSlots-1; i++ {
 		id := int32(i)
 		p.Slots[id] = &PlayerSlot{ID: id}
 	}
-
-	p.Slots[0] = &PlayerSlot{ID: 0, AudioFile: AudioFile{ID: 0, FileName: "test", FilePath: "/home/kzielinski/Studio/Projects/Spaghet/170847__eliasheuninck__steam-train-horn-03.wav"}}
 
 	go p.broadcastPlayerState()
 	return p, nil
@@ -155,9 +154,9 @@ func (p *Player) PlayAudio(slotID int32) error {
 
 func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	slot := *p.Slots[slotID]
-	f, err := os.Open(slot.AudioFile.FilePath)
+	f, err := os.Open(slot.AudioFile.Path)
 	if err != nil {
-		fmt.Printf("Failed to load file from disk.")
+		fmt.Printf("Failed to load file from disk:", err)
 		return err
 	}
 	defer func() {

@@ -28,7 +28,6 @@ func makeSlot(slotNum int32, audioID sql.NullInt64, audioPath sql.NullString, au
 	}
 }
 
-// MapDBPaletteToPB converts a flat sqlc Palette record into a nested pb.Palette
 func MapDBPaletteToPB(d db.Palette) *pb.Palette {
 	if !d.Slot0File.Valid {
 		return nil
@@ -94,4 +93,18 @@ func MapDBAudioFilesToPB(dbFiles []db.AudioFile) []*pb.AudioFile {
 		files[i] = MapDBAudioFileToPB(dbFiles[i])
 	}
 	return files
+}
+
+// Helper to construct a db.AudioFile from joined row fields
+func parseJoinedAudioFile(id sql.NullInt64, name, path sql.NullString, duration sql.NullFloat64) (db.AudioFile, bool) {
+	if !id.Valid || id.Int64 == 0 {
+		return db.AudioFile{}, false // Empty slot
+	}
+
+	return db.AudioFile{
+		ID:       id.Int64, // DB Primary Key (e.g., 42)
+		Name:     name.String,
+		Path:     path.String,
+		Duration: duration.Float64,
+	}, true
 }

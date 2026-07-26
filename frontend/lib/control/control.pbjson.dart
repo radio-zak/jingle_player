@@ -94,6 +94,22 @@ final $typed_data.Uint8List paletteDescriptor = $convert.base64Decode(
     'CgdQYWxldHRlEg4KAmlkGAEgASgFUgJpZBISCgRuYW1lGAIgASgJUgRuYW1lEiQKBXNsb3RzGA'
     'MgAygLMg4ucGIuUGxheWVyU2xvdFIFc2xvdHM=');
 
+@$core.Deprecated('Use paletteResponseDescriptor instead')
+const PaletteResponse$json = {
+  '1': 'PaletteResponse',
+  '2': [
+    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
+    {'1': 'message', '3': 2, '4': 1, '5': 9, '10': 'message'},
+    {'1': 'id', '3': 3, '4': 1, '5': 5, '10': 'id'},
+    {'1': 'name', '3': 4, '4': 1, '5': 9, '10': 'name'},
+  ],
+};
+
+/// Descriptor for `PaletteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List paletteResponseDescriptor = $convert.base64Decode(
+    'Cg9QYWxldHRlUmVzcG9uc2USGAoHc3VjY2VzcxgBIAEoCFIHc3VjY2VzcxIYCgdtZXNzYWdlGA'
+    'IgASgJUgdtZXNzYWdlEg4KAmlkGAMgASgFUgJpZBISCgRuYW1lGAQgASgJUgRuYW1l');
+
 @$core.Deprecated('Use paletteIDDescriptor instead')
 const PaletteID$json = {
   '1': 'PaletteID',
@@ -105,6 +121,31 @@ const PaletteID$json = {
 /// Descriptor for `PaletteID`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List paletteIDDescriptor =
     $convert.base64Decode('CglQYWxldHRlSUQSDgoCaWQYASABKAVSAmlk');
+
+@$core.Deprecated('Use activatePaletteDescriptor instead')
+const ActivatePalette$json = {
+  '1': 'ActivatePalette',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 5, '10': 'id'},
+  ],
+};
+
+/// Descriptor for `ActivatePalette`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List activatePaletteDescriptor =
+    $convert.base64Decode('Cg9BY3RpdmF0ZVBhbGV0dGUSDgoCaWQYASABKAVSAmlk');
+
+@$core.Deprecated('Use paletteActivateResponseDescriptor instead')
+const PaletteActivateResponse$json = {
+  '1': 'PaletteActivateResponse',
+  '2': [
+    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
+  ],
+};
+
+/// Descriptor for `PaletteActivateResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List paletteActivateResponseDescriptor =
+    $convert.base64Decode(
+        'ChdQYWxldHRlQWN0aXZhdGVSZXNwb25zZRIYCgdzdWNjZXNzGAEgASgIUgdzdWNjZXNz');
 
 @$core.Deprecated('Use audioFileDescriptor instead')
 const AudioFile$json = {
@@ -122,6 +163,24 @@ final $typed_data.Uint8List audioFileDescriptor = $convert.base64Decode(
     'CglBdWRpb0ZpbGUSDgoCaWQYASABKAVSAmlkEhsKCWZpbGVfbmFtZRgCIAEoCVIIZmlsZU5hbW'
     'USGwoJZmlsZV9wYXRoGAMgASgJUghmaWxlUGF0aBIaCghkdXJhdGlvbhgEIAEoAVIIZHVyYXRp'
     'b24=');
+
+@$core.Deprecated('Use audioFileResponseDescriptor instead')
+const AudioFileResponse$json = {
+  '1': 'AudioFileResponse',
+  '2': [
+    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
+    {'1': 'message', '3': 2, '4': 1, '5': 9, '10': 'message'},
+    {'1': 'file_name', '3': 3, '4': 1, '5': 9, '10': 'fileName'},
+    {'1': 'file_path', '3': 4, '4': 1, '5': 9, '10': 'filePath'},
+    {'1': 'duration', '3': 5, '4': 1, '5': 1, '10': 'duration'},
+  ],
+};
+
+/// Descriptor for `AudioFileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List audioFileResponseDescriptor = $convert.base64Decode(
+    'ChFBdWRpb0ZpbGVSZXNwb25zZRIYCgdzdWNjZXNzGAEgASgIUgdzdWNjZXNzEhgKB21lc3NhZ2'
+    'UYAiABKAlSB21lc3NhZ2USGwoJZmlsZV9uYW1lGAMgASgJUghmaWxlTmFtZRIbCglmaWxlX3Bh'
+    'dGgYBCABKAlSCGZpbGVQYXRoEhoKCGR1cmF0aW9uGAUgASgBUghkdXJhdGlvbg==');
 
 @$core.Deprecated('Use playerSlotDescriptor instead')
 const PlayerSlot$json = {

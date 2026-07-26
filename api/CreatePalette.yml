@@ -5,9 +5,80 @@ info:
 
 grpc:
   url: localhost:6969
-  method: ""
+  method: /pb.AudioService/CreatePalette
+  methodType: unary
   protoFilePath: ../control.proto
   message:
     - title: message 1
-      message: "{}"
+      message: |-
+        {
+          "id": 1,
+          "name": "universe",
+          "slots": [
+            {
+              "id": 0,
+              "file": {}
+            },
+              {
+              "id": 1,
+              "file": {}
+            },
+              {
+              "id": 2,
+              "file": {}
+            },
+              {
+              "id": 3,
+              "file": {}
+            },
+              {
+              "id": 4,
+              "file": {}
+            },
+              {
+              "id": 5,
+              "file": {}
+            },
+              {
+              "id": 6,
+              "file": {}
+            },
+              {
+              "id": 7,
+              "file": {}
+            },
+              {
+              "id": 8,
+              "file": {}
+            },
+              {
+              "id": 9,
+              "file": {}
+            },
+              {
+              "id": 10,
+              "file": {}
+            },
+              {
+              "id": 11,
+              "file": {}
+            },
+                  {
+              "id": 12,
+              "file": {}
+            },
+                  {
+              "id": 13,
+              "file": {}
+            },
+                  {
+              "id": 14,
+              "file": {}
+            },
+                  {
+              "id": 15,
+              "file": {}
+            }
+          ]
+        }
   auth: inherit

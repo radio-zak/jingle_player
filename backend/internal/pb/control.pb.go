@@ -273,6 +273,74 @@ func (x *Palette) GetSlots() []*PlayerSlot {
 	return nil
 }
 
+type PaletteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Id            int32                  `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PaletteResponse) Reset() {
+	*x = PaletteResponse{}
+	mi := &file_control_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaletteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaletteResponse) ProtoMessage() {}
+
+func (x *PaletteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_control_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaletteResponse.ProtoReflect.Descriptor instead.
+func (*PaletteResponse) Descriptor() ([]byte, []int) {
+	return file_control_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PaletteResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *PaletteResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *PaletteResponse) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *PaletteResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 type PaletteID struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -282,7 +350,7 @@ type PaletteID struct {
 
 func (x *PaletteID) Reset() {
 	*x = PaletteID{}
-	mi := &file_control_proto_msgTypes[5]
+	mi := &file_control_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -294,7 +362,7 @@ func (x *PaletteID) String() string {
 func (*PaletteID) ProtoMessage() {}
 
 func (x *PaletteID) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[5]
+	mi := &file_control_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +375,7 @@ func (x *PaletteID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaletteID.ProtoReflect.Descriptor instead.
 func (*PaletteID) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{5}
+	return file_control_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PaletteID) GetId() int32 {
@@ -315,6 +383,94 @@ func (x *PaletteID) GetId() int32 {
 		return x.Id
 	}
 	return 0
+}
+
+type ActivatePalette struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActivatePalette) Reset() {
+	*x = ActivatePalette{}
+	mi := &file_control_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActivatePalette) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActivatePalette) ProtoMessage() {}
+
+func (x *ActivatePalette) ProtoReflect() protoreflect.Message {
+	mi := &file_control_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActivatePalette.ProtoReflect.Descriptor instead.
+func (*ActivatePalette) Descriptor() ([]byte, []int) {
+	return file_control_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ActivatePalette) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type PaletteActivateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PaletteActivateResponse) Reset() {
+	*x = PaletteActivateResponse{}
+	mi := &file_control_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaletteActivateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaletteActivateResponse) ProtoMessage() {}
+
+func (x *PaletteActivateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_control_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaletteActivateResponse.ProtoReflect.Descriptor instead.
+func (*PaletteActivateResponse) Descriptor() ([]byte, []int) {
+	return file_control_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *PaletteActivateResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 type AudioFile struct {
@@ -329,7 +485,7 @@ type AudioFile struct {
 
 func (x *AudioFile) Reset() {
 	*x = AudioFile{}
-	mi := &file_control_proto_msgTypes[6]
+	mi := &file_control_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +497,7 @@ func (x *AudioFile) String() string {
 func (*AudioFile) ProtoMessage() {}
 
 func (x *AudioFile) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[6]
+	mi := &file_control_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +510,7 @@ func (x *AudioFile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AudioFile.ProtoReflect.Descriptor instead.
 func (*AudioFile) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{6}
+	return file_control_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AudioFile) GetId() int32 {
@@ -385,6 +541,82 @@ func (x *AudioFile) GetDuration() float64 {
 	return 0
 }
 
+type AudioFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	FileName      string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FilePath      string                 `protobuf:"bytes,4,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"`
+	Duration      float64                `protobuf:"fixed64,5,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioFileResponse) Reset() {
+	*x = AudioFileResponse{}
+	mi := &file_control_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioFileResponse) ProtoMessage() {}
+
+func (x *AudioFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_control_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioFileResponse.ProtoReflect.Descriptor instead.
+func (*AudioFileResponse) Descriptor() ([]byte, []int) {
+	return file_control_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AudioFileResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *AudioFileResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *AudioFileResponse) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *AudioFileResponse) GetFilePath() string {
+	if x != nil {
+		return x.FilePath
+	}
+	return ""
+}
+
+func (x *AudioFileResponse) GetDuration() float64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
 type PlayerSlot struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -395,7 +627,7 @@ type PlayerSlot struct {
 
 func (x *PlayerSlot) Reset() {
 	*x = PlayerSlot{}
-	mi := &file_control_proto_msgTypes[7]
+	mi := &file_control_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -407,7 +639,7 @@ func (x *PlayerSlot) String() string {
 func (*PlayerSlot) ProtoMessage() {}
 
 func (x *PlayerSlot) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[7]
+	mi := &file_control_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -420,7 +652,7 @@ func (x *PlayerSlot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayerSlot.ProtoReflect.Descriptor instead.
 func (*PlayerSlot) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{7}
+	return file_control_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PlayerSlot) GetId() int32 {
@@ -445,7 +677,7 @@ type PaletteListRequest struct {
 
 func (x *PaletteListRequest) Reset() {
 	*x = PaletteListRequest{}
-	mi := &file_control_proto_msgTypes[8]
+	mi := &file_control_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -457,7 +689,7 @@ func (x *PaletteListRequest) String() string {
 func (*PaletteListRequest) ProtoMessage() {}
 
 func (x *PaletteListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[8]
+	mi := &file_control_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -470,7 +702,7 @@ func (x *PaletteListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaletteListRequest.ProtoReflect.Descriptor instead.
 func (*PaletteListRequest) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{8}
+	return file_control_proto_rawDescGZIP(), []int{12}
 }
 
 type PaletteListResponse struct {
@@ -483,7 +715,7 @@ type PaletteListResponse struct {
 
 func (x *PaletteListResponse) Reset() {
 	*x = PaletteListResponse{}
-	mi := &file_control_proto_msgTypes[9]
+	mi := &file_control_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -495,7 +727,7 @@ func (x *PaletteListResponse) String() string {
 func (*PaletteListResponse) ProtoMessage() {}
 
 func (x *PaletteListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[9]
+	mi := &file_control_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -508,7 +740,7 @@ func (x *PaletteListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaletteListResponse.ProtoReflect.Descriptor instead.
 func (*PaletteListResponse) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{9}
+	return file_control_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *PaletteListResponse) GetSuccess() bool {
@@ -535,7 +767,7 @@ type PaletteGetResponse struct {
 
 func (x *PaletteGetResponse) Reset() {
 	*x = PaletteGetResponse{}
-	mi := &file_control_proto_msgTypes[10]
+	mi := &file_control_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -547,7 +779,7 @@ func (x *PaletteGetResponse) String() string {
 func (*PaletteGetResponse) ProtoMessage() {}
 
 func (x *PaletteGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[10]
+	mi := &file_control_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -560,7 +792,7 @@ func (x *PaletteGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaletteGetResponse.ProtoReflect.Descriptor instead.
 func (*PaletteGetResponse) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{10}
+	return file_control_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *PaletteGetResponse) GetSuccess() bool {
@@ -586,7 +818,7 @@ type PaletteDeleteResponse struct {
 
 func (x *PaletteDeleteResponse) Reset() {
 	*x = PaletteDeleteResponse{}
-	mi := &file_control_proto_msgTypes[11]
+	mi := &file_control_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -598,7 +830,7 @@ func (x *PaletteDeleteResponse) String() string {
 func (*PaletteDeleteResponse) ProtoMessage() {}
 
 func (x *PaletteDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[11]
+	mi := &file_control_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -611,7 +843,7 @@ func (x *PaletteDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PaletteDeleteResponse.ProtoReflect.Descriptor instead.
 func (*PaletteDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{11}
+	return file_control_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *PaletteDeleteResponse) GetSuccess() bool {
@@ -630,7 +862,7 @@ type AudioFileList struct {
 
 func (x *AudioFileList) Reset() {
 	*x = AudioFileList{}
-	mi := &file_control_proto_msgTypes[12]
+	mi := &file_control_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -642,7 +874,7 @@ func (x *AudioFileList) String() string {
 func (*AudioFileList) ProtoMessage() {}
 
 func (x *AudioFileList) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[12]
+	mi := &file_control_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +887,7 @@ func (x *AudioFileList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AudioFileList.ProtoReflect.Descriptor instead.
 func (*AudioFileList) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{12}
+	return file_control_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AudioFileList) GetAudioFiles() []*AudioFile {
@@ -673,7 +905,7 @@ type ListAudioFileRequest struct {
 
 func (x *ListAudioFileRequest) Reset() {
 	*x = ListAudioFileRequest{}
-	mi := &file_control_proto_msgTypes[13]
+	mi := &file_control_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -685,7 +917,7 @@ func (x *ListAudioFileRequest) String() string {
 func (*ListAudioFileRequest) ProtoMessage() {}
 
 func (x *ListAudioFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[13]
+	mi := &file_control_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +930,7 @@ func (x *ListAudioFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAudioFileRequest.ProtoReflect.Descriptor instead.
 func (*ListAudioFileRequest) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{13}
+	return file_control_proto_rawDescGZIP(), []int{17}
 }
 
 type AudioFileID struct {
@@ -710,7 +942,7 @@ type AudioFileID struct {
 
 func (x *AudioFileID) Reset() {
 	*x = AudioFileID{}
-	mi := &file_control_proto_msgTypes[14]
+	mi := &file_control_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -722,7 +954,7 @@ func (x *AudioFileID) String() string {
 func (*AudioFileID) ProtoMessage() {}
 
 func (x *AudioFileID) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[14]
+	mi := &file_control_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -735,7 +967,7 @@ func (x *AudioFileID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AudioFileID.ProtoReflect.Descriptor instead.
 func (*AudioFileID) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{14}
+	return file_control_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *AudioFileID) GetId() int32 {
@@ -755,7 +987,7 @@ type GetAudioFileResponse struct {
 
 func (x *GetAudioFileResponse) Reset() {
 	*x = GetAudioFileResponse{}
-	mi := &file_control_proto_msgTypes[15]
+	mi := &file_control_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -767,7 +999,7 @@ func (x *GetAudioFileResponse) String() string {
 func (*GetAudioFileResponse) ProtoMessage() {}
 
 func (x *GetAudioFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[15]
+	mi := &file_control_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -780,7 +1012,7 @@ func (x *GetAudioFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAudioFileResponse.ProtoReflect.Descriptor instead.
 func (*GetAudioFileResponse) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{15}
+	return file_control_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetAudioFileResponse) GetSuccess() bool {
@@ -806,7 +1038,7 @@ type AudioFileDeleteResponse struct {
 
 func (x *AudioFileDeleteResponse) Reset() {
 	*x = AudioFileDeleteResponse{}
-	mi := &file_control_proto_msgTypes[16]
+	mi := &file_control_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -818,7 +1050,7 @@ func (x *AudioFileDeleteResponse) String() string {
 func (*AudioFileDeleteResponse) ProtoMessage() {}
 
 func (x *AudioFileDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[16]
+	mi := &file_control_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -831,7 +1063,7 @@ func (x *AudioFileDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AudioFileDeleteResponse.ProtoReflect.Descriptor instead.
 func (*AudioFileDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{16}
+	return file_control_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *AudioFileDeleteResponse) GetSuccess() bool {
@@ -851,7 +1083,7 @@ type AssignAudioFileRequest struct {
 
 func (x *AssignAudioFileRequest) Reset() {
 	*x = AssignAudioFileRequest{}
-	mi := &file_control_proto_msgTypes[17]
+	mi := &file_control_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -863,7 +1095,7 @@ func (x *AssignAudioFileRequest) String() string {
 func (*AssignAudioFileRequest) ProtoMessage() {}
 
 func (x *AssignAudioFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[17]
+	mi := &file_control_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -876,7 +1108,7 @@ func (x *AssignAudioFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignAudioFileRequest.ProtoReflect.Descriptor instead.
 func (*AssignAudioFileRequest) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{17}
+	return file_control_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *AssignAudioFileRequest) GetSlotId() int32 {
@@ -902,7 +1134,7 @@ type UnassignAudioFileRequest struct {
 
 func (x *UnassignAudioFileRequest) Reset() {
 	*x = UnassignAudioFileRequest{}
-	mi := &file_control_proto_msgTypes[18]
+	mi := &file_control_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -914,7 +1146,7 @@ func (x *UnassignAudioFileRequest) String() string {
 func (*UnassignAudioFileRequest) ProtoMessage() {}
 
 func (x *UnassignAudioFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_control_proto_msgTypes[18]
+	mi := &file_control_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -927,7 +1159,7 @@ func (x *UnassignAudioFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnassignAudioFileRequest.ProtoReflect.Descriptor instead.
 func (*UnassignAudioFileRequest) Descriptor() ([]byte, []int) {
-	return file_control_proto_rawDescGZIP(), []int{18}
+	return file_control_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *UnassignAudioFileRequest) GetSlotId() int32 {
@@ -956,14 +1188,29 @@ const file_control_proto_rawDesc = "" +
 	"\aPalette\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12$\n" +
-	"\x05slots\x18\x03 \x03(\v2\x0e.pb.PlayerSlotR\x05slots\"\x1b\n" +
+	"\x05slots\x18\x03 \x03(\v2\x0e.pb.PlayerSlotR\x05slots\"i\n" +
+	"\x0fPaletteResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\"\x1b\n" +
 	"\tPaletteID\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"q\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"!\n" +
+	"\x0fActivatePalette\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"3\n" +
+	"\x17PaletteActivateResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"q\n" +
 	"\tAudioFile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x1b\n" +
 	"\tfile_path\x18\x03 \x01(\tR\bfilePath\x12\x1a\n" +
-	"\bduration\x18\x04 \x01(\x01R\bduration\"?\n" +
+	"\bduration\x18\x04 \x01(\x01R\bduration\"\x9d\x01\n" +
+	"\x11AudioFileResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1b\n" +
+	"\tfile_name\x18\x03 \x01(\tR\bfileName\x12\x1b\n" +
+	"\tfile_path\x18\x04 \x01(\tR\bfilePath\x12\x1a\n" +
+	"\bduration\x18\x05 \x01(\x01R\bduration\"?\n" +
 	"\n" +
 	"PlayerSlot\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12!\n" +
@@ -993,20 +1240,21 @@ const file_control_proto_rawDesc = "" +
 	"\aslot_id\x18\x01 \x01(\x05R\x06slotId\x12\x17\n" +
 	"\afile_id\x18\x02 \x01(\x05R\x06fileId\"3\n" +
 	"\x18UnassignAudioFileRequest\x12\x17\n" +
-	"\aslot_id\x18\x01 \x01(\x05R\x06slotId2\xc3\x06\n" +
+	"\aslot_id\x18\x01 \x01(\x05R\x06slotId2\xa2\a\n" +
 	"\fAudioService\x12A\n" +
 	"\x14StreamPlaybackStatus\x12\x16.pb.AudioStatusRequest\x1a\x0f.pb.AudioStatus0\x01\x12<\n" +
 	"\x0fPlaybackCommand\x12\x13.pb.PlaybackRequest\x1a\x14.pb.PlaybackResponse\x12?\n" +
 	"\fListPalettes\x12\x16.pb.PaletteListRequest\x1a\x17.pb.PaletteListResponse\x123\n" +
 	"\n" +
-	"GetPalette\x12\r.pb.PaletteID\x1a\x16.pb.PaletteGetResponse\x12)\n" +
-	"\rUpdatePalette\x12\v.pb.Palette\x1a\v.pb.Palette\x12)\n" +
-	"\rCreatePalette\x12\v.pb.Palette\x1a\v.pb.Palette\x129\n" +
+	"GetPalette\x12\r.pb.PaletteID\x1a\x16.pb.PaletteGetResponse\x121\n" +
+	"\rUpdatePalette\x12\v.pb.Palette\x1a\x13.pb.PaletteResponse\x121\n" +
+	"\rCreatePalette\x12\v.pb.Palette\x1a\x13.pb.PaletteResponse\x129\n" +
 	"\rDeletePalette\x12\r.pb.PaletteID\x1a\x19.pb.PaletteDeleteResponse\x12=\n" +
+	"\x0fActivatePalette\x12\r.pb.PaletteID\x1a\x1b.pb.PaletteActivateResponse\x12=\n" +
 	"\x0eListAudioFiles\x12\x18.pb.ListAudioFileRequest\x1a\x11.pb.AudioFileList\x129\n" +
-	"\fGetAudioFile\x12\x0f.pb.AudioFileID\x1a\x18.pb.GetAudioFileResponse\x12/\n" +
-	"\x0fCreateAudioFile\x12\r.pb.AudioFile\x1a\r.pb.AudioFile\x12/\n" +
-	"\x0fUpdateAudioFile\x12\r.pb.AudioFile\x1a\r.pb.AudioFile\x12?\n" +
+	"\fGetAudioFile\x12\x0f.pb.AudioFileID\x1a\x18.pb.GetAudioFileResponse\x127\n" +
+	"\x0fCreateAudioFile\x12\r.pb.AudioFile\x1a\x15.pb.AudioFileResponse\x127\n" +
+	"\x0fUpdateAudioFile\x12\r.pb.AudioFile\x1a\x15.pb.AudioFileResponse\x12?\n" +
 	"\x0fDeleteAudioFile\x12\x0f.pb.AudioFileID\x1a\x1b.pb.AudioFileDeleteResponse\x12C\n" +
 	"\x15AssignAudioFileToSlot\x12\x1a.pb.AssignAudioFileRequest\x1a\x0e.pb.PlayerSlot\x12I\n" +
 	"\x19UnassignAudioFileFromSlot\x12\x1c.pb.UnassignAudioFileRequest\x1a\x0e.pb.PlayerSlotB\x06Z\x04./pbb\x06proto3"
@@ -1023,65 +1271,71 @@ func file_control_proto_rawDescGZIP() []byte {
 	return file_control_proto_rawDescData
 }
 
-var file_control_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_control_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_control_proto_goTypes = []any{
 	(*AudioStatusRequest)(nil),       // 0: pb.AudioStatusRequest
 	(*AudioStatus)(nil),              // 1: pb.AudioStatus
 	(*PlaybackRequest)(nil),          // 2: pb.PlaybackRequest
 	(*PlaybackResponse)(nil),         // 3: pb.PlaybackResponse
 	(*Palette)(nil),                  // 4: pb.Palette
-	(*PaletteID)(nil),                // 5: pb.PaletteID
-	(*AudioFile)(nil),                // 6: pb.AudioFile
-	(*PlayerSlot)(nil),               // 7: pb.PlayerSlot
-	(*PaletteListRequest)(nil),       // 8: pb.PaletteListRequest
-	(*PaletteListResponse)(nil),      // 9: pb.PaletteListResponse
-	(*PaletteGetResponse)(nil),       // 10: pb.PaletteGetResponse
-	(*PaletteDeleteResponse)(nil),    // 11: pb.PaletteDeleteResponse
-	(*AudioFileList)(nil),            // 12: pb.AudioFileList
-	(*ListAudioFileRequest)(nil),     // 13: pb.ListAudioFileRequest
-	(*AudioFileID)(nil),              // 14: pb.AudioFileID
-	(*GetAudioFileResponse)(nil),     // 15: pb.GetAudioFileResponse
-	(*AudioFileDeleteResponse)(nil),  // 16: pb.AudioFileDeleteResponse
-	(*AssignAudioFileRequest)(nil),   // 17: pb.AssignAudioFileRequest
-	(*UnassignAudioFileRequest)(nil), // 18: pb.UnassignAudioFileRequest
+	(*PaletteResponse)(nil),          // 5: pb.PaletteResponse
+	(*PaletteID)(nil),                // 6: pb.PaletteID
+	(*ActivatePalette)(nil),          // 7: pb.ActivatePalette
+	(*PaletteActivateResponse)(nil),  // 8: pb.PaletteActivateResponse
+	(*AudioFile)(nil),                // 9: pb.AudioFile
+	(*AudioFileResponse)(nil),        // 10: pb.AudioFileResponse
+	(*PlayerSlot)(nil),               // 11: pb.PlayerSlot
+	(*PaletteListRequest)(nil),       // 12: pb.PaletteListRequest
+	(*PaletteListResponse)(nil),      // 13: pb.PaletteListResponse
+	(*PaletteGetResponse)(nil),       // 14: pb.PaletteGetResponse
+	(*PaletteDeleteResponse)(nil),    // 15: pb.PaletteDeleteResponse
+	(*AudioFileList)(nil),            // 16: pb.AudioFileList
+	(*ListAudioFileRequest)(nil),     // 17: pb.ListAudioFileRequest
+	(*AudioFileID)(nil),              // 18: pb.AudioFileID
+	(*GetAudioFileResponse)(nil),     // 19: pb.GetAudioFileResponse
+	(*AudioFileDeleteResponse)(nil),  // 20: pb.AudioFileDeleteResponse
+	(*AssignAudioFileRequest)(nil),   // 21: pb.AssignAudioFileRequest
+	(*UnassignAudioFileRequest)(nil), // 22: pb.UnassignAudioFileRequest
 }
 var file_control_proto_depIdxs = []int32{
-	7,  // 0: pb.Palette.slots:type_name -> pb.PlayerSlot
-	6,  // 1: pb.PlayerSlot.file:type_name -> pb.AudioFile
+	11, // 0: pb.Palette.slots:type_name -> pb.PlayerSlot
+	9,  // 1: pb.PlayerSlot.file:type_name -> pb.AudioFile
 	4,  // 2: pb.PaletteListResponse.palettes:type_name -> pb.Palette
 	4,  // 3: pb.PaletteGetResponse.palette:type_name -> pb.Palette
-	6,  // 4: pb.AudioFileList.audio_files:type_name -> pb.AudioFile
-	6,  // 5: pb.GetAudioFileResponse.audio_file:type_name -> pb.AudioFile
+	9,  // 4: pb.AudioFileList.audio_files:type_name -> pb.AudioFile
+	9,  // 5: pb.GetAudioFileResponse.audio_file:type_name -> pb.AudioFile
 	0,  // 6: pb.AudioService.StreamPlaybackStatus:input_type -> pb.AudioStatusRequest
 	2,  // 7: pb.AudioService.PlaybackCommand:input_type -> pb.PlaybackRequest
-	8,  // 8: pb.AudioService.ListPalettes:input_type -> pb.PaletteListRequest
-	5,  // 9: pb.AudioService.GetPalette:input_type -> pb.PaletteID
+	12, // 8: pb.AudioService.ListPalettes:input_type -> pb.PaletteListRequest
+	6,  // 9: pb.AudioService.GetPalette:input_type -> pb.PaletteID
 	4,  // 10: pb.AudioService.UpdatePalette:input_type -> pb.Palette
 	4,  // 11: pb.AudioService.CreatePalette:input_type -> pb.Palette
-	5,  // 12: pb.AudioService.DeletePalette:input_type -> pb.PaletteID
-	13, // 13: pb.AudioService.ListAudioFiles:input_type -> pb.ListAudioFileRequest
-	14, // 14: pb.AudioService.GetAudioFile:input_type -> pb.AudioFileID
-	6,  // 15: pb.AudioService.CreateAudioFile:input_type -> pb.AudioFile
-	6,  // 16: pb.AudioService.UpdateAudioFile:input_type -> pb.AudioFile
-	14, // 17: pb.AudioService.DeleteAudioFile:input_type -> pb.AudioFileID
-	17, // 18: pb.AudioService.AssignAudioFileToSlot:input_type -> pb.AssignAudioFileRequest
-	18, // 19: pb.AudioService.UnassignAudioFileFromSlot:input_type -> pb.UnassignAudioFileRequest
-	1,  // 20: pb.AudioService.StreamPlaybackStatus:output_type -> pb.AudioStatus
-	3,  // 21: pb.AudioService.PlaybackCommand:output_type -> pb.PlaybackResponse
-	9,  // 22: pb.AudioService.ListPalettes:output_type -> pb.PaletteListResponse
-	10, // 23: pb.AudioService.GetPalette:output_type -> pb.PaletteGetResponse
-	4,  // 24: pb.AudioService.UpdatePalette:output_type -> pb.Palette
-	4,  // 25: pb.AudioService.CreatePalette:output_type -> pb.Palette
-	11, // 26: pb.AudioService.DeletePalette:output_type -> pb.PaletteDeleteResponse
-	12, // 27: pb.AudioService.ListAudioFiles:output_type -> pb.AudioFileList
-	15, // 28: pb.AudioService.GetAudioFile:output_type -> pb.GetAudioFileResponse
-	6,  // 29: pb.AudioService.CreateAudioFile:output_type -> pb.AudioFile
-	6,  // 30: pb.AudioService.UpdateAudioFile:output_type -> pb.AudioFile
-	16, // 31: pb.AudioService.DeleteAudioFile:output_type -> pb.AudioFileDeleteResponse
-	7,  // 32: pb.AudioService.AssignAudioFileToSlot:output_type -> pb.PlayerSlot
-	7,  // 33: pb.AudioService.UnassignAudioFileFromSlot:output_type -> pb.PlayerSlot
-	20, // [20:34] is the sub-list for method output_type
-	6,  // [6:20] is the sub-list for method input_type
+	6,  // 12: pb.AudioService.DeletePalette:input_type -> pb.PaletteID
+	6,  // 13: pb.AudioService.ActivatePalette:input_type -> pb.PaletteID
+	17, // 14: pb.AudioService.ListAudioFiles:input_type -> pb.ListAudioFileRequest
+	18, // 15: pb.AudioService.GetAudioFile:input_type -> pb.AudioFileID
+	9,  // 16: pb.AudioService.CreateAudioFile:input_type -> pb.AudioFile
+	9,  // 17: pb.AudioService.UpdateAudioFile:input_type -> pb.AudioFile
+	18, // 18: pb.AudioService.DeleteAudioFile:input_type -> pb.AudioFileID
+	21, // 19: pb.AudioService.AssignAudioFileToSlot:input_type -> pb.AssignAudioFileRequest
+	22, // 20: pb.AudioService.UnassignAudioFileFromSlot:input_type -> pb.UnassignAudioFileRequest
+	1,  // 21: pb.AudioService.StreamPlaybackStatus:output_type -> pb.AudioStatus
+	3,  // 22: pb.AudioService.PlaybackCommand:output_type -> pb.PlaybackResponse
+	13, // 23: pb.AudioService.ListPalettes:output_type -> pb.PaletteListResponse
+	14, // 24: pb.AudioService.GetPalette:output_type -> pb.PaletteGetResponse
+	5,  // 25: pb.AudioService.UpdatePalette:output_type -> pb.PaletteResponse
+	5,  // 26: pb.AudioService.CreatePalette:output_type -> pb.PaletteResponse
+	15, // 27: pb.AudioService.DeletePalette:output_type -> pb.PaletteDeleteResponse
+	8,  // 28: pb.AudioService.ActivatePalette:output_type -> pb.PaletteActivateResponse
+	16, // 29: pb.AudioService.ListAudioFiles:output_type -> pb.AudioFileList
+	19, // 30: pb.AudioService.GetAudioFile:output_type -> pb.GetAudioFileResponse
+	10, // 31: pb.AudioService.CreateAudioFile:output_type -> pb.AudioFileResponse
+	10, // 32: pb.AudioService.UpdateAudioFile:output_type -> pb.AudioFileResponse
+	20, // 33: pb.AudioService.DeleteAudioFile:output_type -> pb.AudioFileDeleteResponse
+	11, // 34: pb.AudioService.AssignAudioFileToSlot:output_type -> pb.PlayerSlot
+	11, // 35: pb.AudioService.UnassignAudioFileFromSlot:output_type -> pb.PlayerSlot
+	21, // [21:36] is the sub-list for method output_type
+	6,  // [6:21] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
 	6,  // [6:6] is the sub-list for extension extendee
 	0,  // [0:6] is the sub-list for field type_name
@@ -1098,7 +1352,7 @@ func file_control_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_control_proto_rawDesc), len(file_control_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

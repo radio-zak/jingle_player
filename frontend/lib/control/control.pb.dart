@@ -325,6 +325,96 @@ class Palette extends $pb.GeneratedMessage {
   $pb.PbList<PlayerSlot> get slots => $_getList(2);
 }
 
+class PaletteResponse extends $pb.GeneratedMessage {
+  factory PaletteResponse({
+    $core.bool? success,
+    $core.String? message,
+    $core.int? id,
+    $core.String? name,
+  }) {
+    final result = create();
+    if (success != null) result.success = success;
+    if (message != null) result.message = message;
+    if (id != null) result.id = id;
+    if (name != null) result.name = name;
+    return result;
+  }
+
+  PaletteResponse._();
+
+  factory PaletteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PaletteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PaletteResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..aOB(1, _omitFieldNames ? '' : 'success')
+    ..aOS(2, _omitFieldNames ? '' : 'message')
+    ..aI(3, _omitFieldNames ? '' : 'id')
+    ..aOS(4, _omitFieldNames ? '' : 'name')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PaletteResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PaletteResponse copyWith(void Function(PaletteResponse) updates) =>
+      super.copyWith((message) => updates(message as PaletteResponse))
+          as PaletteResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PaletteResponse create() => PaletteResponse._();
+  @$core.override
+  PaletteResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PaletteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PaletteResponse>(create);
+  static PaletteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get success => $_getBF(0);
+  @$pb.TagNumber(1)
+  set success($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSuccess() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSuccess() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get message => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set message($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMessage() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMessage() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get id => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set id($core.int value) => $_setSignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get name => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set name($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasName() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearName() => $_clearField(4);
+}
+
 class PaletteID extends $pb.GeneratedMessage {
   factory PaletteID({
     $core.int? id,
@@ -376,6 +466,115 @@ class PaletteID extends $pb.GeneratedMessage {
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
   void clearId() => $_clearField(1);
+}
+
+class ActivatePalette extends $pb.GeneratedMessage {
+  factory ActivatePalette({
+    $core.int? id,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    return result;
+  }
+
+  ActivatePalette._();
+
+  factory ActivatePalette.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory ActivatePalette.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'ActivatePalette',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..aI(1, _omitFieldNames ? '' : 'id')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ActivatePalette clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ActivatePalette copyWith(void Function(ActivatePalette) updates) =>
+      super.copyWith((message) => updates(message as ActivatePalette))
+          as ActivatePalette;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ActivatePalette create() => ActivatePalette._();
+  @$core.override
+  ActivatePalette createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static ActivatePalette getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ActivatePalette>(create);
+  static ActivatePalette? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get id => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set id($core.int value) => $_setSignedInt32(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+}
+
+class PaletteActivateResponse extends $pb.GeneratedMessage {
+  factory PaletteActivateResponse({
+    $core.bool? success,
+  }) {
+    final result = create();
+    if (success != null) result.success = success;
+    return result;
+  }
+
+  PaletteActivateResponse._();
+
+  factory PaletteActivateResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PaletteActivateResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PaletteActivateResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..aOB(1, _omitFieldNames ? '' : 'success')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PaletteActivateResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PaletteActivateResponse copyWith(
+          void Function(PaletteActivateResponse) updates) =>
+      super.copyWith((message) => updates(message as PaletteActivateResponse))
+          as PaletteActivateResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PaletteActivateResponse create() => PaletteActivateResponse._();
+  @$core.override
+  PaletteActivateResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PaletteActivateResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PaletteActivateResponse>(create);
+  static PaletteActivateResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get success => $_getBF(0);
+  @$pb.TagNumber(1)
+  set success($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSuccess() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSuccess() => $_clearField(1);
 }
 
 class AudioFile extends $pb.GeneratedMessage {
@@ -465,6 +664,108 @@ class AudioFile extends $pb.GeneratedMessage {
   $core.bool hasDuration() => $_has(3);
   @$pb.TagNumber(4)
   void clearDuration() => $_clearField(4);
+}
+
+class AudioFileResponse extends $pb.GeneratedMessage {
+  factory AudioFileResponse({
+    $core.bool? success,
+    $core.String? message,
+    $core.String? fileName,
+    $core.String? filePath,
+    $core.double? duration,
+  }) {
+    final result = create();
+    if (success != null) result.success = success;
+    if (message != null) result.message = message;
+    if (fileName != null) result.fileName = fileName;
+    if (filePath != null) result.filePath = filePath;
+    if (duration != null) result.duration = duration;
+    return result;
+  }
+
+  AudioFileResponse._();
+
+  factory AudioFileResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory AudioFileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'AudioFileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..aOB(1, _omitFieldNames ? '' : 'success')
+    ..aOS(2, _omitFieldNames ? '' : 'message')
+    ..aOS(3, _omitFieldNames ? '' : 'fileName')
+    ..aOS(4, _omitFieldNames ? '' : 'filePath')
+    ..aD(5, _omitFieldNames ? '' : 'duration')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AudioFileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AudioFileResponse copyWith(void Function(AudioFileResponse) updates) =>
+      super.copyWith((message) => updates(message as AudioFileResponse))
+          as AudioFileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AudioFileResponse create() => AudioFileResponse._();
+  @$core.override
+  AudioFileResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static AudioFileResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<AudioFileResponse>(create);
+  static AudioFileResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get success => $_getBF(0);
+  @$pb.TagNumber(1)
+  set success($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSuccess() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSuccess() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get message => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set message($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMessage() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMessage() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get fileName => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set fileName($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasFileName() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearFileName() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get filePath => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set filePath($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasFilePath() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFilePath() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.double get duration => $_getN(4);
+  @$pb.TagNumber(5)
+  set duration($core.double value) => $_setDouble(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasDuration() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearDuration() => $_clearField(5);
 }
 
 class PlayerSlot extends $pb.GeneratedMessage {

@@ -5,12 +5,14 @@ info:
 
 grpc:
   url: localhost:6969
-  method: /pb.AudioService/TriggerCommand
+  method: /pb.AudioService/PlaybackCommand
   methodType: unary
   protoFilePath: ../control.proto
-  message: |-
-    {
-      "slot_id": 0,
-      "action": "PLAY"
-    }
+  message:
+    - title: message 1
+      message: |-
+        {
+          "slot_id": 0,
+          "action": "PLAY"
+        }
   auth: inherit
