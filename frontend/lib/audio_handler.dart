@@ -387,6 +387,9 @@ class AudioProvider extends ChangeNotifier {
   AudioProvider(this.client) {
     connectToBackend();
   }
+
+  List<SlotModel> slots = List.generate(16, (index) => SlotModel(index: index));
+
   void connectToBackend() {
     errorMessage = null;
     audioStatus?.cancel();
@@ -411,10 +414,35 @@ class AudioProvider extends ChangeNotifier {
     );
   }
 
+  void updateSlotsFromBackend(List<dynamic> backendSlots) {
+    List<SlotModel> updated = List.generate(16, (i) => SlotModel(index: i));
+
+    for (var slot in backendSlots) {
+      // Assuming slot.index or slot.slotNumber corresponds to 0..15
+      int idx = slot.index;
+      if (idx >= 0 && idx < 16) {
+        updated[idx] = SlotModel.fromProto(idx, slot);
+      }
+    }
+
+    slots = updated;
+    notifyListeners(); // Triggers Flutter UI rebuild
+  }
+
+  Future<void> loadToPlayer(int index) async {
+    try {
+      final request = PlayerSlotID(id: index);
+      await client.activateSlot(request);
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
   Future<void> play() async {
     try {
-      final request = CommandRequest(slotId: 0, action: "PLAY");
-      await client.triggerCommand(request);
+      final request = PlaybackRequest(action: "PLAY");
+      await client.playbackCommand(request);
     } catch (e) {
       errorMessage = e.toString();
       notifyListeners();
@@ -423,8 +451,8 @@ class AudioProvider extends ChangeNotifier {
 
   Future<void> stop() async {
     try {
-      final request = CommandRequest(slotId: 0, action: "STOP");
-      await client.triggerCommand(request);
+      final request = PlaybackRequest(action: "STOP");
+      await client.playbackCommand(request);
     } catch (e) {
       errorMessage = e.toString();
       notifyListeners();
@@ -435,5 +463,35 @@ class AudioProvider extends ChangeNotifier {
   void dispose() {
     audioStatus?.cancel();
     super.dispose();
+  }
+}
+
+class SlotModel {
+  final int index;
+  final int? fileID;
+  final String fileName;
+  final String filePath;
+  final double duration;
+
+  SlotModel({
+    required this.index,
+    this.fileID,
+    this.fileName = "",
+    this.filePath = "",
+    this.duration = 0.0,
+  });
+
+  factory SlotModel.fromProto(int index, PlayerSlot playerSlot) {
+    if (playerSlot.file == null) {
+      return SlotModel(index: index);
+    }
+    final file = playerSlot.file;
+    return SlotModel(
+      index: index,
+      fileID: file.id,
+      fileName: file.fileName,
+      filePath: file.filePath,
+      duration: file.duration,
+    );
   }
 }

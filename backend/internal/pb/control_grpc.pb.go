@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	AudioService_StreamPlaybackStatus_FullMethodName      = "/pb.AudioService/StreamPlaybackStatus"
+	AudioService_StreamSlotStatus_FullMethodName          = "/pb.AudioService/StreamSlotStatus"
 	AudioService_PlaybackCommand_FullMethodName           = "/pb.AudioService/PlaybackCommand"
 	AudioService_ListPalettes_FullMethodName              = "/pb.AudioService/ListPalettes"
 	AudioService_GetPalette_FullMethodName                = "/pb.AudioService/GetPalette"
@@ -34,6 +35,7 @@ const (
 	AudioService_DeleteAudioFile_FullMethodName           = "/pb.AudioService/DeleteAudioFile"
 	AudioService_AssignAudioFileToSlot_FullMethodName     = "/pb.AudioService/AssignAudioFileToSlot"
 	AudioService_UnassignAudioFileFromSlot_FullMethodName = "/pb.AudioService/UnassignAudioFileFromSlot"
+	AudioService_ActivateSlot_FullMethodName              = "/pb.AudioService/ActivateSlot"
 )
 
 // AudioServiceClient is the client API for AudioService service.
@@ -41,6 +43,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AudioServiceClient interface {
 	StreamPlaybackStatus(ctx context.Context, in *AudioStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AudioStatus], error)
+	StreamSlotStatus(ctx context.Context, in *SlotStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlayerSlot], error)
 	PlaybackCommand(ctx context.Context, in *PlaybackRequest, opts ...grpc.CallOption) (*PlaybackResponse, error)
 	ListPalettes(ctx context.Context, in *PaletteListRequest, opts ...grpc.CallOption) (*PaletteListResponse, error)
 	GetPalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteGetResponse, error)
@@ -55,6 +58,7 @@ type AudioServiceClient interface {
 	DeleteAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*AudioFileDeleteResponse, error)
 	AssignAudioFileToSlot(ctx context.Context, in *AssignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error)
 	UnassignAudioFileFromSlot(ctx context.Context, in *UnassignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error)
+	ActivateSlot(ctx context.Context, in *PlayerSlotID, opts ...grpc.CallOption) (*PlayerSlot, error)
 }
 
 type audioServiceClient struct {
@@ -83,6 +87,25 @@ func (c *audioServiceClient) StreamPlaybackStatus(ctx context.Context, in *Audio
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AudioService_StreamPlaybackStatusClient = grpc.ServerStreamingClient[AudioStatus]
+
+func (c *audioServiceClient) StreamSlotStatus(ctx context.Context, in *SlotStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PlayerSlot], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AudioService_ServiceDesc.Streams[1], AudioService_StreamSlotStatus_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[SlotStatusRequest, PlayerSlot]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AudioService_StreamSlotStatusClient = grpc.ServerStreamingClient[PlayerSlot]
 
 func (c *audioServiceClient) PlaybackCommand(ctx context.Context, in *PlaybackRequest, opts ...grpc.CallOption) (*PlaybackResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -224,11 +247,22 @@ func (c *audioServiceClient) UnassignAudioFileFromSlot(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *audioServiceClient) ActivateSlot(ctx context.Context, in *PlayerSlotID, opts ...grpc.CallOption) (*PlayerSlot, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlayerSlot)
+	err := c.cc.Invoke(ctx, AudioService_ActivateSlot_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AudioServiceServer is the server API for AudioService service.
 // All implementations must embed UnimplementedAudioServiceServer
 // for forward compatibility.
 type AudioServiceServer interface {
 	StreamPlaybackStatus(*AudioStatusRequest, grpc.ServerStreamingServer[AudioStatus]) error
+	StreamSlotStatus(*SlotStatusRequest, grpc.ServerStreamingServer[PlayerSlot]) error
 	PlaybackCommand(context.Context, *PlaybackRequest) (*PlaybackResponse, error)
 	ListPalettes(context.Context, *PaletteListRequest) (*PaletteListResponse, error)
 	GetPalette(context.Context, *PaletteID) (*PaletteGetResponse, error)
@@ -243,6 +277,7 @@ type AudioServiceServer interface {
 	DeleteAudioFile(context.Context, *AudioFileID) (*AudioFileDeleteResponse, error)
 	AssignAudioFileToSlot(context.Context, *AssignAudioFileRequest) (*PlayerSlot, error)
 	UnassignAudioFileFromSlot(context.Context, *UnassignAudioFileRequest) (*PlayerSlot, error)
+	ActivateSlot(context.Context, *PlayerSlotID) (*PlayerSlot, error)
 	mustEmbedUnimplementedAudioServiceServer()
 }
 
@@ -255,6 +290,9 @@ type UnimplementedAudioServiceServer struct{}
 
 func (UnimplementedAudioServiceServer) StreamPlaybackStatus(*AudioStatusRequest, grpc.ServerStreamingServer[AudioStatus]) error {
 	return status.Error(codes.Unimplemented, "method StreamPlaybackStatus not implemented")
+}
+func (UnimplementedAudioServiceServer) StreamSlotStatus(*SlotStatusRequest, grpc.ServerStreamingServer[PlayerSlot]) error {
+	return status.Error(codes.Unimplemented, "method StreamSlotStatus not implemented")
 }
 func (UnimplementedAudioServiceServer) PlaybackCommand(context.Context, *PlaybackRequest) (*PlaybackResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PlaybackCommand not implemented")
@@ -298,6 +336,9 @@ func (UnimplementedAudioServiceServer) AssignAudioFileToSlot(context.Context, *A
 func (UnimplementedAudioServiceServer) UnassignAudioFileFromSlot(context.Context, *UnassignAudioFileRequest) (*PlayerSlot, error) {
 	return nil, status.Error(codes.Unimplemented, "method UnassignAudioFileFromSlot not implemented")
 }
+func (UnimplementedAudioServiceServer) ActivateSlot(context.Context, *PlayerSlotID) (*PlayerSlot, error) {
+	return nil, status.Error(codes.Unimplemented, "method ActivateSlot not implemented")
+}
 func (UnimplementedAudioServiceServer) mustEmbedUnimplementedAudioServiceServer() {}
 func (UnimplementedAudioServiceServer) testEmbeddedByValue()                      {}
 
@@ -329,6 +370,17 @@ func _AudioService_StreamPlaybackStatus_Handler(srv interface{}, stream grpc.Ser
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AudioService_StreamPlaybackStatusServer = grpc.ServerStreamingServer[AudioStatus]
+
+func _AudioService_StreamSlotStatus_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(SlotStatusRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AudioServiceServer).StreamSlotStatus(m, &grpc.GenericServerStream[SlotStatusRequest, PlayerSlot]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AudioService_StreamSlotStatusServer = grpc.ServerStreamingServer[PlayerSlot]
 
 func _AudioService_PlaybackCommand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PlaybackRequest)
@@ -582,6 +634,24 @@ func _AudioService_UnassignAudioFileFromSlot_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AudioService_ActivateSlot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlayerSlotID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AudioServiceServer).ActivateSlot(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AudioService_ActivateSlot_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AudioServiceServer).ActivateSlot(ctx, req.(*PlayerSlotID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AudioService_ServiceDesc is the grpc.ServiceDesc for AudioService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -645,11 +715,20 @@ var AudioService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "UnassignAudioFileFromSlot",
 			Handler:    _AudioService_UnassignAudioFileFromSlot_Handler,
 		},
+		{
+			MethodName: "ActivateSlot",
+			Handler:    _AudioService_ActivateSlot_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamPlaybackStatus",
 			Handler:       _AudioService_StreamPlaybackStatus_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamSlotStatus",
+			Handler:       _AudioService_StreamSlotStatus_Handler,
 			ServerStreams: true,
 		},
 	},

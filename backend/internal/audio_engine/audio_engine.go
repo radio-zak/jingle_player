@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"jingle_player_backend/internal/db"
+	"jingle_player_backend/internal/models"
+	"jingle_player_backend/internal/uiservice"
 	"os"
 	"sync"
 	"time"
@@ -20,16 +21,11 @@ type Player struct {
 	channels   int
 	bitDepth   int
 	bufferSize int
-	AudioStatus
-	listeners      map[chan AudioStatus]struct{}
-	mu             sync.RWMutex
-	Slots          map[int32]*PlayerSlot
+	*models.AudioStatus
+	UI             *uiservice.UIService
+	Mu             sync.RWMutex
+	Slots          map[int32]*models.PlayerSlot
 	cancelPlayback context.CancelFunc
-}
-
-type PlayerSlot struct {
-	ID        int32
-	AudioFile db.AudioFile
 }
 
 // type AudioFile struct {
@@ -39,19 +35,6 @@ type PlayerSlot struct {
 // 	Duration time.Duration
 // }
 
-type PlaybackState string
-
-const (
-	StatePlaying PlaybackState = "PLAYING"
-	StateStopped PlaybackState = "STOPPED"
-)
-
-type AudioStatus struct {
-	ActiveSlot    int
-	State         PlaybackState
-	TimeRemaining float64
-}
-
 func InitPlayer(sampleRate int, bufferSize int) (*Player, error) {
 	var numSlots = 16
 
@@ -60,35 +43,18 @@ func InitPlayer(sampleRate int, bufferSize int) (*Player, error) {
 		return nil, err
 	}
 	p := &Player{init: true, sampleRate: uint32(sampleRate), channels: 2, bitDepth: 16, bufferSize: bufferSize,
-		AudioStatus: AudioStatus{ActiveSlot: 0, State: StateStopped, TimeRemaining: 0},
-		listeners:   make(map[chan AudioStatus]struct{}), Slots: make(map[int32]*PlayerSlot)}
+		AudioStatus: &models.AudioStatus{ActiveSlot: 0, State: models.StateStopped, TimeRemaining: 0},
+		UI:          uiservice.NewUIService(),
+		Slots:       make(map[int32]*models.PlayerSlot)}
 
 	for i := 0; i <= numSlots-1; i++ {
 		id := int32(i)
-		p.Slots[id] = &PlayerSlot{ID: id}
+		p.Slots[id] = &models.PlayerSlot{ID: id}
 	}
 
 	go p.broadcastPlayerState()
+	go p.broadcastSlotState()
 	return p, nil
-}
-
-// allow clients to read audio state
-func (p *Player) SubscribeToPlayerState() (chan AudioStatus, func()) {
-
-	p.mu.Lock()
-	ch := make(chan AudioStatus, 10)
-	p.listeners[ch] = struct{}{}
-	p.mu.Unlock()
-
-	fmt.Println("New client subscribed to gRPC channel")
-	ch <- p.AudioStatus
-
-	unsub := func() {
-		p.mu.Lock()
-		delete(p.listeners, ch)
-		p.mu.Unlock()
-	}
-	return ch, unsub
 }
 
 // send audiostatus to subscribed clients
@@ -100,13 +66,53 @@ func (p *Player) broadcastPlayerState() {
 	for {
 		select {
 		case <-ticker.C:
-			p.mu.RLock()
-			currentState := AudioStatus{State: p.State, ActiveSlot: p.ActiveSlot, TimeRemaining: p.TimeRemaining}
-			p.mu.RUnlock()
-			for ch := range p.listeners {
+			p.Mu.RLock()
+			p.UI.Mu.RLock()
+			currentAudioState := p.AudioStatus
+			p.Mu.RUnlock()
+			p.UI.Mu.RUnlock()
+			if p.UI.LastAudioStatus == currentAudioState {
+				continue
+			}
+			p.UI.Mu.Lock()
+			p.UI.LastAudioStatus = currentAudioState
+			p.UI.Mu.Unlock()
+			for ch := range p.UI.StatusListeners {
 				select {
-				case ch <- currentState:
+				case ch <- *currentAudioState:
 				default:
+				}
+			}
+		}
+	}
+}
+
+func (p *Player) broadcastSlotState() {
+	fmt.Println("Started broadcasting slot state")
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			for i := 0; i < 16; i++ {
+				p.Mu.RLock()
+				p.UI.Mu.RLock()
+				slot := p.Slots[int32(i)]
+				p.Mu.RUnlock()
+				p.UI.Mu.RUnlock()
+				if p.UI.LastSlotState[i] == slot {
+					continue
+				}
+				fmt.Println("Value of slot", i, "updated in cache")
+				p.UI.Mu.Lock()
+				p.UI.LastSlotState[i] = slot
+				p.UI.Mu.Unlock()
+				for ch := range p.UI.SlotListeners {
+					select {
+					case ch <- *slot:
+					default:
+					}
 				}
 			}
 		}
@@ -134,21 +140,21 @@ func (p *Player) EnumDevices() ([]*portaudio.DeviceInfo, error) {
 }
 
 func (p *Player) StopAudio() error {
-	p.mu.Lock()
+	p.Mu.Lock()
 	cancel := p.cancelPlayback
 	p.cancelPlayback = nil
-	p.mu.Unlock()
+	p.Mu.Unlock()
 	fmt.Println("Stopping playback")
 	cancel()
 	return nil
 }
 
-func (p *Player) PlayAudio(slotID int32) error {
+func (p *Player) PlayAudio() error {
 	ctx, cancel := context.WithCancel(context.Background())
-	p.mu.Lock()
+	p.Mu.Lock()
 	p.cancelPlayback = cancel
-	p.mu.Unlock()
-	go p.runAudioPlayback(ctx, slotID)
+	p.Mu.Unlock()
+	go p.runAudioPlayback(ctx, int32(p.ActiveSlot))
 	return nil
 }
 
@@ -160,10 +166,10 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		return err
 	}
 	defer func() {
-		p.mu.Lock()
+		p.UI.Mu.Lock()
 		p.cancelPlayback = nil
-		p.AudioStatus = AudioStatus{State: StateStopped}
-		p.mu.Unlock()
+		p.AudioStatus = &models.AudioStatus{State: models.StateStopped}
+		p.UI.Mu.Unlock()
 		f.Close()
 	}()
 
@@ -186,7 +192,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		return err
 	}
 	stream.Start()
-	p.AudioStatus = AudioStatus{ActiveSlot: int(slotID), State: StatePlaying, TimeRemaining: 0}
+	p.AudioStatus = &models.AudioStatus{ActiveSlot: int(slotID), State: models.StatePlaying, TimeRemaining: 0}
 	defer stream.Close()
 
 	goAudioBuffer := &audio.IntBuffer{
@@ -195,7 +201,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	}
 	go func() {
 		<-ctx.Done()
-		p.AudioStatus = AudioStatus{ActiveSlot: int(slotID), State: StateStopped, TimeRemaining: 0}
+		p.AudioStatus = &models.AudioStatus{ActiveSlot: int(slotID), State: models.StateStopped, TimeRemaining: 0}
 		fmt.Println("Playback stopped.")
 		stream.Abort()
 	}()
@@ -207,7 +213,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		}
 		if n == 0 {
 
-			p.AudioStatus = AudioStatus{ActiveSlot: int(slotID), State: StateStopped, TimeRemaining: 0}
+			p.AudioStatus = &models.AudioStatus{ActiveSlot: 0, State: models.StateStopped, TimeRemaining: 0}
 			fmt.Println("Playback stopped (EOF)")
 			break // End of file
 		}

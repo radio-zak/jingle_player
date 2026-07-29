@@ -41,6 +41,15 @@ class AudioServiceClient extends $grpc.Client {
         options: options);
   }
 
+  $grpc.ResponseStream<$0.PlayerSlot> streamSlotStatus(
+    $0.SlotStatusRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(
+        _$streamSlotStatus, $async.Stream.fromIterable([request]),
+        options: options);
+  }
+
   $grpc.ResponseFuture<$0.PlaybackResponse> playbackCommand(
     $0.PlaybackRequest request, {
     $grpc.CallOptions? options,
@@ -140,6 +149,13 @@ class AudioServiceClient extends $grpc.Client {
         options: options);
   }
 
+  $grpc.ResponseFuture<$0.PlayerSlot> activateSlot(
+    $0.PlayerSlotID request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$activateSlot, request, options: options);
+  }
+
   // method descriptors
 
   static final _$streamPlaybackStatus =
@@ -147,6 +163,11 @@ class AudioServiceClient extends $grpc.Client {
           '/pb.AudioService/StreamPlaybackStatus',
           ($0.AudioStatusRequest value) => value.writeToBuffer(),
           $0.AudioStatus.fromBuffer);
+  static final _$streamSlotStatus =
+      $grpc.ClientMethod<$0.SlotStatusRequest, $0.PlayerSlot>(
+          '/pb.AudioService/StreamSlotStatus',
+          ($0.SlotStatusRequest value) => value.writeToBuffer(),
+          $0.PlayerSlot.fromBuffer);
   static final _$playbackCommand =
       $grpc.ClientMethod<$0.PlaybackRequest, $0.PlaybackResponse>(
           '/pb.AudioService/PlaybackCommand',
@@ -217,6 +238,11 @@ class AudioServiceClient extends $grpc.Client {
           '/pb.AudioService/UnassignAudioFileFromSlot',
           ($0.UnassignAudioFileRequest value) => value.writeToBuffer(),
           $0.PlayerSlot.fromBuffer);
+  static final _$activateSlot =
+      $grpc.ClientMethod<$0.PlayerSlotID, $0.PlayerSlot>(
+          '/pb.AudioService/ActivateSlot',
+          ($0.PlayerSlotID value) => value.writeToBuffer(),
+          $0.PlayerSlot.fromBuffer);
 }
 
 @$pb.GrpcServiceName('pb.AudioService')
@@ -232,6 +258,13 @@ abstract class AudioServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) =>
             $0.AudioStatusRequest.fromBuffer(value),
         ($0.AudioStatus value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SlotStatusRequest, $0.PlayerSlot>(
+        'StreamSlotStatus',
+        streamSlotStatus_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.SlotStatusRequest.fromBuffer(value),
+        ($0.PlayerSlot value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.PlaybackRequest, $0.PlaybackResponse>(
         'PlaybackCommand',
         playbackCommand_Pre,
@@ -335,6 +368,13 @@ abstract class AudioServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) =>
             $0.UnassignAudioFileRequest.fromBuffer(value),
         ($0.PlayerSlot value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.PlayerSlotID, $0.PlayerSlot>(
+        'ActivateSlot',
+        activateSlot_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.PlayerSlotID.fromBuffer(value),
+        ($0.PlayerSlot value) => value.writeToBuffer()));
   }
 
   $async.Stream<$0.AudioStatus> streamPlaybackStatus_Pre(
@@ -345,6 +385,14 @@ abstract class AudioServiceBase extends $grpc.Service {
 
   $async.Stream<$0.AudioStatus> streamPlaybackStatus(
       $grpc.ServiceCall call, $0.AudioStatusRequest request);
+
+  $async.Stream<$0.PlayerSlot> streamSlotStatus_Pre($grpc.ServiceCall $call,
+      $async.Future<$0.SlotStatusRequest> $request) async* {
+    yield* streamSlotStatus($call, await $request);
+  }
+
+  $async.Stream<$0.PlayerSlot> streamSlotStatus(
+      $grpc.ServiceCall call, $0.SlotStatusRequest request);
 
   $async.Future<$0.PlaybackResponse> playbackCommand_Pre(
       $grpc.ServiceCall $call,
@@ -461,4 +509,12 @@ abstract class AudioServiceBase extends $grpc.Service {
 
   $async.Future<$0.PlayerSlot> unassignAudioFileFromSlot(
       $grpc.ServiceCall call, $0.UnassignAudioFileRequest request);
+
+  $async.Future<$0.PlayerSlot> activateSlot_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.PlayerSlotID> $request) async {
+    return activateSlot($call, await $request);
+  }
+
+  $async.Future<$0.PlayerSlot> activateSlot(
+      $grpc.ServiceCall call, $0.PlayerSlotID request);
 }

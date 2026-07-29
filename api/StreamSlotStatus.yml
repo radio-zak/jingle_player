@@ -1,0 +1,14 @@
+info:
+  name: StreamSlotStatus
+  type: grpc
+  seq: 8
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/StreamSlotStatus
+  methodType: server-streaming
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: "{}"
+  auth: inherit

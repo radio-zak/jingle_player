@@ -10,6 +10,8 @@ class JingleGrid extends StatelessWidget {
 
   Future<void> handleButtonClick(BuildContext context, int index) async {
     final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    await audioProvider.stop();
+    await audioProvider.loadToPlayer(index);
     return;
     // if (audioHandler.paletteLoading) {
     //   return;

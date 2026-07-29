@@ -73,7 +73,7 @@ func main() {
 	fmt.Println("Listening on", listenAddr)
 	err = grpcs.Serve(listener)
 	if err != nil {
-		fmt.Println("Failed to create gRPC server on port :6969", err)
+		fmt.Println("Failed to create gRPC server on address", listenAddr, err)
 		return
 	}
 

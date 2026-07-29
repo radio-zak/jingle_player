@@ -54,6 +54,44 @@ class AudioStatusRequest extends $pb.GeneratedMessage {
   static AudioStatusRequest? _defaultInstance;
 }
 
+class SlotStatusRequest extends $pb.GeneratedMessage {
+  factory SlotStatusRequest() => create();
+
+  SlotStatusRequest._();
+
+  factory SlotStatusRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory SlotStatusRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SlotStatusRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SlotStatusRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SlotStatusRequest copyWith(void Function(SlotStatusRequest) updates) =>
+      super.copyWith((message) => updates(message as SlotStatusRequest))
+          as SlotStatusRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SlotStatusRequest create() => SlotStatusRequest._();
+  @$core.override
+  SlotStatusRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static SlotStatusRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SlotStatusRequest>(create);
+  static SlotStatusRequest? _defaultInstance;
+}
+
 class AudioStatus extends $pb.GeneratedMessage {
   factory AudioStatus({
     $core.int? activeSlot,
@@ -834,6 +872,60 @@ class PlayerSlot extends $pb.GeneratedMessage {
   void clearFile() => $_clearField(2);
   @$pb.TagNumber(2)
   AudioFile ensureFile() => $_ensure(1);
+}
+
+class PlayerSlotID extends $pb.GeneratedMessage {
+  factory PlayerSlotID({
+    $core.int? id,
+  }) {
+    final result = create();
+    if (id != null) result.id = id;
+    return result;
+  }
+
+  PlayerSlotID._();
+
+  factory PlayerSlotID.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PlayerSlotID.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PlayerSlotID',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..aI(1, _omitFieldNames ? '' : 'id')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PlayerSlotID clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PlayerSlotID copyWith(void Function(PlayerSlotID) updates) =>
+      super.copyWith((message) => updates(message as PlayerSlotID))
+          as PlayerSlotID;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PlayerSlotID create() => PlayerSlotID._();
+  @$core.override
+  PlayerSlotID createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PlayerSlotID getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PlayerSlotID>(create);
+  static PlayerSlotID? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get id => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set id($core.int value) => $_setSignedInt32(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
 }
 
 class PaletteListRequest extends $pb.GeneratedMessage {

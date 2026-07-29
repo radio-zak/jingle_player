@@ -6,6 +6,7 @@ option go_package = "./pb";
 
 service AudioService {
   rpc StreamPlaybackStatus(AudioStatusRequest) returns (stream AudioStatus);
+  rpc StreamSlotStatus(SlotStatusRequest) returns (stream PlayerSlot);
   rpc PlaybackCommand(PlaybackRequest) returns (PlaybackResponse);
   rpc ListPalettes(PaletteListRequest) returns (PaletteListResponse);
   rpc GetPalette(PaletteID) returns (PaletteGetResponse);
@@ -20,9 +21,12 @@ service AudioService {
   rpc DeleteAudioFile(AudioFileID) returns (AudioFileDeleteResponse);
   rpc AssignAudioFileToSlot(AssignAudioFileRequest) returns (PlayerSlot);
   rpc UnassignAudioFileFromSlot(UnassignAudioFileRequest) returns (PlayerSlot);
+  rpc ActivateSlot(PlayerSlotID) returns (PlayerSlot);
 }
 
 message AudioStatusRequest {}
+
+message SlotStatusRequest {}
 
 message AudioStatus {
   int32 active_slot = 1;
@@ -75,6 +79,8 @@ message PlayerSlot {
   int32 id = 1;
   AudioFile file = 2;
 }
+
+message PlayerSlotID { int32 id = 1; }
 
 message PaletteListRequest {}
 

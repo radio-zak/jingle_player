@@ -24,6 +24,15 @@ const AudioStatusRequest$json = {
 final $typed_data.Uint8List audioStatusRequestDescriptor =
     $convert.base64Decode('ChJBdWRpb1N0YXR1c1JlcXVlc3Q=');
 
+@$core.Deprecated('Use slotStatusRequestDescriptor instead')
+const SlotStatusRequest$json = {
+  '1': 'SlotStatusRequest',
+};
+
+/// Descriptor for `SlotStatusRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List slotStatusRequestDescriptor =
+    $convert.base64Decode('ChFTbG90U3RhdHVzUmVxdWVzdA==');
+
 @$core.Deprecated('Use audioStatusDescriptor instead')
 const AudioStatus$json = {
   '1': 'AudioStatus',
@@ -195,6 +204,18 @@ const PlayerSlot$json = {
 final $typed_data.Uint8List playerSlotDescriptor = $convert.base64Decode(
     'CgpQbGF5ZXJTbG90Eg4KAmlkGAEgASgFUgJpZBIhCgRmaWxlGAIgASgLMg0ucGIuQXVkaW9GaW'
     'xlUgRmaWxl');
+
+@$core.Deprecated('Use playerSlotIDDescriptor instead')
+const PlayerSlotID$json = {
+  '1': 'PlayerSlotID',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 5, '10': 'id'},
+  ],
+};
+
+/// Descriptor for `PlayerSlotID`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List playerSlotIDDescriptor =
+    $convert.base64Decode('CgxQbGF5ZXJTbG90SUQSDgoCaWQYASABKAVSAmlk');
 
 @$core.Deprecated('Use paletteListRequestDescriptor instead')
 const PaletteListRequest$json = {

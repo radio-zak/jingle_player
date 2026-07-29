@@ -1,0 +1,18 @@
+info:
+  name: LoadFileToSlot
+  type: grpc
+  seq: 9
+
+grpc:
+  url: localhost:6969
+  method: /pb.AudioService/AssignAudioFileToSlot
+  methodType: unary
+  protoFilePath: ../control.proto
+  message:
+    - title: message 1
+      message: |-
+        {
+          "slot_id": 1,
+          "file_id": 1
+        }
+  auth: inherit
