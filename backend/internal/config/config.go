@@ -13,6 +13,7 @@ type Config struct {
 	Server   ServerConfig   `koanf:"server"`
 	Database DatabaseConfig `koanf:"database"`
 	Audio    AudioConfig    `koanf:"audio"`
+	Media    MediaConfig    `koandf:"media"`
 }
 
 type ServerConfig struct {
@@ -28,6 +29,10 @@ type DatabaseConfig struct {
 type AudioConfig struct {
 	SampleRate int `koanf:"sample_rate"`
 	BufferSize int `koanf:"buffer_size"`
+}
+
+type MediaConfig struct {
+	Directory string `koanf:"directory"`
 }
 
 // 2. Load Function

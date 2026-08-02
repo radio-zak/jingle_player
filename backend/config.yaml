@@ -2,6 +2,9 @@ server:
   host: "0.0.0.0"
   port: "6969"
 
+media:
+  directory: "./media"
+
 database:
   driver: "sqlite"
   connection_string: "file:app.db?_foreign_keys=on"
