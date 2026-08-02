@@ -18,7 +18,7 @@ class Toolbar extends StatelessWidget {
           top: 16,
           bottom: 16,
         ),
-        child: Consumer<AudioHandler>(
+        child: Consumer<AudioProvider>(
           builder: (context, player, child) {
             return Container(
               constraints: BoxConstraints.loose(Size.fromWidth(200)),

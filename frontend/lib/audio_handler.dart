@@ -377,22 +377,27 @@ class AudioHandler extends ChangeNotifier {
 class AudioProvider extends ChangeNotifier {
   final GrpcClient client;
   StreamSubscription<AudioStatus>? audioStatus;
+  StreamSubscription<PlayerSlot>? slotStatus;
 
   String playbackStatus = "STOPPED";
   int activeSlotID = 0;
+  int activePalette = 0;
   double timeRemaining = 0.0;
   bool isConnected = false;
   String? errorMessage;
+  bool toolbarActive = false;
+  bool editMode = false;
 
   AudioProvider(this.client) {
     connectToBackend();
   }
 
-  List<SlotModel> slots = List.generate(16, (index) => SlotModel(index: index));
+  List<PlayerSlot> slots = List.generate(16, (index) => PlayerSlot(id: index));
 
   void connectToBackend() {
     errorMessage = null;
     audioStatus?.cancel();
+    slotStatus?.cancel();
 
     audioStatus = client.getAudioStatus().listen(
       (status) {
@@ -412,16 +417,43 @@ class AudioProvider extends ChangeNotifier {
         notifyListeners();
       },
     );
+    slotStatus = client.getSlotStatus().listen(
+      (status) {
+        slots[status.id] = PlayerSlot(id: status.id, file: status.file);
+      },
+      onError: (error) {
+        isConnected = false;
+        errorMessage = error.toString();
+        notifyListeners();
+      },
+      onDone: () {
+        isConnected = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  void toggleToolbar() {
+    toolbarActive = !toolbarActive;
+    notifyListeners();
+  }
+
+  void switchMode(int id) {
+    // if (editMode) {
+    //   savePalette(id);
+    // }
+    editMode = !editMode;
+    notifyListeners();
   }
 
   void updateSlotsFromBackend(List<dynamic> backendSlots) {
-    List<SlotModel> updated = List.generate(16, (i) => SlotModel(index: i));
+    List<PlayerSlot> updated = List.generate(16, (i) => PlayerSlot(id: i));
 
     for (var slot in backendSlots) {
       // Assuming slot.index or slot.slotNumber corresponds to 0..15
       int idx = slot.index;
       if (idx >= 0 && idx < 16) {
-        updated[idx] = SlotModel.fromProto(idx, slot);
+        updated[idx] = PlayerSlot(id: idx);
       }
     }
 
@@ -463,35 +495,5 @@ class AudioProvider extends ChangeNotifier {
   void dispose() {
     audioStatus?.cancel();
     super.dispose();
-  }
-}
-
-class SlotModel {
-  final int index;
-  final int? fileID;
-  final String fileName;
-  final String filePath;
-  final double duration;
-
-  SlotModel({
-    required this.index,
-    this.fileID,
-    this.fileName = "",
-    this.filePath = "",
-    this.duration = 0.0,
-  });
-
-  factory SlotModel.fromProto(int index, PlayerSlot playerSlot) {
-    if (playerSlot.file == null) {
-      return SlotModel(index: index);
-    }
-    final file = playerSlot.file;
-    return SlotModel(
-      index: index,
-      fileID: file.id,
-      fileName: file.fileName,
-      filePath: file.filePath,
-      duration: file.duration,
-    );
   }
 }

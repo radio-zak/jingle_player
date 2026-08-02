@@ -35,6 +35,15 @@ class GrpcClient {
     }
   }
 
+  ResponseStream<PlayerSlot> getSlotStatus() {
+    try {
+      return client.streamSlotStatus(SlotStatusRequest());
+    } catch (e) {
+      print("Failed to get slot status: $e");
+      rethrow;
+    }
+  }
+
   Future<PaletteListResponse> listPalettes() async {
     try {
       return await client.listPalettes(PaletteListRequest());
@@ -153,13 +162,13 @@ class GrpcClient {
     } catch (e) {
       print("Failed unassigning file from slot: $e");
       rethrow;
+    }
   }
 
   Future<PlayerSlot> activateSlot(PlayerSlotID request) async {
     try {
       return await client.activateSlot(request);
-    }
-    catch (e) {
+    } catch (e) {
       print("Failed activating slot: $e");
       rethrow;
     }

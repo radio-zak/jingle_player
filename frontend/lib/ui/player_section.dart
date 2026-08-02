@@ -36,7 +36,7 @@ class PlayerSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Consumer<AudioHandler>(
+                    Consumer<AudioProvider>(
                       builder: (context, player, child) {
                         return Tooltip(
                           waitDuration: Duration(seconds: 1),

@@ -156,7 +156,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WindowListener {
-  late AudioHandler audioPlayer;
+  late AudioProvider audioPlayer;
   final config = ApplicationConfig();
   LoggingService logger = LoggingService();
 
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
         body: Stack(
           children: [
             Center(child: JingleGrid(playerCount: config.players)),
-            Consumer<AudioHandler>(
+            Consumer<AudioProvider>(
               builder: (context, player, child) {
                 switch (player.toolbarActive) {
                   case true:

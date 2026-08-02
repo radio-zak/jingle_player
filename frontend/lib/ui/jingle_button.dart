@@ -20,34 +20,36 @@ class JingleSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String _name = keybind;
-    return Consumer<AudioHandler>(
+    return Consumer<AudioProvider>(
       builder: (context, player, child) {
         return Material(
           borderRadius: BorderRadiusGeometry.circular(4),
           animateColor: true,
           borderOnForeground: true,
           clipBehavior: Clip.hardEdge,
-          color: (player.editMode && player.sourceMap[index] == null)
+          color: (player.editMode && player.slots[index].file.fileName == '')
               ? Theme.of(context).colorScheme.primaryFixedDim
-              : player.editMode && player.sourceMap[index] != null
+              : player.editMode
               ? Colors.orange
-              : player.paletteLoading
+              // : player.paletteLoading
+              // ? Theme.of(context).colorScheme.primaryFixedDim
+              : player.slots[index].file.fileName == ''
               ? Theme.of(context).colorScheme.primaryFixedDim
-              : player.sourceMap[index] == null
-              ? Theme.of(context).colorScheme.primaryFixedDim
-              : player.sourceMap[index] != player.sourceFile
+              : player.slots[index].id != player.activeSlotID
               ? Theme.of(context).colorScheme.primary
               : Colors.red,
           child: InkWell(
             customBorder: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(4),
             ),
-            onTap: player.sourceMap[index] == null ? null : onPressedAction,
-            hoverColor: player.sourceMap[index] == null
+            onTap: player.slots[index].file.fileName == ''
+                ? null
+                : onPressedAction,
+            hoverColor: player.slots[index].file.fileName == ''
                 ? null
                 : player.editMode
                 ? Colors.orange
-                : player.sourceMap[index] != player.sourceFile
+                : player.slots[index].id != player.activeSlotID
                 ? Colors.tealAccent
                 : Colors.redAccent,
             child: Flex(
@@ -92,20 +94,23 @@ class JingleSelector extends StatelessWidget {
                           fit: FlexFit.tight,
                           child: Text(
                             overflow: TextOverflow.ellipsis,
-                            player.paletteLoading
-                                ? 'Loading...'
-                                : player.playerLoading[index]!
-                                ? 'Loading...'
-                                : player.titleMap[index]!,
+                            // player.paletteLoading
+                            //     ? 'Loading...'
+                            //     : player.playerLoading[index]!
+                            //     ? 'Loading...'
+                            player.slots[index].file.fileName != ""
+                                ? player.slots[index].file.fileName
+                                : "No file selected",
                             style: TextTheme.of(context).titleLarge,
                           ),
                         ),
                         Flexible(
                           flex: 1,
                           fit: FlexFit.tight,
-                          child: player.playerLoading[index]!
-                              ? LinearProgressIndicator(minHeight: 8)
-                              : player.editMode
+                          child:
+                              // player.playerLoading[index]!
+                              //     ? LinearProgressIndicator(minHeight: 8)
+                              player.editMode
                               ? Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
@@ -118,8 +123,8 @@ class JingleSelector extends StatelessWidget {
                                           "Select wave file from disk for playout",
                                       hoverColor: Colors.grey,
                                       color: Colors.black87,
-                                      onPressed: () async =>
-                                          await player.setButtonSource(index),
+                                      onPressed: () async => {},
+                                      // await player.setButtonSource(index),
                                       label: 'Pick file',
                                       isSmall: true,
                                     ),
@@ -128,19 +133,20 @@ class JingleSelector extends StatelessWidget {
                                           "Removes file from slot, rendering this button inactive",
                                       hoverColor: Colors.grey,
                                       color: Colors.black87,
-                                      onPressed: () =>
-                                          player.clearButtonSource(index),
+                                      onPressed: () => {},
+                                      // player.clearButtonSource(index),
                                       label: "Clear slot",
                                       isSmall: true,
                                     ),
                                   ],
                                 )
-                              : player.paletteLoading
-                              ? LinearProgressIndicator(minHeight: 8)
+                              // : player.paletteLoading
+                              // ? LinearProgressIndicator(minHeight: 8)
                               : Text(
-                                  player.parseDuration(
-                                    player.durationMap[index],
-                                  ),
+                                  "",
+                                  // player.parseDuration(
+                                  //   player.durationMap[index],
+                                  // ),
                                   style: TextTheme.of(context).bodyLarge,
                                 ),
                         ),

@@ -13,24 +13,24 @@ class TimeRemainingClock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AudioHandler player = Provider.of<AudioHandler>(context, listen: true);
+    AudioProvider player = Provider.of<AudioProvider>(context, listen: true);
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadiusGeometry.circular(4),
 
-        color: player.audioPlayer.state == PlayerState.playing
+        color: player.playbackStatus == "PLAYING"
             ? Colors.red
             : player.editMode
             ? Colors.orange
-            : player.sourceFileParsed == null
-            ? Theme.of(context).colorScheme.primaryFixedDim
+            // : player.sourceFileParsed == null
+            // ? Theme.of(context).colorScheme.primaryFixedDim
             : Theme.of(context).colorScheme.primary,
       ),
       child: Padding(
         padding: EdgeInsetsGeometry.all(4),
         child: Align(
           alignment: FractionalOffset.topCenter,
-          child: Consumer<AudioHandler>(
+          child: Consumer<AudioProvider>(
             builder: (context, player, child) {
               return Flex(
                 direction: Axis.vertical,
@@ -40,18 +40,20 @@ class TimeRemainingClock extends StatelessWidget {
                   Flexible(
                     flex: 1,
                     child: Text(
-                      player.audioPlayer.state != PlayerState.playing
-                          ? Duration.zero.toString().split('.').first
-                          : player.timeRemainingString,
+                      // player.playbackStatus != "PLAYING"
+                      //     ? Duration.zero.toString().split('.').first
+                      //     : player.timeRemainingString,
+                      "",
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
                   ),
                   Flexible(
                     flex: 1,
                     child: Text(
-                      player.audioPlayer.state != PlayerState.playing
-                          ? Duration.zero.toString().split('.').first
-                          : calculateEndTime(player.timeRemaining),
+                      // player.playbackStatus != "PLAYING"
+                      //     ? Duration.zero.toString().split('.').first
+                      //     : calculateEndTime(player.timeRemaining),
+                      "",
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                   ),
