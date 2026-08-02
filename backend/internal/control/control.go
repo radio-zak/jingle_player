@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	engine "jingle_player_backend/internal/audio_engine"
+	"jingle_player_backend/internal/config"
 	"jingle_player_backend/internal/db"
 	"jingle_player_backend/internal/models"
 	pb "jingle_player_backend/internal/pb"
@@ -20,10 +21,11 @@ type AudioGRPCServer struct {
 	pb.UnimplementedAudioServiceServer
 	engine *engine.Player
 	db     *db.Queries
+	config *config.Config
 }
 
-func NewAudioGRPCServer(e *engine.Player, db *db.Queries) *AudioGRPCServer {
-	return &AudioGRPCServer{engine: e, db: db}
+func NewAudioGRPCServer(e *engine.Player, db *db.Queries, cfg *config.Config) *AudioGRPCServer {
+	return &AudioGRPCServer{engine: e, db: db, config: cfg}
 }
 
 func (s *AudioGRPCServer) PlaybackCommand(ctx context.Context, req *pb.PlaybackRequest) (*pb.PlaybackResponse, error) {
@@ -223,15 +225,15 @@ func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFile
 		return status.Errorf(codes.InvalidArgument, "File with this name already exists")
 	}
 
-	pathchk, err := s.db.AudioFilePathExists(ctx, meta.FilePath)
-	if err != nil {
-		fmt.Println("Error retrieving from database", err)
-		return status.Errorf(codes.Internal, "Error retrieving from DB")
-	}
-	if pathchk == 1 {
-		fmt.Println("A file with this path already exists", err)
-		return status.Errorf(codes.InvalidArgument, "File with this path already exists")
-	}
+	// pathchk, err := s.db.AudioFilePathExists(ctx, meta.FilePath)
+	// if err != nil {
+	// 	fmt.Println("Error retrieving from database", err)
+	// 	return status.Errorf(codes.Internal, "Error retrieving from DB")
+	// }
+	// if pathchk == 1 {
+	// 	fmt.Println("A file with this path already exists", err)
+	// 	return status.Errorf(codes.InvalidArgument, "File with this path already exists")
+	// }
 
 	var fileBytes []byte
 	var fileSize int64 = 0
@@ -246,7 +248,7 @@ func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFile
 		fileSize += int64(len(chunks))
 	}
 
-	fp := path.Join("./media", meta.FileName)
+	fp := path.Join(s.config.Media.Directory, meta.FileName)
 	f, err := os.Create(fp)
 	if err != nil {
 		fmt.Println("Error creating file in media directory:", err)
@@ -275,8 +277,8 @@ func (s *AudioGRPCServer) UpdateAudioFile(ctx context.Context, req *pb.AudioFile
 	if err != nil {
 		return &pb.AudioFileResponse{Success: false, Message: "Failed getting audio file in DB"}, err
 	}
-	fp1 := path.Join("./media", file.Name)
-	fp2 := path.Join("./media", req.FileName)
+	fp1 := path.Join(s.config.Media.Directory, file.Name)
+	fp2 := path.Join(s.config.Media.Directory, req.FileName)
 	err = os.Rename(fp1, fp2)
 	if err != nil {
 		return &pb.AudioFileResponse{Success: false, Message: "Unable to update audio file path on disk"}, err
@@ -297,7 +299,7 @@ func (s *AudioGRPCServer) DeleteAudioFile(ctx context.Context, req *pb.AudioFile
 	if err != nil {
 		return &pb.AudioFileDeleteResponse{Success: false}, err
 	}
-	fp := path.Join("./media", file.Name)
+	fp := path.Join(s.config.Media.Directory, file.Name)
 	err = os.Remove(fp)
 	if err != nil {
 		return &pb.AudioFileDeleteResponse{Success: false}, err
