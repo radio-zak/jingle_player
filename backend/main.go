@@ -31,6 +31,12 @@ func main() {
 		panic(err)
 	}
 
+	err = os.Mkdir(cfg.Media.Directory, 0777)
+	if err != nil {
+		log.Fatalf("Failed creating media directory %v", err)
+		panic(err)
+	}
+
 	ctx := context.Background()
 	datastore, err := sql.Open(cfg.Database.Driver, ":memory:")
 	if err != nil {
@@ -67,7 +73,7 @@ func main() {
 		panic(err)
 	}
 	grpcs := grpc.NewServer()
-	handler := control.NewAudioGRPCServer(audio, queries)
+	handler := control.NewAudioGRPCServer(audio, queries, cfg)
 	pb.RegisterAudioServiceServer(grpcs, handler)
 
 	fmt.Println("Listening on", listenAddr)
