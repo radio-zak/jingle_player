@@ -1,3 +1,4 @@
+import 'package:jingle_player/ui/file_manager_page.dart';
 import '../audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,22 +21,44 @@ class Toolbar extends StatelessWidget {
         ),
         child: Consumer<AudioProvider>(
           builder: (context, player, child) {
-            return Container(
-              constraints: BoxConstraints.loose(Size.fromWidth(200)),
-              child: ActionButton(
-                tooltipMessage: player.editMode
-                    ? 'Stop editing palette and allow playout'
-                    : "Edit sounds available in a palette",
-                hoverColor: player.editMode
-                    ? Colors.orangeAccent
-                    : Colors.tealAccent,
-                onPressed: () => player.switchMode(player.activePalette),
-                icon: Icons.edit,
-                label: player.editMode ? 'Exit edit mode' : 'Enter edit mode',
-                color: player.editMode
-                    ? Colors.orange
-                    : Theme.of(context).colorScheme.primary,
-              ),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 12,
+              children: [
+                Container(
+                  constraints: BoxConstraints.loose(Size.fromWidth(200)),
+                  child: ActionButton(
+                    tooltipMessage: player.editMode
+                        ? 'Stop editing palette and allow playout'
+                        : "Edit sounds available in a palette",
+                    hoverColor: player.editMode
+                        ? Colors.orangeAccent
+                        : Colors.tealAccent,
+                    onPressed: () => player.switchMode(player.activePalette),
+                    icon: Icons.edit,
+                    label: player.editMode
+                        ? 'Exit edit mode'
+                        : 'Enter edit mode',
+                    color: player.editMode
+                        ? Colors.orange
+                        : Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints.loose(Size.fromWidth(200)),
+                  child: ActionButton(
+                    tooltipMessage: "Manage files",
+                    label: "Audio management",
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AudioFileManagerPage(audioProvider: player),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),

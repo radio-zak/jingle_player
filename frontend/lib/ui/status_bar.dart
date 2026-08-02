@@ -7,7 +7,7 @@ class StatusBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AudioHandler>(
+    return Consumer<AudioProvider>(
       builder: (context, player, child) {
         return Center(
           child: Column(
@@ -16,26 +16,26 @@ class StatusBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                player.sourceFileParsed != null
-                    ? '${player.sourceFileParsed}'
+                player.slots[player.activeSlotID].file.fileName != ''
+                    ? player.slots[player.activeSlotID].file.fileName
                     : 'No file selected',
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
-              Flexible(
-                child: LinearProgressIndicator(
-                  color: Theme.of(context).colorScheme.primary,
-                  value:
-                      // (player.playerPosition != null &&
-                      //     player.playerDuration != null &&
-                      (player.playerPosition.inMilliseconds > 0 &&
-                          player.playerPosition.inMilliseconds <
-                              player.playerDuration.inMilliseconds)
-                      ? player.playerPosition.inMilliseconds /
-                            player.playerDuration.inMilliseconds
-                      : 0.0,
-                ),
-              ),
+              // Flexible(
+              //   child: LinearProgressIndicator(
+              //     color: Theme.of(context).colorScheme.primary,
+              //     value:
+              //         // (player.playerPosition != null &&
+              //         //     player.playerDuration != null &&
+              //         (player.playerPosition.inMilliseconds > 0 &&
+              //             player.playerPosition.inMilliseconds <
+              //                 player.playerDuration.inMilliseconds)
+              //         ? player.playerPosition.inMilliseconds /
+              //               player.playerDuration.inMilliseconds
+              //         : 0.0,
+              //   ),
+              // ),
               IntrinsicHeight(
                 child: Row(
                   spacing: 16,
@@ -43,10 +43,10 @@ class StatusBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
-                      player.playerPositionString,
+                      '${player.slots[player.activeSlotID].file.duration - player.timeRemaining}',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    player.sourceFileParsed != null
+                    player.slots[player.activeSlotID].file.fileName != ''
                         ? Center(
                             child: VerticalDivider(
                               color: Colors.white,
@@ -56,7 +56,7 @@ class StatusBar extends StatelessWidget {
                           )
                         : Container(),
                     Text(
-                      player.playerDurationString,
+                      '${player.slots[player.activeSlotID].file.duration}',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ],

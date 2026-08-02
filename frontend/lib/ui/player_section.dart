@@ -52,7 +52,7 @@ class PlayerSection extends StatelessWidget {
                         );
                       },
                     ),
-                    PaletteSelector(),
+                    // PaletteSelector(),
                   ],
                 ),
               ),

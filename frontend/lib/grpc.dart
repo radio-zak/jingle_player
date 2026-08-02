@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'control/control.pbgrpc.dart';
 
-class GrpcClient {
+class GrpcClient extends ChangeNotifier {
   late ClientChannel channel;
   late AudioServiceClient client;
 
@@ -116,7 +117,9 @@ class GrpcClient {
     }
   }
 
-  Future<AudioFileResponse> createAudioFile(AudioFile request) async {
+  Future<AudioFileResponse> createAudioFile(
+    Stream<AudioFileUpload> request,
+  ) async {
     try {
       return await client.createAudioFile(request);
     } catch (e) {

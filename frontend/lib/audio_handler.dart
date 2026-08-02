@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:jingle_player/control/control.pbgrpc.dart';
@@ -376,6 +378,8 @@ class AudioHandler extends ChangeNotifier {
 
 class AudioProvider extends ChangeNotifier {
   final GrpcClient client;
+  FileOperationService fileOps;
+  LoggingService logger;
   StreamSubscription<AudioStatus>? audioStatus;
   StreamSubscription<PlayerSlot>? slotStatus;
 
@@ -388,7 +392,7 @@ class AudioProvider extends ChangeNotifier {
   bool toolbarActive = false;
   bool editMode = false;
 
-  AudioProvider(this.client) {
+  AudioProvider(this.client, this.fileOps, this.logger) {
     connectToBackend();
   }
 
@@ -459,6 +463,88 @@ class AudioProvider extends ChangeNotifier {
 
     slots = updated;
     notifyListeners(); // Triggers Flutter UI rebuild
+  }
+
+  Future<AudioFileResponse> uploadAudioFile({
+    required File audioFile,
+    required String mimeType,
+    int chunkSize = 32 * 1024,
+    void Function(double Progress)? onProgress,
+  }) async {
+    final totalBytes = await audioFile.length();
+    int bytesSent = 0;
+    Stream<AudioFileUpload> createStream() async* {
+      yield AudioFileUpload(
+        metadata: AudioFile(fileName: path.basename(audioFile.path)),
+      );
+      final Stream<List<int>> stream = audioFile.openRead();
+      await for (final List<int> chunk in stream) {
+        // Slice larger chunks into our ideal gRPC chunk size if necessary
+        for (var i = 0; i < chunk.length; i += chunkSize) {
+          final end = (i + chunkSize < chunk.length)
+              ? i + chunkSize
+              : chunk.length;
+          final Uint8List slice = Uint8List.fromList(chunk.sublist(i, end));
+
+          bytesSent += slice.length;
+          if (onProgress != null && totalBytes > 0) {
+            onProgress(bytesSent / totalBytes);
+          }
+
+          yield AudioFileUpload(chunks: slice);
+        }
+      }
+    }
+
+    try {
+      final res = await client.createAudioFile(createStream());
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addAudioFile() async {
+    final result = await fileOps.pickFileFromDisk();
+    if (result != null) {
+      final file = File(result.paths.first!);
+      toastification.show(
+        title: Text("Copying file to media directory"),
+        alignment: Alignment.topLeft,
+        type: ToastificationType.info,
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        style: ToastificationStyle.minimal,
+        autoCloseDuration: Duration(seconds: 5),
+      );
+      notifyListeners();
+      try {
+        final res = await uploadAudioFile(
+          audioFile: file,
+          mimeType: 'audio/wav',
+        );
+      } catch (e) {
+        logger.print.e('$e');
+        toastification.show(
+          title: Text("An error occured"),
+          description: Text("$e"),
+          type: ToastificationType.error,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          style: ToastificationStyle.minimal,
+          alignment: Alignment.topLeft,
+        );
+        // playerLoading[index] = false;
+        notifyListeners();
+        return;
+      }
+      // playerLoading[index] = false;
+      notifyListeners();
+    } else {
+      logger.print.i("File selection aborted");
+    }
+    logger.print.i("Uploaded audio file");
+    notifyListeners();
   }
 
   Future<void> loadToPlayer(int index) async {

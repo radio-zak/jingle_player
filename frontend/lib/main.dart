@@ -16,6 +16,7 @@ import 'package:toastification/toastification.dart';
 import 'logger.dart';
 import 'config.dart';
 import 'file_ops.dart';
+import 'control/control.pb.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +57,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AudioProvider>(
-          create: (context) => AudioProvider(grpcClient),
+          create: (context) => AudioProvider(grpcClient, fileOps, logger),
         ),
         ChangeNotifierProvider<ApplicationConfig>(
           create: (context) => ApplicationConfig(),

@@ -40,10 +40,12 @@ class TimeRemainingClock extends StatelessWidget {
                   Flexible(
                     flex: 1,
                     child: Text(
-                      // player.playbackStatus != "PLAYING"
-                      //     ? Duration.zero.toString().split('.').first
-                      //     : player.timeRemainingString,
-                      "",
+                      player.playbackStatus != "PLAYING"
+                          ? Duration.zero.toString().split('.').first
+                          : Duration(
+                              milliseconds: (player.timeRemaining * 1000)
+                                  .round(),
+                            ).toString().split('.').first,
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
                   ),
