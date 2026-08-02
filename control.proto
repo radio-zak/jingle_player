@@ -16,7 +16,7 @@ service AudioService {
   rpc ActivatePalette(PaletteID) returns (PaletteActivateResponse);
   rpc ListAudioFiles(ListAudioFileRequest) returns (AudioFileList);
   rpc GetAudioFile(AudioFileID) returns (GetAudioFileResponse);
-  rpc CreateAudioFile(AudioFile) returns (AudioFileResponse);
+  rpc CreateAudioFile(stream AudioFileUpload) returns (AudioFileResponse);
   rpc UpdateAudioFile(AudioFile) returns (AudioFileResponse);
   rpc DeleteAudioFile(AudioFileID) returns (AudioFileDeleteResponse);
   rpc AssignAudioFileToSlot(AssignAudioFileRequest) returns (PlayerSlot);
@@ -115,3 +115,10 @@ message AssignAudioFileRequest {
 }
 
 message UnassignAudioFileRequest { int32 slot_id = 1; }
+
+message AudioFileUpload {
+  oneof data {
+    AudioFile metadata = 1;
+    bytes chunks = 2;
+  }
+}

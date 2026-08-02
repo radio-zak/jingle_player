@@ -1249,6 +1249,88 @@ func (x *UnassignAudioFileRequest) GetSlotId() int32 {
 	return 0
 }
 
+type AudioFileUpload struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Data:
+	//
+	//	*AudioFileUpload_Metadata
+	//	*AudioFileUpload_Chunks
+	Data          isAudioFileUpload_Data `protobuf_oneof:"data"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioFileUpload) Reset() {
+	*x = AudioFileUpload{}
+	mi := &file_control_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioFileUpload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioFileUpload) ProtoMessage() {}
+
+func (x *AudioFileUpload) ProtoReflect() protoreflect.Message {
+	mi := &file_control_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioFileUpload.ProtoReflect.Descriptor instead.
+func (*AudioFileUpload) Descriptor() ([]byte, []int) {
+	return file_control_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *AudioFileUpload) GetData() isAudioFileUpload_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *AudioFileUpload) GetMetadata() *AudioFile {
+	if x != nil {
+		if x, ok := x.Data.(*AudioFileUpload_Metadata); ok {
+			return x.Metadata
+		}
+	}
+	return nil
+}
+
+func (x *AudioFileUpload) GetChunks() []byte {
+	if x != nil {
+		if x, ok := x.Data.(*AudioFileUpload_Chunks); ok {
+			return x.Chunks
+		}
+	}
+	return nil
+}
+
+type isAudioFileUpload_Data interface {
+	isAudioFileUpload_Data()
+}
+
+type AudioFileUpload_Metadata struct {
+	Metadata *AudioFile `protobuf:"bytes,1,opt,name=metadata,proto3,oneof"`
+}
+
+type AudioFileUpload_Chunks struct {
+	Chunks []byte `protobuf:"bytes,2,opt,name=chunks,proto3,oneof"`
+}
+
+func (*AudioFileUpload_Metadata) isAudioFileUpload_Data() {}
+
+func (*AudioFileUpload_Chunks) isAudioFileUpload_Data() {}
+
 var File_control_proto protoreflect.FileDescriptor
 
 const file_control_proto_rawDesc = "" +
@@ -1323,7 +1405,11 @@ const file_control_proto_rawDesc = "" +
 	"\aslot_id\x18\x01 \x01(\x05R\x06slotId\x12\x17\n" +
 	"\afile_id\x18\x02 \x01(\x05R\x06fileId\"3\n" +
 	"\x18UnassignAudioFileRequest\x12\x17\n" +
-	"\aslot_id\x18\x01 \x01(\x05R\x06slotId2\x91\b\n" +
+	"\aslot_id\x18\x01 \x01(\x05R\x06slotId\"`\n" +
+	"\x0fAudioFileUpload\x12+\n" +
+	"\bmetadata\x18\x01 \x01(\v2\r.pb.AudioFileH\x00R\bmetadata\x12\x18\n" +
+	"\x06chunks\x18\x02 \x01(\fH\x00R\x06chunksB\x06\n" +
+	"\x04data2\x99\b\n" +
 	"\fAudioService\x12A\n" +
 	"\x14StreamPlaybackStatus\x12\x16.pb.AudioStatusRequest\x1a\x0f.pb.AudioStatus0\x01\x12;\n" +
 	"\x10StreamSlotStatus\x12\x15.pb.SlotStatusRequest\x1a\x0e.pb.PlayerSlot0\x01\x12<\n" +
@@ -1336,8 +1422,8 @@ const file_control_proto_rawDesc = "" +
 	"\rDeletePalette\x12\r.pb.PaletteID\x1a\x19.pb.PaletteDeleteResponse\x12=\n" +
 	"\x0fActivatePalette\x12\r.pb.PaletteID\x1a\x1b.pb.PaletteActivateResponse\x12=\n" +
 	"\x0eListAudioFiles\x12\x18.pb.ListAudioFileRequest\x1a\x11.pb.AudioFileList\x129\n" +
-	"\fGetAudioFile\x12\x0f.pb.AudioFileID\x1a\x18.pb.GetAudioFileResponse\x127\n" +
-	"\x0fCreateAudioFile\x12\r.pb.AudioFile\x1a\x15.pb.AudioFileResponse\x127\n" +
+	"\fGetAudioFile\x12\x0f.pb.AudioFileID\x1a\x18.pb.GetAudioFileResponse\x12?\n" +
+	"\x0fCreateAudioFile\x12\x13.pb.AudioFileUpload\x1a\x15.pb.AudioFileResponse(\x01\x127\n" +
 	"\x0fUpdateAudioFile\x12\r.pb.AudioFile\x1a\x15.pb.AudioFileResponse\x12?\n" +
 	"\x0fDeleteAudioFile\x12\x0f.pb.AudioFileID\x1a\x1b.pb.AudioFileDeleteResponse\x12C\n" +
 	"\x15AssignAudioFileToSlot\x12\x1a.pb.AssignAudioFileRequest\x1a\x0e.pb.PlayerSlot\x12I\n" +
@@ -1356,7 +1442,7 @@ func file_control_proto_rawDescGZIP() []byte {
 	return file_control_proto_rawDescData
 }
 
-var file_control_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_control_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_control_proto_goTypes = []any{
 	(*AudioStatusRequest)(nil),       // 0: pb.AudioStatusRequest
 	(*SlotStatusRequest)(nil),        // 1: pb.SlotStatusRequest
@@ -1383,6 +1469,7 @@ var file_control_proto_goTypes = []any{
 	(*AudioFileDeleteResponse)(nil),  // 22: pb.AudioFileDeleteResponse
 	(*AssignAudioFileRequest)(nil),   // 23: pb.AssignAudioFileRequest
 	(*UnassignAudioFileRequest)(nil), // 24: pb.UnassignAudioFileRequest
+	(*AudioFileUpload)(nil),          // 25: pb.AudioFileUpload
 }
 var file_control_proto_depIdxs = []int32{
 	12, // 0: pb.Palette.slots:type_name -> pb.PlayerSlot
@@ -1391,45 +1478,46 @@ var file_control_proto_depIdxs = []int32{
 	5,  // 3: pb.PaletteGetResponse.palette:type_name -> pb.Palette
 	10, // 4: pb.AudioFileList.audio_files:type_name -> pb.AudioFile
 	10, // 5: pb.GetAudioFileResponse.audio_file:type_name -> pb.AudioFile
-	0,  // 6: pb.AudioService.StreamPlaybackStatus:input_type -> pb.AudioStatusRequest
-	1,  // 7: pb.AudioService.StreamSlotStatus:input_type -> pb.SlotStatusRequest
-	3,  // 8: pb.AudioService.PlaybackCommand:input_type -> pb.PlaybackRequest
-	14, // 9: pb.AudioService.ListPalettes:input_type -> pb.PaletteListRequest
-	7,  // 10: pb.AudioService.GetPalette:input_type -> pb.PaletteID
-	5,  // 11: pb.AudioService.UpdatePalette:input_type -> pb.Palette
-	5,  // 12: pb.AudioService.CreatePalette:input_type -> pb.Palette
-	7,  // 13: pb.AudioService.DeletePalette:input_type -> pb.PaletteID
-	7,  // 14: pb.AudioService.ActivatePalette:input_type -> pb.PaletteID
-	19, // 15: pb.AudioService.ListAudioFiles:input_type -> pb.ListAudioFileRequest
-	20, // 16: pb.AudioService.GetAudioFile:input_type -> pb.AudioFileID
-	10, // 17: pb.AudioService.CreateAudioFile:input_type -> pb.AudioFile
-	10, // 18: pb.AudioService.UpdateAudioFile:input_type -> pb.AudioFile
-	20, // 19: pb.AudioService.DeleteAudioFile:input_type -> pb.AudioFileID
-	23, // 20: pb.AudioService.AssignAudioFileToSlot:input_type -> pb.AssignAudioFileRequest
-	24, // 21: pb.AudioService.UnassignAudioFileFromSlot:input_type -> pb.UnassignAudioFileRequest
-	13, // 22: pb.AudioService.ActivateSlot:input_type -> pb.PlayerSlotID
-	2,  // 23: pb.AudioService.StreamPlaybackStatus:output_type -> pb.AudioStatus
-	12, // 24: pb.AudioService.StreamSlotStatus:output_type -> pb.PlayerSlot
-	4,  // 25: pb.AudioService.PlaybackCommand:output_type -> pb.PlaybackResponse
-	15, // 26: pb.AudioService.ListPalettes:output_type -> pb.PaletteListResponse
-	16, // 27: pb.AudioService.GetPalette:output_type -> pb.PaletteGetResponse
-	6,  // 28: pb.AudioService.UpdatePalette:output_type -> pb.PaletteResponse
-	6,  // 29: pb.AudioService.CreatePalette:output_type -> pb.PaletteResponse
-	17, // 30: pb.AudioService.DeletePalette:output_type -> pb.PaletteDeleteResponse
-	9,  // 31: pb.AudioService.ActivatePalette:output_type -> pb.PaletteActivateResponse
-	18, // 32: pb.AudioService.ListAudioFiles:output_type -> pb.AudioFileList
-	21, // 33: pb.AudioService.GetAudioFile:output_type -> pb.GetAudioFileResponse
-	11, // 34: pb.AudioService.CreateAudioFile:output_type -> pb.AudioFileResponse
-	11, // 35: pb.AudioService.UpdateAudioFile:output_type -> pb.AudioFileResponse
-	22, // 36: pb.AudioService.DeleteAudioFile:output_type -> pb.AudioFileDeleteResponse
-	12, // 37: pb.AudioService.AssignAudioFileToSlot:output_type -> pb.PlayerSlot
-	12, // 38: pb.AudioService.UnassignAudioFileFromSlot:output_type -> pb.PlayerSlot
-	12, // 39: pb.AudioService.ActivateSlot:output_type -> pb.PlayerSlot
-	23, // [23:40] is the sub-list for method output_type
-	6,  // [6:23] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	10, // 6: pb.AudioFileUpload.metadata:type_name -> pb.AudioFile
+	0,  // 7: pb.AudioService.StreamPlaybackStatus:input_type -> pb.AudioStatusRequest
+	1,  // 8: pb.AudioService.StreamSlotStatus:input_type -> pb.SlotStatusRequest
+	3,  // 9: pb.AudioService.PlaybackCommand:input_type -> pb.PlaybackRequest
+	14, // 10: pb.AudioService.ListPalettes:input_type -> pb.PaletteListRequest
+	7,  // 11: pb.AudioService.GetPalette:input_type -> pb.PaletteID
+	5,  // 12: pb.AudioService.UpdatePalette:input_type -> pb.Palette
+	5,  // 13: pb.AudioService.CreatePalette:input_type -> pb.Palette
+	7,  // 14: pb.AudioService.DeletePalette:input_type -> pb.PaletteID
+	7,  // 15: pb.AudioService.ActivatePalette:input_type -> pb.PaletteID
+	19, // 16: pb.AudioService.ListAudioFiles:input_type -> pb.ListAudioFileRequest
+	20, // 17: pb.AudioService.GetAudioFile:input_type -> pb.AudioFileID
+	25, // 18: pb.AudioService.CreateAudioFile:input_type -> pb.AudioFileUpload
+	10, // 19: pb.AudioService.UpdateAudioFile:input_type -> pb.AudioFile
+	20, // 20: pb.AudioService.DeleteAudioFile:input_type -> pb.AudioFileID
+	23, // 21: pb.AudioService.AssignAudioFileToSlot:input_type -> pb.AssignAudioFileRequest
+	24, // 22: pb.AudioService.UnassignAudioFileFromSlot:input_type -> pb.UnassignAudioFileRequest
+	13, // 23: pb.AudioService.ActivateSlot:input_type -> pb.PlayerSlotID
+	2,  // 24: pb.AudioService.StreamPlaybackStatus:output_type -> pb.AudioStatus
+	12, // 25: pb.AudioService.StreamSlotStatus:output_type -> pb.PlayerSlot
+	4,  // 26: pb.AudioService.PlaybackCommand:output_type -> pb.PlaybackResponse
+	15, // 27: pb.AudioService.ListPalettes:output_type -> pb.PaletteListResponse
+	16, // 28: pb.AudioService.GetPalette:output_type -> pb.PaletteGetResponse
+	6,  // 29: pb.AudioService.UpdatePalette:output_type -> pb.PaletteResponse
+	6,  // 30: pb.AudioService.CreatePalette:output_type -> pb.PaletteResponse
+	17, // 31: pb.AudioService.DeletePalette:output_type -> pb.PaletteDeleteResponse
+	9,  // 32: pb.AudioService.ActivatePalette:output_type -> pb.PaletteActivateResponse
+	18, // 33: pb.AudioService.ListAudioFiles:output_type -> pb.AudioFileList
+	21, // 34: pb.AudioService.GetAudioFile:output_type -> pb.GetAudioFileResponse
+	11, // 35: pb.AudioService.CreateAudioFile:output_type -> pb.AudioFileResponse
+	11, // 36: pb.AudioService.UpdateAudioFile:output_type -> pb.AudioFileResponse
+	22, // 37: pb.AudioService.DeleteAudioFile:output_type -> pb.AudioFileDeleteResponse
+	12, // 38: pb.AudioService.AssignAudioFileToSlot:output_type -> pb.PlayerSlot
+	12, // 39: pb.AudioService.UnassignAudioFileFromSlot:output_type -> pb.PlayerSlot
+	12, // 40: pb.AudioService.ActivateSlot:output_type -> pb.PlayerSlot
+	24, // [24:41] is the sub-list for method output_type
+	7,  // [7:24] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_control_proto_init() }
@@ -1437,13 +1525,17 @@ func file_control_proto_init() {
 	if File_control_proto != nil {
 		return
 	}
+	file_control_proto_msgTypes[25].OneofWrappers = []any{
+		(*AudioFileUpload_Metadata)(nil),
+		(*AudioFileUpload_Chunks)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_control_proto_rawDesc), len(file_control_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

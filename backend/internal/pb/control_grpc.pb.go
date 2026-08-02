@@ -53,7 +53,7 @@ type AudioServiceClient interface {
 	ActivatePalette(ctx context.Context, in *PaletteID, opts ...grpc.CallOption) (*PaletteActivateResponse, error)
 	ListAudioFiles(ctx context.Context, in *ListAudioFileRequest, opts ...grpc.CallOption) (*AudioFileList, error)
 	GetAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*GetAudioFileResponse, error)
-	CreateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFileResponse, error)
+	CreateAudioFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[AudioFileUpload, AudioFileResponse], error)
 	UpdateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFileResponse, error)
 	DeleteAudioFile(ctx context.Context, in *AudioFileID, opts ...grpc.CallOption) (*AudioFileDeleteResponse, error)
 	AssignAudioFileToSlot(ctx context.Context, in *AssignAudioFileRequest, opts ...grpc.CallOption) (*PlayerSlot, error)
@@ -197,15 +197,18 @@ func (c *audioServiceClient) GetAudioFile(ctx context.Context, in *AudioFileID, 
 	return out, nil
 }
 
-func (c *audioServiceClient) CreateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFileResponse, error) {
+func (c *audioServiceClient) CreateAudioFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[AudioFileUpload, AudioFileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AudioFileResponse)
-	err := c.cc.Invoke(ctx, AudioService_CreateAudioFile_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &AudioService_ServiceDesc.Streams[2], AudioService_CreateAudioFile_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[AudioFileUpload, AudioFileResponse]{ClientStream: stream}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AudioService_CreateAudioFileClient = grpc.ClientStreamingClient[AudioFileUpload, AudioFileResponse]
 
 func (c *audioServiceClient) UpdateAudioFile(ctx context.Context, in *AudioFile, opts ...grpc.CallOption) (*AudioFileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -272,7 +275,7 @@ type AudioServiceServer interface {
 	ActivatePalette(context.Context, *PaletteID) (*PaletteActivateResponse, error)
 	ListAudioFiles(context.Context, *ListAudioFileRequest) (*AudioFileList, error)
 	GetAudioFile(context.Context, *AudioFileID) (*GetAudioFileResponse, error)
-	CreateAudioFile(context.Context, *AudioFile) (*AudioFileResponse, error)
+	CreateAudioFile(grpc.ClientStreamingServer[AudioFileUpload, AudioFileResponse]) error
 	UpdateAudioFile(context.Context, *AudioFile) (*AudioFileResponse, error)
 	DeleteAudioFile(context.Context, *AudioFileID) (*AudioFileDeleteResponse, error)
 	AssignAudioFileToSlot(context.Context, *AssignAudioFileRequest) (*PlayerSlot, error)
@@ -321,8 +324,8 @@ func (UnimplementedAudioServiceServer) ListAudioFiles(context.Context, *ListAudi
 func (UnimplementedAudioServiceServer) GetAudioFile(context.Context, *AudioFileID) (*GetAudioFileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAudioFile not implemented")
 }
-func (UnimplementedAudioServiceServer) CreateAudioFile(context.Context, *AudioFile) (*AudioFileResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateAudioFile not implemented")
+func (UnimplementedAudioServiceServer) CreateAudioFile(grpc.ClientStreamingServer[AudioFileUpload, AudioFileResponse]) error {
+	return status.Error(codes.Unimplemented, "method CreateAudioFile not implemented")
 }
 func (UnimplementedAudioServiceServer) UpdateAudioFile(context.Context, *AudioFile) (*AudioFileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateAudioFile not implemented")
@@ -544,23 +547,12 @@ func _AudioService_GetAudioFile_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AudioService_CreateAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AudioFile)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AudioServiceServer).CreateAudioFile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AudioService_CreateAudioFile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AudioServiceServer).CreateAudioFile(ctx, req.(*AudioFile))
-	}
-	return interceptor(ctx, in, info, handler)
+func _AudioService_CreateAudioFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AudioServiceServer).CreateAudioFile(&grpc.GenericServerStream[AudioFileUpload, AudioFileResponse]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AudioService_CreateAudioFileServer = grpc.ClientStreamingServer[AudioFileUpload, AudioFileResponse]
 
 func _AudioService_UpdateAudioFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AudioFile)
@@ -696,10 +688,6 @@ var AudioService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AudioService_GetAudioFile_Handler,
 		},
 		{
-			MethodName: "CreateAudioFile",
-			Handler:    _AudioService_CreateAudioFile_Handler,
-		},
-		{
 			MethodName: "UpdateAudioFile",
 			Handler:    _AudioService_UpdateAudioFile_Handler,
 		},
@@ -730,6 +718,11 @@ var AudioService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "StreamSlotStatus",
 			Handler:       _AudioService_StreamSlotStatus_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "CreateAudioFile",
+			Handler:       _AudioService_CreateAudioFile_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "control.proto",

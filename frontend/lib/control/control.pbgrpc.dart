@@ -114,10 +114,11 @@ class AudioServiceClient extends $grpc.Client {
   }
 
   $grpc.ResponseFuture<$0.AudioFileResponse> createAudioFile(
-    $0.AudioFile request, {
+    $async.Stream<$0.AudioFileUpload> request, {
     $grpc.CallOptions? options,
   }) {
-    return $createUnaryCall(_$createAudioFile, request, options: options);
+    return $createStreamingCall(_$createAudioFile, request, options: options)
+        .single;
   }
 
   $grpc.ResponseFuture<$0.AudioFileResponse> updateAudioFile(
@@ -214,9 +215,9 @@ class AudioServiceClient extends $grpc.Client {
           ($0.AudioFileID value) => value.writeToBuffer(),
           $0.GetAudioFileResponse.fromBuffer);
   static final _$createAudioFile =
-      $grpc.ClientMethod<$0.AudioFile, $0.AudioFileResponse>(
+      $grpc.ClientMethod<$0.AudioFileUpload, $0.AudioFileResponse>(
           '/pb.AudioService/CreateAudioFile',
-          ($0.AudioFile value) => value.writeToBuffer(),
+          ($0.AudioFileUpload value) => value.writeToBuffer(),
           $0.AudioFileResponse.fromBuffer);
   static final _$updateAudioFile =
       $grpc.ClientMethod<$0.AudioFile, $0.AudioFileResponse>(
@@ -331,12 +332,12 @@ abstract class AudioServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.AudioFileID.fromBuffer(value),
         ($0.GetAudioFileResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFileResponse>(
+    $addMethod($grpc.ServiceMethod<$0.AudioFileUpload, $0.AudioFileResponse>(
         'CreateAudioFile',
-        createAudioFile_Pre,
+        createAudioFile,
+        true,
         false,
-        false,
-        ($core.List<$core.int> value) => $0.AudioFile.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.AudioFileUpload.fromBuffer(value),
         ($0.AudioFileResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.AudioFile, $0.AudioFileResponse>(
         'UpdateAudioFile',
@@ -468,13 +469,8 @@ abstract class AudioServiceBase extends $grpc.Service {
   $async.Future<$0.GetAudioFileResponse> getAudioFile(
       $grpc.ServiceCall call, $0.AudioFileID request);
 
-  $async.Future<$0.AudioFileResponse> createAudioFile_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.AudioFile> $request) async {
-    return createAudioFile($call, await $request);
-  }
-
   $async.Future<$0.AudioFileResponse> createAudioFile(
-      $grpc.ServiceCall call, $0.AudioFile request);
+      $grpc.ServiceCall call, $async.Stream<$0.AudioFileUpload> request);
 
   $async.Future<$0.AudioFileResponse> updateAudioFile_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.AudioFile> $request) async {

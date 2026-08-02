@@ -4,10 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	engine "jingle_player_backend/internal/audio_engine"
 	"jingle_player_backend/internal/db"
 	"jingle_player_backend/internal/models"
 	pb "jingle_player_backend/internal/pb"
+	"os"
+	"path"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AudioGRPCServer struct {
@@ -193,39 +199,89 @@ func (s *AudioGRPCServer) DeletePalette(ctx context.Context, req *pb.PaletteID) 
 	return &pb.PaletteDeleteResponse{Success: true}, nil
 }
 
-func (s *AudioGRPCServer) CreateAudioFile(ctx context.Context, req *pb.AudioFile) (*pb.AudioFileResponse, error) {
-	namechk, err := s.db.AudioFileNameExists(ctx, req.FileName)
+func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFileServer) error {
+	req, err := stream.Recv()
+	ctx := stream.Context()
+	if err != nil {
+		fmt.Println("Failed to get metadata from client", err)
+		return status.Errorf(codes.FailedPrecondition, "Failed to get metadata from client")
+	}
+
+	meta := req.GetMetadata()
+	if meta == nil {
+		fmt.Println("Failed to get metadata from client", err)
+		return status.Errorf(codes.FailedPrecondition, "Failed to get metadata from client")
+	}
+
+	namechk, err := s.db.AudioFileNameExists(ctx, meta.FileName)
 	if err != nil {
 		fmt.Println("Error retrieving from database", err)
-		return &pb.AudioFileResponse{Success: false, Message: "Error retrieving from database, see server logs"}, err
+		return status.Errorf(codes.Internal, "Error retrieving from DB")
 	}
 	if namechk == 1 {
 		fmt.Println("A file with this name already exists", err)
-		return &pb.AudioFileResponse{Success: false, Message: "A file with this name already exists"}, err
+		return status.Errorf(codes.InvalidArgument, "File with this name already exists")
 	}
 
-	pathchk, err := s.db.AudioFilePathExists(ctx, req.FilePath)
+	pathchk, err := s.db.AudioFilePathExists(ctx, meta.FilePath)
 	if err != nil {
 		fmt.Println("Error retrieving from database", err)
-		return &pb.AudioFileResponse{Success: false, Message: "Error retrieving from database, see server logs"}, err
+		return status.Errorf(codes.Internal, "Error retrieving from DB")
 	}
 	if pathchk == 1 {
 		fmt.Println("A file with this path already exists", err)
-		return &pb.AudioFileResponse{Success: false, Message: "A file with this path already exists."}, err
+		return status.Errorf(codes.InvalidArgument, "File with this path already exists")
+	}
+
+	var fileBytes []byte
+	var fileSize int64 = 0
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		chunks := req.GetChunks()
+		fileBytes = append(fileBytes, chunks...)
+		fileSize += int64(len(chunks))
+	}
+
+	fp := path.Join("./media", meta.FileName)
+	f, err := os.Create(fp)
+	if err != nil {
+		fmt.Println("Error creating file in media directory:", err)
+		return status.Errorf(codes.Internal, "Error creating file in media directory: ", err)
+	}
+	defer f.Close()
+
+	_, err = f.Write(fileBytes)
+	if err != nil {
+		fmt.Println("Error writing file to media directory:", err)
+		return status.Errorf(codes.Internal, "Error writing file to media directory: ", err)
 	}
 
 	if _, err := s.db.CreateAudioFile(ctx, db.CreateAudioFileParams{
-		Name: req.FileName,
-		Path: req.FilePath,
+		Name: meta.FileName,
+		Path: meta.FilePath,
 	}); err != nil {
 		fmt.Println("Error creating audio file", err)
-		return &pb.AudioFileResponse{Success: false, Message: "Error creating audio file"}, err
+		return status.Errorf(codes.Internal, "Error creating audio file in DB: ", err)
 	}
-	return &pb.AudioFileResponse{Success: true, Message: "File created in database"}, nil
+	return stream.SendAndClose(&pb.AudioFileResponse{Success: true, Message: "File created in database"})
 }
 
 func (s *AudioGRPCServer) UpdateAudioFile(ctx context.Context, req *pb.AudioFile) (*pb.AudioFileResponse, error) {
-	err := s.db.UpdateAudioFile(ctx, db.UpdateAudioFileParams{
+	file, err := s.db.GetAudioFile(ctx, int64(req.Id))
+	if err != nil {
+		return &pb.AudioFileResponse{Success: false, Message: "Failed getting audio file in DB"}, err
+	}
+	fp1 := path.Join("./media", file.Name)
+	fp2 := path.Join("./media", req.FileName)
+	err = os.Rename(fp1, fp2)
+	if err != nil {
+		return &pb.AudioFileResponse{Success: false, Message: "Unable to update audio file path on disk"}, err
+	}
+	err = s.db.UpdateAudioFile(ctx, db.UpdateAudioFileParams{
 		ID:   int64(req.Id),
 		Name: req.FileName,
 		Path: req.FilePath,
@@ -237,7 +293,16 @@ func (s *AudioGRPCServer) UpdateAudioFile(ctx context.Context, req *pb.AudioFile
 }
 
 func (s *AudioGRPCServer) DeleteAudioFile(ctx context.Context, req *pb.AudioFileID) (*pb.AudioFileDeleteResponse, error) {
-	err := s.db.DeleteAudioFile(ctx, int64(req.Id))
+	file, err := s.db.GetAudioFile(ctx, int64(req.Id))
+	if err != nil {
+		return &pb.AudioFileDeleteResponse{Success: false}, err
+	}
+	fp := path.Join("./media", file.Name)
+	err = os.Remove(fp)
+	if err != nil {
+		return &pb.AudioFileDeleteResponse{Success: false}, err
+	}
+	err = s.db.DeleteAudioFile(ctx, int64(req.Id))
 	if err != nil {
 		return &pb.AudioFileDeleteResponse{Success: false}, err
 	}

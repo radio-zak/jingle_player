@@ -1538,6 +1538,93 @@ class UnassignAudioFileRequest extends $pb.GeneratedMessage {
   void clearSlotId() => $_clearField(1);
 }
 
+enum AudioFileUpload_Data { metadata, chunks, notSet }
+
+class AudioFileUpload extends $pb.GeneratedMessage {
+  factory AudioFileUpload({
+    AudioFile? metadata,
+    $core.List<$core.int>? chunks,
+  }) {
+    final result = create();
+    if (metadata != null) result.metadata = metadata;
+    if (chunks != null) result.chunks = chunks;
+    return result;
+  }
+
+  AudioFileUpload._();
+
+  factory AudioFileUpload.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory AudioFileUpload.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static const $core.Map<$core.int, AudioFileUpload_Data>
+      _AudioFileUpload_DataByTag = {
+    1: AudioFileUpload_Data.metadata,
+    2: AudioFileUpload_Data.chunks,
+    0: AudioFileUpload_Data.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'AudioFileUpload',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'),
+      createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<AudioFile>(1, _omitFieldNames ? '' : 'metadata',
+        subBuilder: AudioFile.create)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'chunks', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AudioFileUpload clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AudioFileUpload copyWith(void Function(AudioFileUpload) updates) =>
+      super.copyWith((message) => updates(message as AudioFileUpload))
+          as AudioFileUpload;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AudioFileUpload create() => AudioFileUpload._();
+  @$core.override
+  AudioFileUpload createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static AudioFileUpload getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<AudioFileUpload>(create);
+  static AudioFileUpload? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  @$pb.TagNumber(2)
+  AudioFileUpload_Data whichData() =>
+      _AudioFileUpload_DataByTag[$_whichOneof(0)]!;
+  @$pb.TagNumber(1)
+  @$pb.TagNumber(2)
+  void clearData() => $_clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  AudioFile get metadata => $_getN(0);
+  @$pb.TagNumber(1)
+  set metadata(AudioFile value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMetadata() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMetadata() => $_clearField(1);
+  @$pb.TagNumber(1)
+  AudioFile ensureMetadata() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get chunks => $_getN(1);
+  @$pb.TagNumber(2)
+  set chunks($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasChunks() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearChunks() => $_clearField(2);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

@@ -383,3 +383,28 @@ const UnassignAudioFileRequest$json = {
 final $typed_data.Uint8List unassignAudioFileRequestDescriptor =
     $convert.base64Decode(
         'ChhVbmFzc2lnbkF1ZGlvRmlsZVJlcXVlc3QSFwoHc2xvdF9pZBgBIAEoBVIGc2xvdElk');
+
+@$core.Deprecated('Use audioFileUploadDescriptor instead')
+const AudioFileUpload$json = {
+  '1': 'AudioFileUpload',
+  '2': [
+    {
+      '1': 'metadata',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.pb.AudioFile',
+      '9': 0,
+      '10': 'metadata'
+    },
+    {'1': 'chunks', '3': 2, '4': 1, '5': 12, '9': 0, '10': 'chunks'},
+  ],
+  '8': [
+    {'1': 'data'},
+  ],
+};
+
+/// Descriptor for `AudioFileUpload`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List audioFileUploadDescriptor = $convert.base64Decode(
+    'Cg9BdWRpb0ZpbGVVcGxvYWQSKwoIbWV0YWRhdGEYASABKAsyDS5wYi5BdWRpb0ZpbGVIAFIIbW'
+    'V0YWRhdGESGAoGY2h1bmtzGAIgASgMSABSBmNodW5rc0IGCgRkYXRh');
