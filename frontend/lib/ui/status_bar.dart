@@ -16,8 +16,10 @@ class StatusBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                player.slots[player.activeSlotID].file.fileName != ''
-                    ? player.slots[player.activeSlotID].file.fileName
+                player.activeSlotID == null
+                    ? "No file selected"
+                    : player.slots[player.activeSlotID!].file.fileName != ''
+                    ? player.slots[player.activeSlotID!].file.fileName
                     : 'No file selected',
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
@@ -43,10 +45,12 @@ class StatusBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
-                      '${player.slots[player.activeSlotID].file.duration - player.timeRemaining}',
+                      player.activeSlotID == null
+                          ? ''
+                          : '${player.slots[player.activeSlotID!].file.duration - player.timeRemaining}',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    player.slots[player.activeSlotID].file.fileName != ''
+                    player.activeSlotID != null
                         ? Center(
                             child: VerticalDivider(
                               color: Colors.white,
@@ -56,7 +60,9 @@ class StatusBar extends StatelessWidget {
                           )
                         : Container(),
                     Text(
-                      '${player.slots[player.activeSlotID].file.duration}',
+                      player.activeSlotID == null
+                          ? ''
+                          : '${player.slots[player.activeSlotID!].file.duration}',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ],

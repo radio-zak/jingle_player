@@ -80,10 +80,14 @@ class PlayerSection extends StatelessWidget {
                         spacing: spacing,
                         children: [
                           ActionButton(
-                            onPressed: () => player.play(),
+                            onPressed: player.activeSlotID != null
+                                ? () => player.play()
+                                : () {},
                             icon: Icons.play_arrow,
                             label: playLabel,
-                            color: player.playbackStatus == "PLAYING"
+                            color: player.activeSlotID == null
+                                ? Theme.of(context).colorScheme.primaryFixedDim
+                                : player.playbackStatus == "PLAYING"
                                 ? Colors.red
                                 : color,
                             tooltipMessage: playTooltipMessage,

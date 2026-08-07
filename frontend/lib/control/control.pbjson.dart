@@ -37,7 +37,15 @@ final $typed_data.Uint8List slotStatusRequestDescriptor =
 const AudioStatus$json = {
   '1': 'AudioStatus',
   '2': [
-    {'1': 'active_slot', '3': 1, '4': 1, '5': 5, '10': 'activeSlot'},
+    {
+      '1': 'active_slot',
+      '3': 1,
+      '4': 1,
+      '5': 5,
+      '9': 0,
+      '10': 'activeSlot',
+      '17': true
+    },
     {'1': 'state', '3': 2, '4': 1, '5': 9, '10': 'state'},
     {
       '1': 'time_remaining_seconds',
@@ -47,13 +55,16 @@ const AudioStatus$json = {
       '10': 'timeRemainingSeconds'
     },
   ],
+  '8': [
+    {'1': '_active_slot'},
+  ],
 };
 
 /// Descriptor for `AudioStatus`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List audioStatusDescriptor = $convert.base64Decode(
-    'CgtBdWRpb1N0YXR1cxIfCgthY3RpdmVfc2xvdBgBIAEoBVIKYWN0aXZlU2xvdBIUCgVzdGF0ZR'
-    'gCIAEoCVIFc3RhdGUSNAoWdGltZV9yZW1haW5pbmdfc2Vjb25kcxgDIAEoAVIUdGltZVJlbWFp'
-    'bmluZ1NlY29uZHM=');
+    'CgtBdWRpb1N0YXR1cxIkCgthY3RpdmVfc2xvdBgBIAEoBUgAUgphY3RpdmVTbG90iAEBEhQKBX'
+    'N0YXRlGAIgASgJUgVzdGF0ZRI0ChZ0aW1lX3JlbWFpbmluZ19zZWNvbmRzGAMgASgBUhR0aW1l'
+    'UmVtYWluaW5nU2Vjb25kc0IOCgxfYWN0aXZlX3Nsb3Q=');
 
 @$core.Deprecated('Use playbackRequestDescriptor instead')
 const PlaybackRequest$json = {

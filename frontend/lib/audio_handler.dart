@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:jingle_player/control/control.pbgrpc.dart';
@@ -382,15 +381,18 @@ class AudioProvider extends ChangeNotifier {
   LoggingService logger;
   StreamSubscription<AudioStatus>? audioStatus;
   StreamSubscription<PlayerSlot>? slotStatus;
+  AudioFileList? audioFileList;
 
   String playbackStatus = "STOPPED";
-  int activeSlotID = 0;
+  int? activeSlotID;
+  int? editedSlotID;
   int activePalette = 0;
   double timeRemaining = 0.0;
   bool isConnected = false;
   String? errorMessage;
   bool toolbarActive = false;
   bool editMode = false;
+  int? selectedFile;
 
   AudioProvider(this.client, this.fileOps, this.logger) {
     connectToBackend();
@@ -406,15 +408,22 @@ class AudioProvider extends ChangeNotifier {
     audioStatus = client.getAudioStatus().listen(
       (status) {
         playbackStatus = status.state;
-        activeSlotID = status.activeSlot;
+        if (status.hasActiveSlot()) {
+          activeSlotID = status.activeSlot;
+        } else {
+          activeSlotID = null;
+        }
         timeRemaining = status.timeRemainingSeconds;
         isConnected = true;
         notifyListeners();
       },
       onError: (error) {
         isConnected = false;
+        print("Lost connection to backend! Reconnecting in 3 seconds...");
         errorMessage = error.toString();
         notifyListeners();
+        sleep(Duration(seconds: 3));
+        connectToBackend();
       },
       onDone: () {
         isConnected = false;
@@ -424,6 +433,7 @@ class AudioProvider extends ChangeNotifier {
     slotStatus = client.getSlotStatus().listen(
       (status) {
         slots[status.id] = PlayerSlot(id: status.id, file: status.file);
+        notifyListeners();
       },
       onError: (error) {
         isConnected = false;
@@ -450,6 +460,32 @@ class AudioProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void selectFile(int id) {
+    if (selectedFile == id) {
+      selectedFile = null;
+    } else {
+      selectedFile = id;
+    }
+    notifyListeners();
+  }
+
+  void selectSlotForEdit(int id) {
+    editedSlotID = id;
+    notifyListeners();
+  }
+
+  Future<void> assignFileToSlot(int slotId, int id) async {
+    final req = AssignAudioFileRequest(slotId: slotId, fileId: id);
+    try {
+      await client.assignAudioFileToSlot(req);
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
+    editedSlotID = null;
+    notifyListeners();
+  }
+
   void updateSlotsFromBackend(List<dynamic> backendSlots) {
     List<PlayerSlot> updated = List.generate(16, (i) => PlayerSlot(id: i));
 
@@ -463,6 +499,25 @@ class AudioProvider extends ChangeNotifier {
 
     slots = updated;
     notifyListeners(); // Triggers Flutter UI rebuild
+  }
+
+  Future<void> deleteAudioFile(int fileID) async {
+    final req = AudioFileID(id: fileID);
+    try {
+      await client.deleteAudioFile(req);
+      toastification.show(
+        type: ToastificationType.info,
+        title: Text("Deleted audio file"),
+        alignment: Alignment.topLeft,
+        style: ToastificationStyle.minimal,
+      );
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
+    selectedFile = null;
+    await listAudioFiles();
+    // notifyListeners();
   }
 
   Future<AudioFileResponse> uploadAudioFile({
@@ -534,16 +589,25 @@ class AudioProvider extends ChangeNotifier {
           style: ToastificationStyle.minimal,
           alignment: Alignment.topLeft,
         );
-        // playerLoading[index] = false;
         notifyListeners();
         return;
       }
-      // playerLoading[index] = false;
       notifyListeners();
     } else {
       logger.print.i("File selection aborted");
     }
     logger.print.i("Uploaded audio file");
+    await listAudioFiles();
+    notifyListeners();
+  }
+
+  Future<void> listAudioFiles() async {
+    try {
+      audioFileList = await client.listAudioFiles();
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+    }
     notifyListeners();
   }
 
@@ -555,6 +619,7 @@ class AudioProvider extends ChangeNotifier {
       errorMessage = e.toString();
       notifyListeners();
     }
+    notifyListeners();
   }
 
   Future<void> play() async {
@@ -565,6 +630,7 @@ class AudioProvider extends ChangeNotifier {
       errorMessage = e.toString();
       notifyListeners();
     }
+    notifyListeners();
   }
 
   Future<void> stop() async {
@@ -575,6 +641,7 @@ class AudioProvider extends ChangeNotifier {
       errorMessage = e.toString();
       notifyListeners();
     }
+    notifyListeners();
   }
 
   @override

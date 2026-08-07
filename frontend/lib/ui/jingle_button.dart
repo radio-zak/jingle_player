@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jingle_player/pages/file_selector_page.dart';
 import 'action_button.dart';
 import 'package:provider/provider.dart';
 import '../audio_handler.dart';
@@ -123,8 +124,19 @@ class JingleSelector extends StatelessWidget {
                                           "Select wave file from disk for playout",
                                       hoverColor: Colors.grey,
                                       color: Colors.black87,
-                                      onPressed: () async => {},
-                                      // await player.setButtonSource(index),
+                                      onPressed: () {
+                                        player.selectSlotForEdit(
+                                          player.slots[index].id,
+                                        );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AudioFileSelectorPage(),
+                                          ),
+                                        );
+                                        player.listAudioFiles();
+                                      },
                                       label: 'Pick file',
                                       isSmall: true,
                                     ),

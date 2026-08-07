@@ -31,14 +31,18 @@ func main() {
 		panic(err)
 	}
 
-	err = os.Mkdir(cfg.Media.Directory, 0777)
-	if err != nil {
-		log.Fatalf("Failed creating media directory %v", err)
-		panic(err)
+	_, err = os.Stat(cfg.Media.Directory)
+	if os.IsNotExist(err) {
+		fmt.Println("Media directory does not exist, creating...")
+		err = os.Mkdir(cfg.Media.Directory, 0777)
+		if err != nil {
+			log.Fatalf("Failed creating media directory %v", err)
+			panic(err)
+		}
 	}
 
 	ctx := context.Background()
-	datastore, err := sql.Open(cfg.Database.Driver, ":memory:")
+	datastore, err := sql.Open(cfg.Database.Driver, "test.db")
 	if err != nil {
 		log.Fatalf("Failed opening database with driver %v: %v", cfg.Database.Driver, err)
 		panic(err)
@@ -51,7 +55,7 @@ func main() {
 
 	queries := db.New(datastore)
 
-	audio, err := audio_engine.InitPlayer(cfg.Audio.SampleRate, cfg.Audio.BufferSize)
+	audio, err := audio_engine.InitPlayer(cfg)
 	if err != nil {
 		log.Fatalf("Failed initializing audio engine: %v", err)
 		panic(err)

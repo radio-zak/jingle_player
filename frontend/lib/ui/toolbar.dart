@@ -1,4 +1,4 @@
-import 'package:jingle_player/ui/file_manager_page.dart';
+import 'package:jingle_player/pages/file_manager_page.dart';
 import '../audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,10 @@ class Toolbar extends StatelessWidget {
                     hoverColor: player.editMode
                         ? Colors.orangeAccent
                         : Colors.tealAccent,
-                    onPressed: () => player.switchMode(player.activePalette),
+                    onPressed: () {
+                      player.switchMode(player.activePalette);
+                      player.toggleToolbar();
+                    },
                     icon: Icons.edit,
                     label: player.editMode
                         ? 'Exit edit mode'
@@ -49,13 +52,16 @@ class Toolbar extends StatelessWidget {
                   child: ActionButton(
                     tooltipMessage: "Manage files",
                     label: "Audio management",
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AudioFileManagerPage(audioProvider: player),
-                      ),
-                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AudioFileManagerPage(),
+                        ),
+                      );
+                      player.toggleToolbar();
+                      player.listAudioFiles();
+                    },
                   ),
                 ),
               ],

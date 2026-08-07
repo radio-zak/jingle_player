@@ -29,7 +29,7 @@ message AudioStatusRequest {}
 message SlotStatusRequest {}
 
 message AudioStatus {
-  int32 active_slot = 1;
+  optional int32 active_slot = 1;
   string state = 2;
   double time_remaining_seconds = 3;
 }

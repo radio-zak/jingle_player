@@ -2,6 +2,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jingle_player/grpc.dart';
+import 'package:jingle_player/ui/clock.dart';
+import 'package:jingle_player/ui/time_remaining.dart';
 import 'ui/jingle_grid.dart';
 import 'package:provider/provider.dart';
 import 'audio_handler.dart';
@@ -178,83 +180,95 @@ class _HomePageState extends State<HomePage> with WindowListener {
   Widget build(BuildContext context) {
     final config = context.read<ApplicationConfig>();
     final _audioPlayer = Provider.of<AudioProvider>(context, listen: true);
-    // return Shortcuts(
-    //   shortcuts: {
-    //     SingleActivator(LogicalKeyboardKey.space): PlayerStartIntent(),
-    //     SingleActivator(LogicalKeyboardKey.escape): PlayerStopIntent(),
-    //     SingleActivator(LogicalKeyboardKey.keyE, control: true):
-    //         EditModeHandler(),
-    //     for (MapEntry<int, LogicalKeyboardKey> k in config.keyMap.entries)
-    //       SingleActivator(k.value): ButtonPressHandler(index: k.key),
-    //     for (MapEntry<int, LogicalKeyboardKey> k
-    //         in config.paletteKeyMap.entries)
-    //       SingleActivator(k.value, control: true): PaletteSelectHandler(
-    //         index: k.key,
-    //       ),
-    //   },
-    //   child: Actions(
-    //     actions: {
-    //       ButtonPressHandler: ButtonPressAction(audioHandler: _audioPlayer),
-    //       PaletteSelectHandler: PaletteSelectAction(audioHandler: _audioPlayer),
-    //       PlayerStartIntent: PlayerStartAction(audioHandler: _audioPlayer),
-    //       PlayerStopIntent: PlayerStopAction(audioHandler: _audioPlayer),
-    //       EditModeHandler: EditModeAction(audioHandler: _audioPlayer),
-    //     },
-    return Focus(
-      autofocus: true,
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(MediaQuery.of(context).size.width, 120),
-          child: TopBar(title: widget.title),
-        ),
-        body: Stack(
-          children: [
-            Center(child: JingleGrid(playerCount: config.players)),
-            Consumer<AudioProvider>(
-              builder: (context, player, child) {
-                switch (player.toolbarActive) {
-                  case true:
-                    return Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Toolbar(),
-                    );
+    return Shortcuts(
+      shortcuts: {
+        SingleActivator(LogicalKeyboardKey.space): PlayerStartIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): PlayerStopIntent(),
+        SingleActivator(LogicalKeyboardKey.keyE, control: true):
+            EditModeHandler(),
+        for (MapEntry<int, LogicalKeyboardKey> k in config.keyMap.entries)
+          SingleActivator(k.value): ButtonPressHandler(index: k.key),
+        // for (MapEntry<int, LogicalKeyboardKey> k
+        //     in config.paletteKeyMap.entries)
+        //   SingleActivator(k.value, control: true): PaletteSelectHandler(
+        //     index: k.key,
+        //   ),
+      },
+      child: Actions(
+        actions: {
+          ButtonPressHandler: ButtonPressAction(audioProvider: _audioPlayer),
+          // PaletteSelectHandler: PaletteSelectAction(audioHandler: _audioPlayer),
+          PlayerStartIntent: PlayerStartAction(audioProvider: _audioPlayer),
+          PlayerStopIntent: PlayerStopAction(audioProvider: _audioPlayer),
+          EditModeHandler: EditModeAction(audioProvider: _audioPlayer),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size(MediaQuery.of(context).size.width, 120),
+              child: TopBar(
+                title: widget.title,
+                backButton: false,
+                centerSlot: TimeRemainingClock(),
+                rightSlot: StudioClock(),
+              ),
+            ),
+            body: Consumer<AudioProvider>(
+              builder: (context, value, child) {
+                switch (value.isConnected) {
                   case false:
-                    return Container();
+                    return CircularProgressIndicator();
+                  case true:
+                    return Stack(
+                      children: [
+                        Center(child: JingleGrid(playerCount: config.players)),
+                        Consumer<AudioProvider>(
+                          builder: (context, player, child) {
+                            switch (player.toolbarActive) {
+                              case true:
+                                return Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Toolbar(),
+                                );
+                              case false:
+                                return Container();
+                            }
+                          },
+                        ),
+                      ],
+                    );
                 }
               },
             ),
-          ],
+            bottomNavigationBar: PlayerSection(),
+          ),
         ),
-        bottomNavigationBar: PlayerSection(),
       ),
     );
   }
 }
 
-// class ButtonPressHandler extends Intent {
-//   final int index;
-//   const ButtonPressHandler({required this.index});
-// }
+class ButtonPressHandler extends Intent {
+  final int index;
+  const ButtonPressHandler({required this.index});
+}
 
-// class ButtonPressAction extends Action<ButtonPressHandler> {
-//   AudioProvider audioProvider;
-//   LoggingService logger = LoggingService();
+class ButtonPressAction extends Action<ButtonPressHandler> {
+  AudioProvider audioProvider;
+  LoggingService logger = LoggingService();
 
-//   ButtonPressAction({required this.audioProvider});
+  ButtonPressAction({required this.audioProvider});
 
-//   @override
-//   Future<void> invoke(ButtonPressHandler intent) async {
-//     if (audioHandler.sourceMap[intent.index] == null) {
-//       logger.print.d('$intent.index');
-//       logger.print.d('tried to activate empty source');
-//     } else if (audioHandler.editMode) {
-//       // logger.print.d('button in edit mode - not playing');
-//     } else {
-//       await audioHandler.stop();
-//       await audioHandler.loadToPlayer(audioHandler.sourceMap[intent.index]!);
-//     }
-//   }
-// }
+  @override
+  Future<void> invoke(ButtonPressHandler intent) async {
+    if (audioProvider.editMode) {
+      logger.print.d('button in edit mode - not playing');
+    } else {
+      await audioProvider.stop();
+    }
+  }
+}
 
 class PlayerScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -266,29 +280,28 @@ class PlayerScrollBehavior extends MaterialScrollBehavior {
   };
 }
 
-// class PlayerStartIntent extends Intent {}
+class PlayerStartIntent extends Intent {}
 
-// class PlayerStopIntent extends Intent {}
+class PlayerStopIntent extends Intent {}
 
-// class PlayerStartAction extends Action<PlayerStartIntent> {
-//   AudioHandler audioHandler;
-//   PlayerStartAction({required this.audioHandler});
+class PlayerStartAction extends Action<PlayerStartIntent> {
+  AudioProvider audioProvider;
+  PlayerStartAction({required this.audioProvider});
+  @override
+  Future<void> invoke(PlayerStartIntent intent) async {
+    audioProvider.play();
+  }
+}
 
-//   @override
-//   Future<void> invoke(PlayerStartIntent intent) async {
-//     audioHandler.play();
-//   }
-// }
+class PlayerStopAction extends Action<PlayerStopIntent> {
+  AudioProvider audioProvider;
+  PlayerStopAction({required this.audioProvider});
 
-// class PlayerStopAction extends Action<PlayerStopIntent> {
-//   AudioHandler audioHandler;
-//   PlayerStopAction({required this.audioHandler});
-
-//   @override
-//   Future<void> invoke(PlayerStopIntent intent) async {
-//     audioHandler.stop();
-//   }
-// }
+  @override
+  Future<void> invoke(PlayerStopIntent intent) async {
+    audioProvider.stop();
+  }
+}
 
 // class PaletteSelectHandler extends Intent {
 //   final int index;
@@ -307,15 +320,15 @@ class PlayerScrollBehavior extends MaterialScrollBehavior {
 //   }
 // }
 
-// class EditModeHandler extends Intent {}
+class EditModeHandler extends Intent {}
 
-// class EditModeAction extends Action<EditModeHandler> {
-//   AudioHandler audioHandler;
-//   EditModeAction({required this.audioHandler});
+class EditModeAction extends Action<EditModeHandler> {
+  AudioProvider audioProvider;
+  EditModeAction({required this.audioProvider});
 
-//   @override
-//   void invoke(EditModeHandler intent) {
-//     int activePalette = audioHandler.activePalette;
-//     audioHandler.switchMode(activePalette);
-//   }
-// }
+  @override
+  void invoke(EditModeHandler intent) {
+    int activePalette = audioProvider.activePalette;
+    audioProvider.switchMode(activePalette);
+  }
+}

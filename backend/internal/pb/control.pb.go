@@ -95,7 +95,7 @@ func (*SlotStatusRequest) Descriptor() ([]byte, []int) {
 
 type AudioStatus struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ActiveSlot           int32                  `protobuf:"varint,1,opt,name=active_slot,json=activeSlot,proto3" json:"active_slot,omitempty"`
+	ActiveSlot           *int32                 `protobuf:"varint,1,opt,name=active_slot,json=activeSlot,proto3,oneof" json:"active_slot,omitempty"`
 	State                string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
 	TimeRemainingSeconds float64                `protobuf:"fixed64,3,opt,name=time_remaining_seconds,json=timeRemainingSeconds,proto3" json:"time_remaining_seconds,omitempty"`
 	unknownFields        protoimpl.UnknownFields
@@ -133,8 +133,8 @@ func (*AudioStatus) Descriptor() ([]byte, []int) {
 }
 
 func (x *AudioStatus) GetActiveSlot() int32 {
-	if x != nil {
-		return x.ActiveSlot
+	if x != nil && x.ActiveSlot != nil {
+		return *x.ActiveSlot
 	}
 	return 0
 }
@@ -1337,12 +1337,13 @@ const file_control_proto_rawDesc = "" +
 	"\n" +
 	"\rcontrol.proto\x12\x02pb\"\x14\n" +
 	"\x12AudioStatusRequest\"\x13\n" +
-	"\x11SlotStatusRequest\"z\n" +
-	"\vAudioStatus\x12\x1f\n" +
-	"\vactive_slot\x18\x01 \x01(\x05R\n" +
-	"activeSlot\x12\x14\n" +
+	"\x11SlotStatusRequest\"\x8f\x01\n" +
+	"\vAudioStatus\x12$\n" +
+	"\vactive_slot\x18\x01 \x01(\x05H\x00R\n" +
+	"activeSlot\x88\x01\x01\x12\x14\n" +
 	"\x05state\x18\x02 \x01(\tR\x05state\x124\n" +
-	"\x16time_remaining_seconds\x18\x03 \x01(\x01R\x14timeRemainingSeconds\")\n" +
+	"\x16time_remaining_seconds\x18\x03 \x01(\x01R\x14timeRemainingSecondsB\x0e\n" +
+	"\f_active_slot\")\n" +
 	"\x0fPlaybackRequest\x12\x16\n" +
 	"\x06action\x18\x01 \x01(\tR\x06action\"F\n" +
 	"\x10PlaybackResponse\x12\x18\n" +
@@ -1525,6 +1526,7 @@ func file_control_proto_init() {
 	if File_control_proto != nil {
 		return
 	}
+	file_control_proto_msgTypes[2].OneofWrappers = []any{}
 	file_control_proto_msgTypes[25].OneofWrappers = []any{
 		(*AudioFileUpload_Metadata)(nil),
 		(*AudioFileUpload_Chunks)(nil),

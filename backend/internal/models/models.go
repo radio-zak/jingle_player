@@ -4,11 +4,11 @@ import "jingle_player_backend/internal/db"
 
 type PlayerSlot struct {
 	ID        int32
-	AudioFile db.AudioFile
+	AudioFile *db.AudioFile
 }
 
 type AudioStatus struct {
-	ActiveSlot    int
+	ActiveSlot    *int32
 	State         PlaybackState
 	TimeRemaining float64
 }
@@ -19,3 +19,14 @@ const (
 	StatePlaying PlaybackState = "PLAYING"
 	StateStopped PlaybackState = "STOPPED"
 )
+
+func (s *PlayerSlot) GetFileName() string {
+	if s == nil || s.AudioFile == nil {
+		return "" // Or "Empty Slot"
+	}
+	return s.AudioFile.Name
+}
+
+func (s *PlayerSlot) HasAudio() bool {
+	return s != nil && s.AudioFile != nil
+}

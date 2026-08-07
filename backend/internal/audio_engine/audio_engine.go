@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"jingle_player_backend/internal/config"
 	"jingle_player_backend/internal/models"
 	"jingle_player_backend/internal/uiservice"
 	"os"
+	"path"
 	"sync"
 	"time"
 
@@ -21,10 +23,11 @@ type Player struct {
 	channels   int
 	bitDepth   int
 	bufferSize int
+	config     *config.Config
 	*models.AudioStatus
 	UI             *uiservice.UIService
 	Mu             sync.RWMutex
-	Slots          map[int32]*models.PlayerSlot
+	Slots          [16]*models.PlayerSlot
 	cancelPlayback context.CancelFunc
 }
 
@@ -35,17 +38,16 @@ type Player struct {
 // 	Duration time.Duration
 // }
 
-func InitPlayer(sampleRate int, bufferSize int) (*Player, error) {
+func InitPlayer(cfg *config.Config) (*Player, error) {
 	var numSlots = 16
 
 	err := portaudio.Initialize()
 	if err != nil {
 		return nil, err
 	}
-	p := &Player{init: true, sampleRate: uint32(sampleRate), channels: 2, bitDepth: 16, bufferSize: bufferSize,
-		AudioStatus: &models.AudioStatus{ActiveSlot: 0, State: models.StateStopped, TimeRemaining: 0},
-		UI:          uiservice.NewUIService(),
-		Slots:       make(map[int32]*models.PlayerSlot)}
+	p := &Player{init: true, sampleRate: uint32(cfg.Audio.SampleRate), channels: 2, bitDepth: 16, bufferSize: cfg.Audio.BufferSize,
+		AudioStatus: &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0},
+		UI:          uiservice.NewUIService()}
 
 	for i := 0; i <= numSlots-1; i++ {
 		id := int32(i)
@@ -71,9 +73,9 @@ func (p *Player) broadcastPlayerState() {
 			currentAudioState := p.AudioStatus
 			p.Mu.RUnlock()
 			p.UI.Mu.RUnlock()
-			if p.UI.LastAudioStatus == currentAudioState {
-				continue
-			}
+			// if p.UI.LastAudioStatus == currentAudioState {
+			// 	continue
+			// }
 			p.UI.Mu.Lock()
 			p.UI.LastAudioStatus = currentAudioState
 			p.UI.Mu.Unlock()
@@ -86,7 +88,6 @@ func (p *Player) broadcastPlayerState() {
 		}
 	}
 }
-
 func (p *Player) broadcastSlotState() {
 	fmt.Println("Started broadcasting slot state")
 	ticker := time.NewTicker(500 * time.Millisecond)
@@ -104,7 +105,6 @@ func (p *Player) broadcastSlotState() {
 				if p.UI.LastSlotState[i] == slot {
 					continue
 				}
-				fmt.Println("Value of slot", i, "updated in cache")
 				p.UI.Mu.Lock()
 				p.UI.LastSlotState[i] = slot
 				p.UI.Mu.Unlock()
@@ -142,10 +142,21 @@ func (p *Player) EnumDevices() ([]*portaudio.DeviceInfo, error) {
 func (p *Player) StopAudio() error {
 	p.Mu.Lock()
 	cancel := p.cancelPlayback
-	p.cancelPlayback = nil
 	p.Mu.Unlock()
-	fmt.Println("Stopping playback")
-	cancel()
+	fmt.Println("Stopping playback...")
+	if cancel != nil {
+		cancel()
+		p.Mu.Lock()
+		p.cancelPlayback = nil
+		p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
+		p.Mu.Unlock()
+
+	} else {
+		fmt.Println("Attempted stop operation on already stopped audio")
+		p.Mu.Lock()
+		p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
+		p.Mu.Unlock()
+	}
 	return nil
 }
 
@@ -154,22 +165,25 @@ func (p *Player) PlayAudio() error {
 	p.Mu.Lock()
 	p.cancelPlayback = cancel
 	p.Mu.Unlock()
-	go p.runAudioPlayback(ctx, int32(p.ActiveSlot))
+	fmt.Println("playing audio from slot", *p.ActiveSlot)
+	go p.runAudioPlayback(ctx, *p.ActiveSlot)
 	return nil
 }
 
 func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
-	slot := *p.Slots[slotID]
-	f, err := os.Open(slot.AudioFile.Path)
+	slot := p.Slots[slotID].GetFileName()
+	path := path.Join("./media", slot)
+	fmt.Printf("Opening file %v", path)
+	f, err := os.Open(path)
 	if err != nil {
 		fmt.Printf("Failed to load file from disk:", err)
 		return err
 	}
 	defer func() {
-		p.UI.Mu.Lock()
+		p.Mu.Lock()
 		p.cancelPlayback = nil
 		p.AudioStatus = &models.AudioStatus{State: models.StateStopped}
-		p.UI.Mu.Unlock()
+		p.Mu.Unlock()
 		f.Close()
 	}()
 
@@ -178,7 +192,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		fmt.Printf("Invalid wav")
 		return err
 	}
-
+	fmt.Println("Setting decoder configuration")
 	sampleRate := decoder.SampleRate
 	channels := int(decoder.Format().NumChannels)
 	bitDepth := int(decoder.BitDepth)
@@ -192,7 +206,9 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		return err
 	}
 	stream.Start()
-	p.AudioStatus = &models.AudioStatus{ActiveSlot: int(slotID), State: models.StatePlaying, TimeRemaining: 0}
+	p.Mu.Lock()
+	p.AudioStatus = &models.AudioStatus{ActiveSlot: &slotID, State: models.StatePlaying, TimeRemaining: 0}
+	p.Mu.Unlock()
 	defer stream.Close()
 
 	goAudioBuffer := &audio.IntBuffer{
@@ -201,38 +217,46 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	}
 	go func() {
 		<-ctx.Done()
-		p.AudioStatus = &models.AudioStatus{ActiveSlot: int(slotID), State: models.StateStopped, TimeRemaining: 0}
-		fmt.Println("Playback stopped.")
-		stream.Abort()
+		fmt.Println("Stopping playback...")
+		stream.Stop()
 	}()
 	for {
-		n, err := decoder.PCMBuffer(goAudioBuffer)
-		if err != nil && err != io.EOF {
-			fmt.Printf("Error decoding audio: %v\n", err)
-			break
-		}
-		if n == 0 {
+		select {
+		case <-ctx.Done():
+			p.Mu.Lock()
+			p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
+			p.Mu.Unlock()
+			fmt.Println("Stopped playback")
+			return ctx.Err()
+		default:
+			n, err := decoder.PCMBuffer(goAudioBuffer)
+			if err != nil && err != io.EOF {
+				fmt.Printf("Error decoding audio: %v\n", err)
+				break
+			}
+			if n == 0 {
+				p.Mu.Lock()
+				p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
+				p.Mu.Unlock()
+				fmt.Println("Playback stopped (EOF)")
+				break // End of file
+			}
 
-			p.AudioStatus = &models.AudioStatus{ActiveSlot: 0, State: models.StateStopped, TimeRemaining: 0}
-			fmt.Println("Playback stopped (EOF)")
-			break // End of file
-		}
+			for i := 0; i < n; i++ {
+				audioOutBuffer[i] = int16(goAudioBuffer.Data[i])
+			}
 
-		for i := 0; i < n; i++ {
-			audioOutBuffer[i] = int16(goAudioBuffer.Data[i])
-		}
+			if n < len(audioOutBuffer) {
+				for i := n; i < len(audioOutBuffer); i++ {
+					audioOutBuffer[i] = 0
+				}
+			}
 
-		if n < len(audioOutBuffer) {
-			for i := n; i < len(audioOutBuffer); i++ {
-				audioOutBuffer[i] = 0
+			err = stream.Write()
+			if err != nil {
+				fmt.Printf("Error writing to audio stream: %v\n", err)
+				break
 			}
 		}
-
-		err = stream.Write()
-		if err != nil {
-			fmt.Printf("Error writing to audio stream: %v\n", err)
-			break
-		}
 	}
-	return nil
 }

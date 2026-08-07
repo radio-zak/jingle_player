@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'date_display.dart';
-import 'clock.dart';
-import 'time_remaining.dart';
 
 class TopBar extends StatelessWidget {
+  final bool backButton;
   final String title;
-  const TopBar({super.key, required this.title});
+  final Widget? centerSlot;
+  final Widget? rightSlot;
+  const TopBar({
+    super.key,
+    required this.backButton,
+    required this.title,
+    this.centerSlot,
+    this.rightSlot,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +27,25 @@ class TopBar extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                title,
-                style: TextStyle(color: Colors.white, fontSize: 36),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  backButton
+                      ? IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                        )
+                      : Container(),
+                  Text(
+                    title,
+                    style: TextStyle(color: Colors.white, fontSize: 36),
+                  ),
+                ],
               ),
             ),
-            Expanded(child: TimeRemainingClock()),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [StudioClock(), DateDisplay()],
-              ),
-            ),
+            centerSlot != null ? Expanded(child: centerSlot!) : Container(),
+            rightSlot != null ? Expanded(child: rightSlot!) : Container(),
           ],
         ),
       ),
