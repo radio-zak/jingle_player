@@ -383,12 +383,15 @@ class AudioProvider extends ChangeNotifier {
   StreamSubscription<PlayerSlot>? slotStatus;
   AudioFileList? audioFileList;
 
+  int reconnectionTries = 0;
+
   String playbackStatus = "STOPPED";
   int? activeSlotID;
   int? editedSlotID;
   int activePalette = 0;
   double timeRemaining = 0.0;
   bool isConnected = false;
+  bool connBackOff = false;
   String? errorMessage;
   bool toolbarActive = false;
   bool editMode = false;
@@ -400,13 +403,14 @@ class AudioProvider extends ChangeNotifier {
 
   List<PlayerSlot> slots = List.generate(16, (index) => PlayerSlot(id: index));
 
-  void connectToBackend() {
+  Future<void> connectToBackend() async {
     errorMessage = null;
     audioStatus?.cancel();
     slotStatus?.cancel();
 
     audioStatus = client.getAudioStatus().listen(
       (status) {
+        reconnectionTries = 0;
         playbackStatus = status.state;
         if (status.hasActiveSlot()) {
           activeSlotID = status.activeSlot;
@@ -417,17 +421,29 @@ class AudioProvider extends ChangeNotifier {
         isConnected = true;
         notifyListeners();
       },
-      onError: (error) {
+      onError: (error) async {
         isConnected = false;
-        print("Lost connection to backend! Reconnecting in 3 seconds...");
+        reconnectionTries = reconnectionTries + 1;
         errorMessage = error.toString();
+        if (reconnectionTries < 5) {
+          logger.print.d(reconnectionTries);
+          final future = await Future.delayed(Duration(seconds: 3), () {
+            connectToBackend();
+          });
+        }
+        if (reconnectionTries == 5) {
+          logger.print.d("Backing off");
+          connBackOff = true;
+          audioStatus?.cancel();
+        }
         notifyListeners();
-        sleep(Duration(seconds: 3));
-        connectToBackend();
       },
-      onDone: () {
+      onDone: () async {
         isConnected = false;
         notifyListeners();
+        await Future.delayed(Duration(seconds: 3), () {
+          connectToBackend();
+        });
       },
     );
     slotStatus = client.getSlotStatus().listen(
@@ -435,14 +451,28 @@ class AudioProvider extends ChangeNotifier {
         slots[status.id] = PlayerSlot(id: status.id, file: status.file);
         notifyListeners();
       },
-      onError: (error) {
+      onError: (error) async {
         isConnected = false;
         errorMessage = error.toString();
+        if (reconnectionTries < 5) {
+          logger.print.d(reconnectionTries);
+          final future = await Future.delayed(Duration(seconds: 3), () {
+            connectToBackend();
+          });
+        }
+        if (reconnectionTries == 5) {
+          logger.print.d("Backing off");
+          connBackOff = true;
+          slotStatus?.cancel();
+        }
         notifyListeners();
       },
-      onDone: () {
+      onDone: () async {
         isConnected = false;
         notifyListeners();
+        await Future.delayed(Duration(seconds: 3), () {
+          connectToBackend();
+        });
       },
     );
   }

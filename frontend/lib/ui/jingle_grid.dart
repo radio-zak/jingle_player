@@ -10,21 +10,13 @@ class JingleGrid extends StatelessWidget {
 
   Future<void> handleButtonClick(BuildContext context, int index) async {
     final audioProvider = Provider.of<AudioProvider>(context, listen: false);
-    await audioProvider.stop();
-    await audioProvider.loadToPlayer(index);
-    return;
-    // if (audioHandler.paletteLoading) {
-    //   return;
-    // }
-    // if (audioHandler.sourceMap[index] == null) {
-    //   debugPrint('$index');
-    //   debugPrint('tried to activate empty source');
-    // } else if (audioHandler.editMode) {
-    //   debugPrint('button in edit mode - not playing');
-    // } else {
-    //   await audioHandler.stop();
-    //   await audioHandler.loadToPlayer(audioHandler.sourceMap[index]!);
-    // }
+    if (audioProvider.editMode) {
+      return;
+    } else {
+      await audioProvider.stop();
+      await audioProvider.loadToPlayer(index);
+      return;
+    }
   }
 
   @override

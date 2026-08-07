@@ -18,14 +18,13 @@ import 'package:toastification/toastification.dart';
 import 'logger.dart';
 import 'config.dart';
 import 'file_ops.dart';
-import 'control/control.pb.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
-    minimumSize: Size(1280, 720),
+    minimumSize: Size(1280, 800),
     skipTaskbar: false,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -83,7 +82,7 @@ class JinglePlayer extends StatelessWidget {
     final textGreyedColor = Color(0xFFBBBBBB);
     return ToastificationWrapper(
       child: MaterialApp(
-        title: config.appTitle,
+        title: "Djinn",
         scrollBehavior: PlayerScrollBehavior(),
         theme: ThemeData(
           appBarTheme: AppBarThemeData(
@@ -144,7 +143,7 @@ class JinglePlayer extends StatelessWidget {
             bodySmall: GoogleFonts.sora(),
           ),
         ),
-        home: HomePage(title: config.appTitle),
+        home: HomePage(title: "Djinn"),
       ),
     );
   }
@@ -218,7 +217,48 @@ class _HomePageState extends State<HomePage> with WindowListener {
               builder: (context, value, child) {
                 switch (value.isConnected) {
                   case false:
-                    return CircularProgressIndicator();
+                    return Center(
+                      child: !value.connBackOff
+                          ? Row(
+                              spacing: 32,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  strokeCap: StrokeCap.round,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  semanticsLabel: "Connecting...",
+                                ),
+                                Text(
+                                  "Connecting...",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                              ],
+                            )
+                          : Column(
+                              spacing: 16,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Conenction to backend failed",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                Text(
+                                  "${value.errorMessage}",
+                                  textAlign: TextAlign.center,
+                                ),
+                                TextButton(
+                                  child: Text("Reconnect"),
+                                  onPressed: () {
+                                    value.reconnectionTries = 0;
+                                    value.connBackOff = false;
+                                    value.connectToBackend();
+                                  },
+                                ),
+                              ],
+                            ),
+                    );
                   case true:
                     return Stack(
                       children: [
@@ -265,7 +305,7 @@ class ButtonPressAction extends Action<ButtonPressHandler> {
     if (audioProvider.editMode) {
       logger.print.d('button in edit mode - not playing');
     } else {
-      await audioProvider.stop();
+      await audioProvider.loadToPlayer(intent.index);
     }
   }
 }

@@ -22,45 +22,32 @@ class TimeRemainingClock extends StatelessWidget {
             ? Colors.red
             : player.editMode
             ? Colors.orange
-            // : player.sourceFileParsed == null
-            // ? Theme.of(context).colorScheme.primaryFixedDim
+            : player.activeSlotID == null
+            ? Theme.of(context).colorScheme.primaryFixedDim
             : Theme.of(context).colorScheme.primary,
       ),
       child: Padding(
         padding: EdgeInsetsGeometry.all(4),
         child: Align(
-          alignment: FractionalOffset.topCenter,
+          alignment: FractionalOffset.center,
           child: Consumer<AudioProvider>(
             builder: (context, player, child) {
-              return Flex(
-                direction: Axis.vertical,
-                mainAxisSize: MainAxisSize.min,
-                spacing: 2,
-                children: [
-                  Flexible(
-                    flex: 1,
-                    child: Text(
-                      player.playbackStatus != "PLAYING"
-                          ? Duration.zero.toString().split('.').first
-                          : Duration(
-                              milliseconds: (player.timeRemaining * 1000)
-                                  .round(),
-                            ).toString().split('.').first,
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: Text(
-                      // player.playbackStatus != "PLAYING"
-                      //     ? Duration.zero.toString().split('.').first
-                      //     : calculateEndTime(player.timeRemaining),
-                      "",
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ),
-                ],
-              );
+              switch (player.isConnected) {
+                case true:
+                  return Text(
+                    player.playbackStatus != "PLAYING"
+                        ? Duration.zero.toString().split('.').first
+                        : Duration(
+                            milliseconds: (player.timeRemaining * 1000).round(),
+                          ).toString().split('.').first,
+                    style: Theme.of(context).textTheme.displayLarge,
+                  );
+                case false:
+                  return Text(
+                    "OFFLINE",
+                    style: Theme.of(context).textTheme.displayLarge,
+                  );
+              }
             },
           ),
         ),

@@ -27,8 +27,8 @@ class AudioFileManagerPage extends StatelessWidget {
                 ActionButton(
                   label: "Add file",
                   icon: Icons.add,
-                  color: color,
-                  hoverColor: Colors.tealAccent,
+                  color: Theme.of(context).colorScheme.primaryFixedDim,
+                  hoverColor: color,
                   onPressed: () {
                     audioProvider.addAudioFile();
                   },
@@ -37,7 +37,7 @@ class AudioFileManagerPage extends StatelessWidget {
                 ActionButton(
                   label: "Delete file",
                   icon: Icons.delete,
-                  color: Colors.red,
+                  color: Theme.of(context).colorScheme.primaryFixedDim,
                   hoverColor: Colors.redAccent,
                   onPressed: () {
                     if (audioProvider.selectedFile != null) {
@@ -57,49 +57,3 @@ class AudioFileManagerPage extends StatelessWidget {
     );
   }
 }
-
-// class BottomSection extends StatelessWidget {
-//   BottomSection({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Material(
-//       color: Colors.black87,
-//       child: SizedBox(
-//         width: MediaQuery.of(context).size.width,
-//         height: 100,
-//         child: Padding(
-//           padding: EdgeInsetsGeometry.directional(
-//             end: 32,
-//             start: 32,
-//             top: 16,
-//             bottom: 16,
-//           ),
-//           child: Flex(
-//             direction: Axis.horizontal,
-//             mainAxisSize: MainAxisSize.max,
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Flexible(
-//                 flex: 2,
-//                 child: Row(
-//                   spacing: 16,
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   mainAxisSize: MainAxisSize.max,
-//                   children: [
-//                     IconButton(
-//                       onPressed: () {
-//                         Navigator.pop(context);
-//                       },
-//                       icon: Icon(Icons.arrow_back),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
