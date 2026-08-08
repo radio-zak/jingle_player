@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
-import "package:jingle_player/ui/top_bar.dart";
-import "package:jingle_player/ui/audio_file_list_view.dart";
+import "package:djinn/ui/top_bar.dart";
+import "package:djinn/ui/audio_file_list_view.dart";
 
 class AudioFileSelectorPage extends StatelessWidget {
   AudioFileSelectorPage({super.key});

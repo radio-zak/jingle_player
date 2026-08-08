@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
-import "package:jingle_player/audio_handler.dart";
+import "package:djinn/audio_handler.dart";
 import "package:provider/provider.dart";
-import "package:jingle_player/ui/audio_file_selector.dart";
+import "package:djinn/ui/audio_file_selector.dart";
 
 class AudioFileListView extends StatelessWidget {
   bool management;

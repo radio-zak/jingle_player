@@ -1,4 +1,4 @@
-import 'package:jingle_player/pages/file_manager_page.dart';
+import 'package:djinn/pages/file_manager_page.dart';
 import '../audio_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

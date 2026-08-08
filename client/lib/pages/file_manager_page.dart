@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
-import "package:jingle_player/audio_handler.dart";
-import "package:jingle_player/ui/action_button.dart";
-import "package:jingle_player/ui/audio_file_list_view.dart";
-import "package:jingle_player/ui/top_bar.dart";
+import "package:djinn/audio_handler.dart";
+import "package:djinn/ui/action_button.dart";
+import "package:djinn/ui/audio_file_list_view.dart";
+import "package:djinn/ui/top_bar.dart";
 import "package:provider/provider.dart";
 
 class AudioFileManagerPage extends StatelessWidget {

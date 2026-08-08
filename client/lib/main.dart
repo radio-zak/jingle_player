@@ -1,9 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jingle_player/grpc.dart';
-import 'package:jingle_player/ui/clock.dart';
-import 'package:jingle_player/ui/time_remaining.dart';
+import 'package:djinn/grpc.dart';
+import 'package:djinn/ui/clock.dart';
+import 'package:djinn/ui/time_remaining.dart';
 import 'ui/jingle_grid.dart';
 import 'package:provider/provider.dart';
 import 'audio_handler.dart';

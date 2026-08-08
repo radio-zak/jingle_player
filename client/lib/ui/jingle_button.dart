@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jingle_player/pages/file_selector_page.dart';
+import 'package:djinn/pages/file_selector_page.dart';
 import 'action_button.dart';
 import 'package:provider/provider.dart';
 import '../audio_handler.dart';
