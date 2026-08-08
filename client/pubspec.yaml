@@ -1,5 +1,5 @@
-name: "jingle_player"
-description: 'A minimal, cross-platform audio player designed for short audio file playout. Designed for broadcast purposes for Technical University of Lodz Student Radio "ŻAK"'
+name: "djinn"
+description: 'Cross-platform audio player designed for short audio file playout. Designed for broadcast purposes for Technical University of Lodz Student Radio "ŻAK"'
 publish_to: "none"
 version: "1.0.0"
 environment:
@@ -35,5 +35,5 @@ flutter:
 inno_bundle:
   id: 5f7bc030-46fa-11f1-89fe-17938c56c899
   publisher: Studenckie Radio ŻAK Politechniki Łódzkiej
-  name: Jingle Player
+  name: Djinn
   url: https://github.com/radio_zak/jingle_player
