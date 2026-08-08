@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"jingle_player_backend/internal/audio_engine"
 	"jingle_player_backend/internal/config"
@@ -18,7 +17,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/gordonklaus/portaudio"
 	"google.golang.org/grpc"
 	_ "modernc.org/sqlite"
 )
@@ -67,71 +65,29 @@ func main() {
 	ver := audio.GetVersion()
 	fmt.Println(ver)
 
-	// dev, err := audio.EnumDevices()
-	// if err != nil {
-	// 	fmt.Println("Failed to enumerate devices", err)
-	// 	return
-	// }
-	// deviceInfoToJSON(dev)
-	listenAddr := strings.Join([]string{cfg.Server.Host, cfg.Server.Port}, ":")
-	listener, err := net.Listen("tcp", listenAddr)
-	if err != nil {
-		log.Fatalf("Failed to listen on address %v: %v", listenAddr, err)
-		panic(err)
-	}
 	grpcs := grpc.NewServer()
 	handler := control.NewAudioGRPCServer(audio, queries, cfg)
 	pb.RegisterAudioServiceServer(grpcs, handler)
-
-	fmt.Println("Listening on", listenAddr)
-	err = grpcs.Serve(listener)
-	if err != nil {
-		fmt.Println("Failed to create gRPC server on address", listenAddr, err)
-		return
-	}
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT)
+	go func() {
+		listenAddr := strings.Join([]string{cfg.Server.Host, cfg.Server.Port}, ":")
+		listener, err := net.Listen("tcp", listenAddr)
+		if err != nil {
+			log.Fatalf("Failed to listen on address %v: %v", listenAddr, err)
+			panic(err)
+		}
+		fmt.Println("Listening on", listenAddr)
+		grpcs.Serve(listener)
+		if err != nil {
+			fmt.Println("Failed to create gRPC server on address", listenAddr, err)
+			return
+		}
+	}()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
 	// Block main until a signal is received (e.g. Ctrl+C or Docker/Kubernetes SIGTERM)
 	<-ctx.Done()
 
-	log.Println("Shutdown signal received, starting graceful shutdown...")
-
+	log.Println("Shutting down...")
 	grpcs.GracefulStop()
-}
-
-type JSONDevice struct {
-	ID                int     `json:"id"`
-	Name              string  `json:"name"`
-	HostAPI           string  `json:"host_api"`
-	MaxInputChannels  int     `json:"max_input_channels"`
-	MaxOutputChannels int     `json:"max_output_channels"`
-	DefaultSampleRate float64 `json:"default_sample_rate"`
-}
-
-func deviceInfoToJSON(dev []*portaudio.DeviceInfo) {
-
-	var jsonDevices []JSONDevice
-
-	for i, dev := range dev {
-
-		jsonDevices = append(jsonDevices, JSONDevice{
-			ID:                i,
-			Name:              dev.Name,
-			HostAPI:           dev.HostApi.Name,
-			MaxInputChannels:  dev.MaxInputChannels,
-			MaxOutputChannels: dev.MaxOutputChannels,
-			DefaultSampleRate: dev.DefaultSampleRate,
-		})
-	}
-
-	jsonBytes, err := json.MarshalIndent(jsonDevices, "", "  ")
-	if err != nil {
-		fmt.Println("{\"error\": \"Failed to generate JSON: %v\"}\n", err)
-		return
-	}
-
-	// 5. Print it straight to standard output
-	os.Stdout.Write(jsonBytes)
-	fmt.Println()
 }

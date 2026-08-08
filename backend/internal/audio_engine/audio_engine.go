@@ -113,6 +113,7 @@ func (p *Player) broadcastSlotState() {
 }
 
 func (p *Player) Close() error {
+	fmt.Println("Shutting down PortAudio")
 	if !p.init {
 		return nil
 	}
@@ -141,14 +142,12 @@ func (p *Player) StopAudio() error {
 		cancel()
 		p.Mu.Lock()
 		p.cancelPlayback = nil
-		p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
 		p.Mu.Unlock()
+		p.updateAudioStatus(nil, models.StateStopped, 0)
 
 	} else {
 		fmt.Println("Attempted stop operation on already stopped audio")
-		p.Mu.Lock()
-		p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
-		p.Mu.Unlock()
+		p.updateAudioStatus(nil, models.StateStopped, 0)
 	}
 	return nil
 }
@@ -178,9 +177,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	}
 	defer func() {
 		p.Mu.Lock()
-		p.cancelPlayback = nil
-		p.AudioStatus = &models.AudioStatus{State: models.StateStopped}
-		p.Mu.Unlock()
+		p.updateAudioStatus(nil, models.StateStopped, 0)
 		f.Close()
 	}()
 
@@ -204,9 +201,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 		return err
 	}
 	stream.Start()
-	p.Mu.Lock()
-	p.AudioStatus = &models.AudioStatus{ActiveSlot: &slotID, State: models.StatePlaying, TimeRemaining: 0}
-	p.Mu.Unlock()
+	p.updateAudioStatus(&slotID, models.StatePlaying, 0)
 	defer stream.Close()
 
 	goAudioBuffer := &audio.IntBuffer{
@@ -221,9 +216,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	for {
 		select {
 		case <-ctx.Done():
-			p.Mu.Lock()
-			p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
-			p.Mu.Unlock()
+			p.updateAudioStatus(nil, models.StateStopped, 0)
 			fmt.Println("Stopped playback")
 			return ctx.Err()
 		default:
@@ -233,9 +226,7 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 				break
 			}
 			if n == 0 {
-				p.Mu.Lock()
-				p.AudioStatus = &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0}
-				p.Mu.Unlock()
+				p.updateAudioStatus(nil, models.StateStopped, 0)
 				fmt.Println("Playback stopped (EOF)")
 				break // End of file
 			}
@@ -260,4 +251,10 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 			}
 		}
 	}
+}
+
+func (p *Player) updateAudioStatus(slotID *int32, state models.PlaybackState, timeRemaining float64) {
+	p.Mu.Lock()
+	p.AudioStatus = &models.AudioStatus{ActiveSlot: slotID, State: state, TimeRemaining: timeRemaining}
+	p.Mu.Unlock()
 }
