@@ -31,13 +31,6 @@ type Player struct {
 	cancelPlayback context.CancelFunc
 }
 
-// type AudioFile struct {
-// 	ID       int32
-// 	FileName string
-// 	FilePath string
-// 	Duration time.Duration
-// }
-
 func InitPlayer(cfg *config.Config) (*Player, error) {
 	var numSlots = 16
 
@@ -45,7 +38,7 @@ func InitPlayer(cfg *config.Config) (*Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := &Player{init: true, sampleRate: uint32(cfg.Audio.SampleRate), channels: 2, bitDepth: 16, bufferSize: cfg.Audio.BufferSize,
+	p := &Player{init: true, sampleRate: uint32(cfg.Audio.SampleRate), channels: 2, bitDepth: 24, bufferSize: cfg.Audio.BufferSize,
 		AudioStatus: &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0},
 		UI:          uiservice.NewUIService()}
 
@@ -143,8 +136,8 @@ func (p *Player) StopAudio() error {
 	p.Mu.Lock()
 	cancel := p.cancelPlayback
 	p.Mu.Unlock()
-	fmt.Println("Stopping playback...")
 	if cancel != nil {
+		fmt.Println("Stopping playback...")
 		cancel()
 		p.Mu.Lock()
 		p.cancelPlayback = nil
@@ -165,8 +158,12 @@ func (p *Player) PlayAudio() error {
 	p.Mu.Lock()
 	p.cancelPlayback = cancel
 	p.Mu.Unlock()
-	fmt.Println("playing audio from slot", *p.ActiveSlot)
-	go p.runAudioPlayback(ctx, *p.ActiveSlot)
+	if p.ActiveSlot != nil {
+		fmt.Println("playing audio from slot", *p.ActiveSlot)
+		go p.runAudioPlayback(ctx, *p.ActiveSlot)
+	} else {
+		fmt.Println("No slot active - no playback")
+	}
 	return nil
 }
 
@@ -197,11 +194,12 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	channels := int(decoder.Format().NumChannels)
 	bitDepth := int(decoder.BitDepth)
 	duration := decoder.Duration
+	maxVal := float32(int(1) << (bitDepth - 1))
 
 	fmt.Printf("Playing: %d-bit WAV, %dHz, %d channels, %d duration\n", bitDepth, sampleRate, channels, duration)
 
-	audioOutBuffer := make([]int16, p.bufferSize)
-	stream, err := portaudio.OpenDefaultStream(0, p.channels, float64(p.sampleRate), len(audioOutBuffer), &audioOutBuffer)
+	audioOutBuffer := make([]float32, p.bufferSize)
+	stream, err := portaudio.OpenDefaultStream(0, channels, float64(sampleRate), len(audioOutBuffer), &audioOutBuffer)
 	if err != nil {
 		return err
 	}
@@ -243,12 +241,15 @@ func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 			}
 
 			for i := 0; i < n; i++ {
-				audioOutBuffer[i] = int16(goAudioBuffer.Data[i])
+				for i, val := range goAudioBuffer.Data {
+					audioOutBuffer[i] = float32(val) / maxVal // Scale into [-1.0, 1.0] range
+				}
 			}
 
 			if n < len(audioOutBuffer) {
 				for i := n; i < len(audioOutBuffer); i++ {
 					audioOutBuffer[i] = 0
+					break
 				}
 			}
 

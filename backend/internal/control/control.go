@@ -93,7 +93,7 @@ func (s *AudioGRPCServer) StreamSlotStatus(req *pb.SlotStatusRequest, stream pb.
 			}
 			var ps *pb.AudioFile
 			if data.AudioFile != nil {
-				ps = &pb.AudioFile{Id: int32(data.AudioFile.ID), FileName: data.AudioFile.Name, FilePath: data.AudioFile.Path}
+				ps = &pb.AudioFile{Id: int32(data.AudioFile.ID), FileName: data.AudioFile.Name}
 			}
 			slotStatus := &pb.PlayerSlot{
 				Id:   int32(data.ID),
@@ -233,7 +233,7 @@ func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFile
 		return status.Errorf(codes.InvalidArgument, "File with this name already exists")
 	}
 
-	// pathchk, err := s.db.AudioFilePathExists(ctx, meta.FilePath)
+	// pathchk, err := s.db.AudioFileSizeExists(ctx, meta.FilePath)
 	// if err != nil {
 	// 	fmt.Println("Error retrieving from database", err)
 	// 	return status.Errorf(codes.Internal, "Error retrieving from DB")
@@ -258,7 +258,7 @@ func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFile
 
 	if _, err := s.db.CreateAudioFile(ctx, db.CreateAudioFileParams{
 		Name: meta.FileName,
-		Path: meta.FilePath,
+		Size: meta.FileSize,
 	}); err != nil {
 		fmt.Println("Error creating audio file", err)
 		return status.Errorf(codes.Internal, "Error creating audio file in DB: ", err)
@@ -278,6 +278,17 @@ func (s *AudioGRPCServer) CreateAudioFile(stream pb.AudioService_CreateAudioFile
 		return status.Errorf(codes.Internal, "Error writing file to media directory: ", err)
 	}
 
+	check, err := f.Stat()
+	if err != nil {
+		fmt.Println("Error validating file in media directory:", err)
+		return status.Errorf(codes.Internal, "Error validating file in media directory: ", err)
+
+	}
+	if check.Size() != meta.FileSize {
+		fmt.Println("File size does not equal the client request:", err)
+		return status.Errorf(codes.Internal, "Error validating file in media directory, file size mismatch: ", err)
+	}
+
 	return stream.SendAndClose(&pb.AudioFileResponse{Success: true, Message: "File created in database"})
 }
 
@@ -295,7 +306,7 @@ func (s *AudioGRPCServer) UpdateAudioFile(ctx context.Context, req *pb.AudioFile
 	err = s.db.UpdateAudioFile(ctx, db.UpdateAudioFileParams{
 		ID:   int64(req.Id),
 		Name: req.FileName,
-		Path: req.FilePath,
+		Size: req.FileSize,
 	})
 	if err != nil {
 		return &pb.AudioFileResponse{Success: false, Message: "Unable to update audio file"}, err
@@ -323,7 +334,8 @@ func (s *AudioGRPCServer) DeleteAudioFile(ctx context.Context, req *pb.AudioFile
 func (s *AudioGRPCServer) GetAudioFile(ctx context.Context, req *pb.AudioFileID) (*pb.GetAudioFileResponse, error) {
 	file, err := s.db.GetAudioFile(ctx, int64(req.Id))
 
-	res := mapDBToAudioFile(Int64ToSqlNullInt64(file.ID), sql.NullString{Valid: true, String: file.Path}, sql.NullString{Valid: true, String: file.Name})
+	res := mapDBToAudioFile(Int64ToSqlNullInt64(file.ID), sql.NullInt64{Valid: true, Int64: file.Size}, sql.NullString{Valid: true, String: file.Name})
+
 	if err != nil {
 		return &pb.GetAudioFileResponse{Success: false}, err
 	}
@@ -346,8 +358,8 @@ func (s *AudioGRPCServer) AssignAudioFileToSlot(ctx context.Context, req *pb.Ass
 		return nil, err
 	}
 
-	s.engine.Slots[req.SlotId] = &models.PlayerSlot{ID: req.SlotId, AudioFile: &db.AudioFile{ID: file.ID, Name: file.Name, Path: file.Path}}
-	return &pb.PlayerSlot{Id: req.SlotId, File: &pb.AudioFile{Id: int32(file.ID), FileName: file.Name, FilePath: file.Path}}, nil
+	s.engine.Slots[req.SlotId] = &models.PlayerSlot{ID: req.SlotId, AudioFile: &db.AudioFile{ID: file.ID, Name: file.Name, Size: file.Size}}
+	return &pb.PlayerSlot{Id: req.SlotId, File: &pb.AudioFile{Id: int32(file.ID), FileName: file.Name, FileSize: file.Size}}, nil
 }
 
 func (s *AudioGRPCServer) UnassignAudioFileFromSlot(ctx context.Context, req *pb.UnassignAudioFileRequest) (*pb.PlayerSlot, error) {
@@ -360,22 +372,22 @@ func (s *AudioGRPCServer) ActivatePalette(ctx context.Context, req *pb.PaletteID
 	if err != nil {
 		return &pb.PaletteActivateResponse{Success: false}, err
 	}
-	s.engine.Slots[0] = &models.PlayerSlot{ID: 0, AudioFile: &db.AudioFile{ID: join.Slot0ID.Int64, Name: join.Slot0Name.String, Path: join.Slot0Path.String}}
-	s.engine.Slots[1] = &models.PlayerSlot{ID: 1, AudioFile: &db.AudioFile{ID: join.Slot1ID.Int64, Name: join.Slot1Name.String, Path: join.Slot1Path.String}}
-	s.engine.Slots[2] = &models.PlayerSlot{ID: 2, AudioFile: &db.AudioFile{ID: join.Slot2ID.Int64, Name: join.Slot2Name.String, Path: join.Slot2Path.String}}
-	s.engine.Slots[3] = &models.PlayerSlot{ID: 3, AudioFile: &db.AudioFile{ID: join.Slot3ID.Int64, Name: join.Slot3Name.String, Path: join.Slot3Path.String}}
-	s.engine.Slots[4] = &models.PlayerSlot{ID: 4, AudioFile: &db.AudioFile{ID: join.Slot4ID.Int64, Name: join.Slot4Name.String, Path: join.Slot4Path.String}}
-	s.engine.Slots[5] = &models.PlayerSlot{ID: 5, AudioFile: &db.AudioFile{ID: join.Slot5ID.Int64, Name: join.Slot5Name.String, Path: join.Slot5Path.String}}
-	s.engine.Slots[6] = &models.PlayerSlot{ID: 6, AudioFile: &db.AudioFile{ID: join.Slot6ID.Int64, Name: join.Slot6Name.String, Path: join.Slot6Path.String}}
-	s.engine.Slots[7] = &models.PlayerSlot{ID: 7, AudioFile: &db.AudioFile{ID: join.Slot7ID.Int64, Name: join.Slot7Name.String, Path: join.Slot7Path.String}}
-	s.engine.Slots[8] = &models.PlayerSlot{ID: 8, AudioFile: &db.AudioFile{ID: join.Slot8ID.Int64, Name: join.Slot8Name.String, Path: join.Slot8Path.String}}
-	s.engine.Slots[9] = &models.PlayerSlot{ID: 9, AudioFile: &db.AudioFile{ID: join.Slot9ID.Int64, Name: join.Slot9Name.String, Path: join.Slot9Path.String}}
-	s.engine.Slots[10] = &models.PlayerSlot{ID: 10, AudioFile: &db.AudioFile{ID: join.Slot10ID.Int64, Name: join.Slot10Name.String, Path: join.Slot10Path.String}}
-	s.engine.Slots[11] = &models.PlayerSlot{ID: 11, AudioFile: &db.AudioFile{ID: join.Slot11ID.Int64, Name: join.Slot11Name.String, Path: join.Slot11Path.String}}
-	s.engine.Slots[12] = &models.PlayerSlot{ID: 12, AudioFile: &db.AudioFile{ID: join.Slot12ID.Int64, Name: join.Slot12Name.String, Path: join.Slot12Path.String}}
-	s.engine.Slots[13] = &models.PlayerSlot{ID: 13, AudioFile: &db.AudioFile{ID: join.Slot13ID.Int64, Name: join.Slot13Name.String, Path: join.Slot13Path.String}}
-	s.engine.Slots[14] = &models.PlayerSlot{ID: 14, AudioFile: &db.AudioFile{ID: join.Slot14ID.Int64, Name: join.Slot14Name.String, Path: join.Slot14Path.String}}
-	s.engine.Slots[15] = &models.PlayerSlot{ID: 15, AudioFile: &db.AudioFile{ID: join.Slot15ID.Int64, Name: join.Slot15Name.String, Path: join.Slot15Path.String}}
+	s.engine.Slots[0] = &models.PlayerSlot{ID: 0, AudioFile: &db.AudioFile{ID: join.Slot0ID.Int64, Name: join.Slot0Name.String, Size: join.Slot0Size.Int64}}
+	s.engine.Slots[1] = &models.PlayerSlot{ID: 1, AudioFile: &db.AudioFile{ID: join.Slot1ID.Int64, Name: join.Slot1Name.String, Size: join.Slot1Size.Int64}}
+	s.engine.Slots[2] = &models.PlayerSlot{ID: 2, AudioFile: &db.AudioFile{ID: join.Slot2ID.Int64, Name: join.Slot2Name.String, Size: join.Slot2Size.Int64}}
+	s.engine.Slots[3] = &models.PlayerSlot{ID: 3, AudioFile: &db.AudioFile{ID: join.Slot3ID.Int64, Name: join.Slot3Name.String, Size: join.Slot3Size.Int64}}
+	s.engine.Slots[4] = &models.PlayerSlot{ID: 4, AudioFile: &db.AudioFile{ID: join.Slot4ID.Int64, Name: join.Slot4Name.String, Size: join.Slot4Size.Int64}}
+	s.engine.Slots[5] = &models.PlayerSlot{ID: 5, AudioFile: &db.AudioFile{ID: join.Slot5ID.Int64, Name: join.Slot5Name.String, Size: join.Slot5Size.Int64}}
+	s.engine.Slots[6] = &models.PlayerSlot{ID: 6, AudioFile: &db.AudioFile{ID: join.Slot6ID.Int64, Name: join.Slot6Name.String, Size: join.Slot6Size.Int64}}
+	s.engine.Slots[7] = &models.PlayerSlot{ID: 7, AudioFile: &db.AudioFile{ID: join.Slot7ID.Int64, Name: join.Slot7Name.String, Size: join.Slot7Size.Int64}}
+	s.engine.Slots[8] = &models.PlayerSlot{ID: 8, AudioFile: &db.AudioFile{ID: join.Slot8ID.Int64, Name: join.Slot8Name.String, Size: join.Slot8Size.Int64}}
+	s.engine.Slots[9] = &models.PlayerSlot{ID: 9, AudioFile: &db.AudioFile{ID: join.Slot9ID.Int64, Name: join.Slot9Name.String, Size: join.Slot9Size.Int64}}
+	s.engine.Slots[10] = &models.PlayerSlot{ID: 10, AudioFile: &db.AudioFile{ID: join.Slot10ID.Int64, Name: join.Slot10Name.String, Size: join.Slot10Size.Int64}}
+	s.engine.Slots[11] = &models.PlayerSlot{ID: 11, AudioFile: &db.AudioFile{ID: join.Slot11ID.Int64, Name: join.Slot11Name.String, Size: join.Slot11Size.Int64}}
+	s.engine.Slots[12] = &models.PlayerSlot{ID: 12, AudioFile: &db.AudioFile{ID: join.Slot12ID.Int64, Name: join.Slot12Name.String, Size: join.Slot12Size.Int64}}
+	s.engine.Slots[13] = &models.PlayerSlot{ID: 13, AudioFile: &db.AudioFile{ID: join.Slot13ID.Int64, Name: join.Slot13Name.String, Size: join.Slot13Size.Int64}}
+	s.engine.Slots[14] = &models.PlayerSlot{ID: 14, AudioFile: &db.AudioFile{ID: join.Slot14ID.Int64, Name: join.Slot14Name.String, Size: join.Slot14Size.Int64}}
+	s.engine.Slots[15] = &models.PlayerSlot{ID: 15, AudioFile: &db.AudioFile{ID: join.Slot15ID.Int64, Name: join.Slot15Name.String, Size: join.Slot15Size.Int64}}
 
 	return &pb.PaletteActivateResponse{Success: true}, nil
 }
@@ -383,8 +395,15 @@ func (s *AudioGRPCServer) ActivatePalette(ctx context.Context, req *pb.PaletteID
 func (s *AudioGRPCServer) ActivateSlot(ctx context.Context, req *pb.PlayerSlotID) (*pb.PlayerSlot, error) {
 	s.engine.Mu.Lock()
 	slot := s.engine.Slots[req.Id]
-	fmt.Println("Slot activation requested:", req.Id)
-	s.engine.AudioStatus.ActiveSlot = &req.Id
 	s.engine.Mu.Unlock()
-	return &pb.PlayerSlot{Id: slot.ID, File: MapDBAudioFileToPB(*slot.AudioFile)}, nil
+	fmt.Println("Slot activation requested:", req.Id)
+	if slot.AudioFile != nil {
+		s.engine.Mu.Lock()
+		s.engine.AudioStatus.ActiveSlot = &req.Id
+		s.engine.Mu.Unlock()
+		return &pb.PlayerSlot{Id: slot.ID, File: MapDBAudioFileToPB(*slot.AudioFile)}, nil
+	} else {
+		fmt.Printf("Slot %v has no file associated", req.Id)
+		return &pb.PlayerSlot{Id: slot.ID, File: nil}, nil
+	}
 }

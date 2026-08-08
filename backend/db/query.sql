@@ -3,10 +3,6 @@ SELECT EXISTS(
     SELECT 1 FROM audio_files WHERE name = ?
 ) AS name_exists;
 
--- name: AudioFilePathExists :one
-SELECT EXISTS(
-    SELECT 1 FROM audio_files WHERE path = ?
-) AS name_exists;
 
 -- name: PaletteNameExists :one 
 SELECT EXISTS(
@@ -65,7 +61,7 @@ ORDER BY name;
 
 -- name: CreateAudioFile :one
 INSERT INTO audio_files (
-  name, path, duration
+  name, size, duration
 ) VALUES (
   ?, ?, ?
 )
@@ -74,7 +70,7 @@ RETURNING *;
 -- name: UpdateAudioFile :exec
 UPDATE audio_files
 set name = ?,
-path = ?,
+size = ?,
 duration = ?
 WHERE id = ?;
 
@@ -88,37 +84,37 @@ SELECT
     p.name AS palette_name,
 
     -- Slot 0 (Index 0)
-    a0.id AS slot_0_id, a0.name AS slot_0_name, a0.path AS slot_0_path, a0.duration AS slot_0_duration,
+    a0.id AS slot_0_id, a0.name AS slot_0_name, a0.size AS slot_0_size, a0.duration AS slot_0_duration,
     -- Slot 1 (Index 1)
-    a1.id AS slot_1_id, a1.name AS slot_1_name, a1.path AS slot_1_path, a1.duration AS slot_1_duration,
+    a1.id AS slot_1_id, a1.name AS slot_1_name, a1.size AS slot_1_size, a1.duration AS slot_1_duration,
     -- Slot 2 (Index 2)
-    a2.id AS slot_2_id, a2.name AS slot_2_name, a2.path AS slot_2_path, a2.duration AS slot_2_duration,
+    a2.id AS slot_2_id, a2.name AS slot_2_name, a2.size AS slot_2_size, a2.duration AS slot_2_duration,
     -- Slot 3 (Index 3)
-    a3.id AS slot_3_id, a3.name AS slot_3_name, a3.path AS slot_3_path, a3.duration AS slot_3_duration,
+    a3.id AS slot_3_id, a3.name AS slot_3_name, a3.size AS slot_3_size, a3.duration AS slot_3_duration,
     -- Slot 4 (Index 4)
-    a4.id AS slot_4_id, a4.name AS slot_4_name, a4.path AS slot_4_path, a4.duration AS slot_4_duration,
+    a4.id AS slot_4_id, a4.name AS slot_4_name, a4.size AS slot_4_size, a4.duration AS slot_4_duration,
     -- Slot 5 (Index 5)
-    a5.id AS slot_5_id, a5.name AS slot_5_name, a5.path AS slot_5_path, a5.duration AS slot_5_duration,
+    a5.id AS slot_5_id, a5.name AS slot_5_name, a5.size AS slot_5_size, a5.duration AS slot_5_duration,
     -- Slot 6 (Index 6)
-    a6.id AS slot_6_id, a6.name AS slot_6_name, a6.path AS slot_6_path, a6.duration AS slot_6_duration,
+    a6.id AS slot_6_id, a6.name AS slot_6_name, a6.size AS slot_6_size, a6.duration AS slot_6_duration,
     -- Slot 7 (Index 7)
-    a7.id AS slot_7_id, a7.name AS slot_7_name, a7.path AS slot_7_path, a7.duration AS slot_7_duration,
+    a7.id AS slot_7_id, a7.name AS slot_7_name, a7.size AS slot_7_size, a7.duration AS slot_7_duration,
     -- Slot 8 (Index 8)
-    a8.id AS slot_8_id, a8.name AS slot_8_name, a8.path AS slot_8_path, a8.duration AS slot_8_duration,
+    a8.id AS slot_8_id, a8.name AS slot_8_name, a8.size AS slot_8_size, a8.duration AS slot_8_duration,
     -- Slot 9 (Index 9)
-    a9.id AS slot_9_id, a9.name AS slot_9_name, a9.path AS slot_9_path, a9.duration AS slot_9_duration,
+    a9.id AS slot_9_id, a9.name AS slot_9_name, a9.size AS slot_9_size, a9.duration AS slot_9_duration,
     -- Slot 10 (Index 10)
-    a10.id AS slot_10_id, a10.name AS slot_10_name, a10.path AS slot_10_path, a10.duration AS slot_10_duration,
+    a10.id AS slot_10_id, a10.name AS slot_10_name, a10.size AS slot_10_size, a10.duration AS slot_10_duration,
     -- Slot 11 (Index 11)
-    a11.id AS slot_11_id, a11.name AS slot_11_name, a11.path AS slot_11_path, a11.duration AS slot_11_duration,
+    a11.id AS slot_11_id, a11.name AS slot_11_name, a11.size AS slot_11_size, a11.duration AS slot_11_duration,
     -- Slot 12 (Index 12)
-    a12.id AS slot_12_id, a12.name AS slot_12_name, a12.path AS slot_12_path, a12.duration AS slot_12_duration,
+    a12.id AS slot_12_id, a12.name AS slot_12_name, a12.size AS slot_12_size, a12.duration AS slot_12_duration,
     -- Slot 13 (Index 13)
-    a13.id AS slot_13_id, a13.name AS slot_13_name, a13.path AS slot_13_path, a13.duration AS slot_13_duration,
+    a13.id AS slot_13_id, a13.name AS slot_13_name, a13.size AS slot_13_size, a13.duration AS slot_13_duration,
     -- Slot 14 (Index 14)
-    a14.id AS slot_14_id, a14.name AS slot_14_name, a14.path AS slot_14_path, a14.duration AS slot_14_duration,
+    a14.id AS slot_14_id, a14.name AS slot_14_name, a14.size AS slot_14_size, a14.duration AS slot_14_duration,
     -- Slot 15 (Index 15)
-    a15.id AS slot_15_id, a15.name AS slot_15_name, a15.path AS slot_15_path, a15.duration AS slot_15_duration
+    a15.id AS slot_15_id, a15.name AS slot_15_name, a15.size AS slot_15_size, a15.duration AS slot_15_duration
 
 FROM palettes p
 LEFT JOIN audio_files a0  ON p.slot_0_file  = a0.id

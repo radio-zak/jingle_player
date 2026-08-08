@@ -215,10 +215,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
             ),
             body: Consumer<AudioProvider>(
               builder: (context, value, child) {
-                switch (value.isConnected) {
+                switch (value.isSlotStatusConnected) {
                   case false:
                     return Center(
-                      child: !value.connBackOff
+                      child: !value.slotStatusConnBackOff
                           ? Row(
                               spacing: 32,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -252,8 +252,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                   child: Text("Reconnect"),
                                   onPressed: () {
                                     value.reconnectionTries = 0;
-                                    value.connBackOff = false;
-                                    value.connectToBackend();
+                                    value.slotStatusConnBackOff = false;
+                                    value.audioStatusConnBackOff = false;
+                                    value.connectToAudioStatusBackend();
+                                    value.connectToSlotStatus();
                                   },
                                 ),
                               ],

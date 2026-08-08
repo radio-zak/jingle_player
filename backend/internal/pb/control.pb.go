@@ -513,7 +513,7 @@ type AudioFile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	FilePath      string                 `protobuf:"bytes,3,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"`
+	FileSize      int64                  `protobuf:"varint,3,opt,name=file_size,json=fileSize,proto3" json:"file_size,omitempty"`
 	Duration      float64                `protobuf:"fixed64,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -563,11 +563,11 @@ func (x *AudioFile) GetFileName() string {
 	return ""
 }
 
-func (x *AudioFile) GetFilePath() string {
+func (x *AudioFile) GetFileSize() int64 {
 	if x != nil {
-		return x.FilePath
+		return x.FileSize
 	}
-	return ""
+	return 0
 }
 
 func (x *AudioFile) GetDuration() float64 {
@@ -1367,7 +1367,7 @@ const file_control_proto_rawDesc = "" +
 	"\tAudioFile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1b\n" +
 	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12\x1b\n" +
-	"\tfile_path\x18\x03 \x01(\tR\bfilePath\x12\x1a\n" +
+	"\tfile_size\x18\x03 \x01(\x03R\bfileSize\x12\x1a\n" +
 	"\bduration\x18\x04 \x01(\x01R\bduration\"\x9d\x01\n" +
 	"\x11AudioFileResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +

@@ -12,6 +12,7 @@
 
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
@@ -619,13 +620,13 @@ class AudioFile extends $pb.GeneratedMessage {
   factory AudioFile({
     $core.int? id,
     $core.String? fileName,
-    $core.String? filePath,
+    $fixnum.Int64? fileSize,
     $core.double? duration,
   }) {
     final result = create();
     if (id != null) result.id = id;
     if (fileName != null) result.fileName = fileName;
-    if (filePath != null) result.filePath = filePath;
+    if (fileSize != null) result.fileSize = fileSize;
     if (duration != null) result.duration = duration;
     return result;
   }
@@ -645,7 +646,7 @@ class AudioFile extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aI(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'fileName')
-    ..aOS(3, _omitFieldNames ? '' : 'filePath')
+    ..aInt64(3, _omitFieldNames ? '' : 'fileSize')
     ..aD(4, _omitFieldNames ? '' : 'duration')
     ..hasRequiredFields = false;
 
@@ -686,13 +687,13 @@ class AudioFile extends $pb.GeneratedMessage {
   void clearFileName() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get filePath => $_getSZ(2);
+  $fixnum.Int64 get fileSize => $_getI64(2);
   @$pb.TagNumber(3)
-  set filePath($core.String value) => $_setString(2, value);
+  set fileSize($fixnum.Int64 value) => $_setInt64(2, value);
   @$pb.TagNumber(3)
-  $core.bool hasFilePath() => $_has(2);
+  $core.bool hasFileSize() => $_has(2);
   @$pb.TagNumber(3)
-  void clearFilePath() => $_clearField(3);
+  void clearFileSize() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.double get duration => $_getN(3);

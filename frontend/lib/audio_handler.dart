@@ -1,8 +1,10 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:jingle_player/control/control.pbgrpc.dart';
 import 'package:jingle_player/grpc.dart';
+import 'package:mime/mime.dart';
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:convert';
@@ -13,6 +15,7 @@ import 'package:toastification/toastification.dart';
 import 'logger.dart';
 import 'config.dart';
 import 'file_ops.dart';
+import 'package:fixnum/fixnum.dart';
 
 class AudioHandler extends ChangeNotifier {
   DeviceFileSource? sourceFile;
@@ -385,30 +388,100 @@ class AudioProvider extends ChangeNotifier {
 
   int reconnectionTries = 0;
 
+  List<String> allowedMimeTypes = ["audio/wav", "audio/x-wav", "audio/wave"];
+
   String playbackStatus = "STOPPED";
   int? activeSlotID;
   int? editedSlotID;
   int activePalette = 0;
   double timeRemaining = 0.0;
-  bool isConnected = false;
-  bool connBackOff = false;
+  bool audioStatusConnecting = false;
+  bool slotStatusConnecting = false;
+  bool isAudioStatusConnected = false;
+  bool isSlotStatusConnected = false;
+  bool audioStatusConnBackOff = false;
+  bool slotStatusConnBackOff = false;
   String? errorMessage;
   bool toolbarActive = false;
   bool editMode = false;
   int? selectedFile;
 
   AudioProvider(this.client, this.fileOps, this.logger) {
-    connectToBackend();
+    connectToAudioStatusBackend();
+    connectToSlotStatus();
   }
 
   List<PlayerSlot> slots = List.generate(16, (index) => PlayerSlot(id: index));
 
-  Future<void> connectToBackend() async {
+  Future<void> slotStatusReconnect() async {
+    if (slotStatusConnecting) return;
+    reconnectionTries++;
+    if (!isAudioStatusConnected && reconnectionTries < 5) {
+      final future = await Future.delayed(Duration(seconds: 3), () async {
+        slotStatusConnecting = true;
+        await slotStatus?.cancel();
+        await connectToSlotStatus();
+      });
+    }
+    if (!isSlotStatusConnected && reconnectionTries == 5) {
+      slotStatusConnecting = false;
+      await slotStatus?.cancel();
+      slotStatusConnBackOff = true;
+    }
+  }
+
+  Future<void> audioStatusReconnect() async {
+    if (audioStatusConnecting) return;
+    reconnectionTries++;
+    if (!isAudioStatusConnected && reconnectionTries < 5) {
+      print(reconnectionTries);
+      final future = await Future.delayed(Duration(seconds: 3), () async {
+        audioStatusConnecting = true;
+        await audioStatus?.cancel();
+        await connectToAudioStatusBackend();
+      });
+    }
+    if (!isAudioStatusConnected && reconnectionTries == 5) {
+      audioStatusConnecting = false;
+      await audioStatus?.cancel();
+      audioStatusConnBackOff = true;
+    }
+  }
+
+  Future<void> connectToSlotStatus() async {
     errorMessage = null;
-    audioStatus?.cancel();
-    slotStatus?.cancel();
+    slotStatusConnecting = true;
+    await slotStatus?.cancel();
+
+    slotStatus = client.getSlotStatus().listen(
+      cancelOnError: true,
+      (status) {
+        slots[status.id] = PlayerSlot(id: status.id, file: status.file);
+        slotStatusConnecting = false;
+        slotStatusConnBackOff = false;
+        isSlotStatusConnected = true;
+        notifyListeners();
+      },
+      onError: (error) async {
+        isSlotStatusConnected = false;
+        errorMessage = error.toString();
+        slotStatusReconnect();
+        notifyListeners();
+      },
+      onDone: () {
+        isSlotStatusConnected = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> connectToAudioStatusBackend() async {
+    errorMessage = null;
+    audioStatusConnecting = true;
+    await audioStatus?.cancel();
 
     audioStatus = client.getAudioStatus().listen(
+      cancelOnError: true,
       (status) {
         reconnectionTries = 0;
         playbackStatus = status.state;
@@ -418,61 +491,20 @@ class AudioProvider extends ChangeNotifier {
           activeSlotID = null;
         }
         timeRemaining = status.timeRemainingSeconds;
-        isConnected = true;
+        audioStatusConnecting = false;
+        audioStatusConnBackOff = false;
+        isAudioStatusConnected = true;
         notifyListeners();
       },
       onError: (error) async {
-        isConnected = false;
-        reconnectionTries = reconnectionTries + 1;
+        isAudioStatusConnected = false;
         errorMessage = error.toString();
-        if (reconnectionTries < 5) {
-          logger.print.d(reconnectionTries);
-          final future = await Future.delayed(Duration(seconds: 3), () {
-            connectToBackend();
-          });
-        }
-        if (reconnectionTries == 5) {
-          logger.print.d("Backing off");
-          connBackOff = true;
-          audioStatus?.cancel();
-        }
+        audioStatusReconnect();
         notifyListeners();
       },
-      onDone: () async {
-        isConnected = false;
+      onDone: () {
+        isAudioStatusConnected = false;
         notifyListeners();
-        await Future.delayed(Duration(seconds: 3), () {
-          connectToBackend();
-        });
-      },
-    );
-    slotStatus = client.getSlotStatus().listen(
-      (status) {
-        slots[status.id] = PlayerSlot(id: status.id, file: status.file);
-        notifyListeners();
-      },
-      onError: (error) async {
-        isConnected = false;
-        errorMessage = error.toString();
-        if (reconnectionTries < 5) {
-          logger.print.d(reconnectionTries);
-          final future = await Future.delayed(Duration(seconds: 3), () {
-            connectToBackend();
-          });
-        }
-        if (reconnectionTries == 5) {
-          logger.print.d("Backing off");
-          connBackOff = true;
-          slotStatus?.cancel();
-        }
-        notifyListeners();
-      },
-      onDone: () async {
-        isConnected = false;
-        notifyListeners();
-        await Future.delayed(Duration(seconds: 3), () {
-          connectToBackend();
-        });
       },
     );
   }
@@ -560,11 +592,13 @@ class AudioProvider extends ChangeNotifier {
     int bytesSent = 0;
     Stream<AudioFileUpload> createStream() async* {
       yield AudioFileUpload(
-        metadata: AudioFile(fileName: path.basename(audioFile.path)),
+        metadata: AudioFile(
+          fileName: path.basename(audioFile.path),
+          fileSize: Int64(totalBytes),
+        ),
       );
       final Stream<List<int>> stream = audioFile.openRead();
       await for (final List<int> chunk in stream) {
-        // Slice larger chunks into our ideal gRPC chunk size if necessary
         for (var i = 0; i < chunk.length; i += chunkSize) {
           final end = (i + chunkSize < chunk.length)
               ? i + chunkSize
@@ -603,11 +637,24 @@ class AudioProvider extends ChangeNotifier {
         autoCloseDuration: Duration(seconds: 5),
       );
       notifyListeners();
-      try {
-        final res = await uploadAudioFile(
-          audioFile: file,
-          mimeType: 'audio/wav',
+      final mime = lookupMimeType(file.path);
+      print(mime);
+      if (mime == null) return;
+      if (!allowedMimeTypes.contains(mime)) {
+        print("File type is not wav! Aborting upload");
+        toastification.show(
+          title: Text("An error occured"),
+          description: Text("File type is not .wav"),
+          type: ToastificationType.error,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          style: ToastificationStyle.minimal,
+          alignment: Alignment.topLeft,
         );
+        return;
+      }
+      try {
+        final res = await uploadAudioFile(audioFile: file, mimeType: mime);
       } catch (e) {
         logger.print.e('$e');
         toastification.show(

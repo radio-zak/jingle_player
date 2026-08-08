@@ -22,6 +22,6 @@ CREATE TABLE IF NOT EXISTS palettes (
 CREATE TABLE IF NOT EXISTS audio_files (
     id INTEGER PRIMARY KEY NOT NULL,
     name text NOT NULL,
-    path text NOT NULL,
+    size INTEGER NOT NULL,
     duration REAL NOT NULL
 );

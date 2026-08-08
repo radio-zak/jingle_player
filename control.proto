@@ -63,7 +63,7 @@ message PaletteActivateResponse { bool success = 1; }
 message AudioFile {
   int32 id = 1;
   string file_name = 2;
-  string file_path = 3;
+  int64 file_size = 3;
   double duration = 4;
 }
 

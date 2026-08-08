@@ -35,7 +35,6 @@ func (u *UIService) SubscribeToPlayerState() (chan models.AudioStatus, func()) {
 	status := u.LastAudioStatus
 	u.Mu.RUnlock()
 	if status != nil {
-		fmt.Println("Sending audio hydration data")
 		ch <- *u.LastAudioStatus
 	}
 
@@ -56,7 +55,6 @@ func (u *UIService) SubscribeToSlotState() (chan models.PlayerSlot, func()) {
 
 	fmt.Println("New client subscribed to UI gRPC channel")
 	for i := 0; i < 16; i++ {
-		fmt.Println("Sending player hydration data")
 		u.Mu.Lock()
 		slot := u.LastSlotState[i]
 		u.Mu.Unlock()

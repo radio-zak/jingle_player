@@ -11,7 +11,7 @@ import (
 type AudioFile struct {
 	ID       int64
 	Name     string
-	Path     string
+	Size     int64
 	Duration float64
 }
 

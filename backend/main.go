@@ -14,7 +14,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/gordonklaus/portaudio"
 	"google.golang.org/grpc"
@@ -60,6 +62,7 @@ func main() {
 		log.Fatalf("Failed initializing audio engine: %v", err)
 		panic(err)
 	}
+	defer audio.Close()
 
 	ver := audio.GetVersion()
 	fmt.Println(ver)
@@ -86,7 +89,15 @@ func main() {
 		fmt.Println("Failed to create gRPC server on address", listenAddr, err)
 		return
 	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT)
+	defer stop()
 
+	// Block main until a signal is received (e.g. Ctrl+C or Docker/Kubernetes SIGTERM)
+	<-ctx.Done()
+
+	log.Println("Shutdown signal received, starting graceful shutdown...")
+
+	grpcs.GracefulStop()
 }
 
 type JSONDevice struct {

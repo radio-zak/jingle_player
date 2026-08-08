@@ -23,41 +23,28 @@ func (q *Queries) AudioFileNameExists(ctx context.Context, name string) (int64, 
 	return name_exists, err
 }
 
-const audioFilePathExists = `-- name: AudioFilePathExists :one
-SELECT EXISTS(
-    SELECT 1 FROM audio_files WHERE path = ?
-) AS name_exists
-`
-
-func (q *Queries) AudioFilePathExists(ctx context.Context, path string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, audioFilePathExists, path)
-	var name_exists int64
-	err := row.Scan(&name_exists)
-	return name_exists, err
-}
-
 const createAudioFile = `-- name: CreateAudioFile :one
 INSERT INTO audio_files (
-  name, path, duration
+  name, size, duration
 ) VALUES (
   ?, ?, ?
 )
-RETURNING id, name, path, duration
+RETURNING id, name, size, duration
 `
 
 type CreateAudioFileParams struct {
 	Name     string
-	Path     string
+	Size     int64
 	Duration float64
 }
 
 func (q *Queries) CreateAudioFile(ctx context.Context, arg CreateAudioFileParams) (AudioFile, error) {
-	row := q.db.QueryRowContext(ctx, createAudioFile, arg.Name, arg.Path, arg.Duration)
+	row := q.db.QueryRowContext(ctx, createAudioFile, arg.Name, arg.Size, arg.Duration)
 	var i AudioFile
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Path,
+		&i.Size,
 		&i.Duration,
 	)
 	return i, err
@@ -158,7 +145,7 @@ func (q *Queries) DeletePalette(ctx context.Context, id int64) error {
 }
 
 const getAudioFile = `-- name: GetAudioFile :one
-SELECT id, name, path, duration FROM audio_files
+SELECT id, name, size, duration FROM audio_files
 WHERE id = ? LIMIT 1
 `
 
@@ -168,7 +155,7 @@ func (q *Queries) GetAudioFile(ctx context.Context, id int64) (AudioFile, error)
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Path,
+		&i.Size,
 		&i.Duration,
 	)
 	return i, err
@@ -211,37 +198,37 @@ SELECT
     p.name AS palette_name,
 
     -- Slot 0 (Index 0)
-    a0.id AS slot_0_id, a0.name AS slot_0_name, a0.path AS slot_0_path, a0.duration AS slot_0_duration,
+    a0.id AS slot_0_id, a0.name AS slot_0_name, a0.size AS slot_0_size, a0.duration AS slot_0_duration,
     -- Slot 1 (Index 1)
-    a1.id AS slot_1_id, a1.name AS slot_1_name, a1.path AS slot_1_path, a1.duration AS slot_1_duration,
+    a1.id AS slot_1_id, a1.name AS slot_1_name, a1.size AS slot_1_size, a1.duration AS slot_1_duration,
     -- Slot 2 (Index 2)
-    a2.id AS slot_2_id, a2.name AS slot_2_name, a2.path AS slot_2_path, a2.duration AS slot_2_duration,
+    a2.id AS slot_2_id, a2.name AS slot_2_name, a2.size AS slot_2_size, a2.duration AS slot_2_duration,
     -- Slot 3 (Index 3)
-    a3.id AS slot_3_id, a3.name AS slot_3_name, a3.path AS slot_3_path, a3.duration AS slot_3_duration,
+    a3.id AS slot_3_id, a3.name AS slot_3_name, a3.size AS slot_3_size, a3.duration AS slot_3_duration,
     -- Slot 4 (Index 4)
-    a4.id AS slot_4_id, a4.name AS slot_4_name, a4.path AS slot_4_path, a4.duration AS slot_4_duration,
+    a4.id AS slot_4_id, a4.name AS slot_4_name, a4.size AS slot_4_size, a4.duration AS slot_4_duration,
     -- Slot 5 (Index 5)
-    a5.id AS slot_5_id, a5.name AS slot_5_name, a5.path AS slot_5_path, a5.duration AS slot_5_duration,
+    a5.id AS slot_5_id, a5.name AS slot_5_name, a5.size AS slot_5_size, a5.duration AS slot_5_duration,
     -- Slot 6 (Index 6)
-    a6.id AS slot_6_id, a6.name AS slot_6_name, a6.path AS slot_6_path, a6.duration AS slot_6_duration,
+    a6.id AS slot_6_id, a6.name AS slot_6_name, a6.size AS slot_6_size, a6.duration AS slot_6_duration,
     -- Slot 7 (Index 7)
-    a7.id AS slot_7_id, a7.name AS slot_7_name, a7.path AS slot_7_path, a7.duration AS slot_7_duration,
+    a7.id AS slot_7_id, a7.name AS slot_7_name, a7.size AS slot_7_size, a7.duration AS slot_7_duration,
     -- Slot 8 (Index 8)
-    a8.id AS slot_8_id, a8.name AS slot_8_name, a8.path AS slot_8_path, a8.duration AS slot_8_duration,
+    a8.id AS slot_8_id, a8.name AS slot_8_name, a8.size AS slot_8_size, a8.duration AS slot_8_duration,
     -- Slot 9 (Index 9)
-    a9.id AS slot_9_id, a9.name AS slot_9_name, a9.path AS slot_9_path, a9.duration AS slot_9_duration,
+    a9.id AS slot_9_id, a9.name AS slot_9_name, a9.size AS slot_9_size, a9.duration AS slot_9_duration,
     -- Slot 10 (Index 10)
-    a10.id AS slot_10_id, a10.name AS slot_10_name, a10.path AS slot_10_path, a10.duration AS slot_10_duration,
+    a10.id AS slot_10_id, a10.name AS slot_10_name, a10.size AS slot_10_size, a10.duration AS slot_10_duration,
     -- Slot 11 (Index 11)
-    a11.id AS slot_11_id, a11.name AS slot_11_name, a11.path AS slot_11_path, a11.duration AS slot_11_duration,
+    a11.id AS slot_11_id, a11.name AS slot_11_name, a11.size AS slot_11_size, a11.duration AS slot_11_duration,
     -- Slot 12 (Index 12)
-    a12.id AS slot_12_id, a12.name AS slot_12_name, a12.path AS slot_12_path, a12.duration AS slot_12_duration,
+    a12.id AS slot_12_id, a12.name AS slot_12_name, a12.size AS slot_12_size, a12.duration AS slot_12_duration,
     -- Slot 13 (Index 13)
-    a13.id AS slot_13_id, a13.name AS slot_13_name, a13.path AS slot_13_path, a13.duration AS slot_13_duration,
+    a13.id AS slot_13_id, a13.name AS slot_13_name, a13.size AS slot_13_size, a13.duration AS slot_13_duration,
     -- Slot 14 (Index 14)
-    a14.id AS slot_14_id, a14.name AS slot_14_name, a14.path AS slot_14_path, a14.duration AS slot_14_duration,
+    a14.id AS slot_14_id, a14.name AS slot_14_name, a14.size AS slot_14_size, a14.duration AS slot_14_duration,
     -- Slot 15 (Index 15)
-    a15.id AS slot_15_id, a15.name AS slot_15_name, a15.path AS slot_15_path, a15.duration AS slot_15_duration
+    a15.id AS slot_15_id, a15.name AS slot_15_name, a15.size AS slot_15_size, a15.duration AS slot_15_duration
 
 FROM palettes p
 LEFT JOIN audio_files a0  ON p.slot_0_file  = a0.id
@@ -268,67 +255,67 @@ type GetPaletteWithAudioFilesRow struct {
 	PaletteName    string
 	Slot0ID        sql.NullInt64
 	Slot0Name      sql.NullString
-	Slot0Path      sql.NullString
+	Slot0Size      sql.NullInt64
 	Slot0Duration  sql.NullFloat64
 	Slot1ID        sql.NullInt64
 	Slot1Name      sql.NullString
-	Slot1Path      sql.NullString
+	Slot1Size      sql.NullInt64
 	Slot1Duration  sql.NullFloat64
 	Slot2ID        sql.NullInt64
 	Slot2Name      sql.NullString
-	Slot2Path      sql.NullString
+	Slot2Size      sql.NullInt64
 	Slot2Duration  sql.NullFloat64
 	Slot3ID        sql.NullInt64
 	Slot3Name      sql.NullString
-	Slot3Path      sql.NullString
+	Slot3Size      sql.NullInt64
 	Slot3Duration  sql.NullFloat64
 	Slot4ID        sql.NullInt64
 	Slot4Name      sql.NullString
-	Slot4Path      sql.NullString
+	Slot4Size      sql.NullInt64
 	Slot4Duration  sql.NullFloat64
 	Slot5ID        sql.NullInt64
 	Slot5Name      sql.NullString
-	Slot5Path      sql.NullString
+	Slot5Size      sql.NullInt64
 	Slot5Duration  sql.NullFloat64
 	Slot6ID        sql.NullInt64
 	Slot6Name      sql.NullString
-	Slot6Path      sql.NullString
+	Slot6Size      sql.NullInt64
 	Slot6Duration  sql.NullFloat64
 	Slot7ID        sql.NullInt64
 	Slot7Name      sql.NullString
-	Slot7Path      sql.NullString
+	Slot7Size      sql.NullInt64
 	Slot7Duration  sql.NullFloat64
 	Slot8ID        sql.NullInt64
 	Slot8Name      sql.NullString
-	Slot8Path      sql.NullString
+	Slot8Size      sql.NullInt64
 	Slot8Duration  sql.NullFloat64
 	Slot9ID        sql.NullInt64
 	Slot9Name      sql.NullString
-	Slot9Path      sql.NullString
+	Slot9Size      sql.NullInt64
 	Slot9Duration  sql.NullFloat64
 	Slot10ID       sql.NullInt64
 	Slot10Name     sql.NullString
-	Slot10Path     sql.NullString
+	Slot10Size     sql.NullInt64
 	Slot10Duration sql.NullFloat64
 	Slot11ID       sql.NullInt64
 	Slot11Name     sql.NullString
-	Slot11Path     sql.NullString
+	Slot11Size     sql.NullInt64
 	Slot11Duration sql.NullFloat64
 	Slot12ID       sql.NullInt64
 	Slot12Name     sql.NullString
-	Slot12Path     sql.NullString
+	Slot12Size     sql.NullInt64
 	Slot12Duration sql.NullFloat64
 	Slot13ID       sql.NullInt64
 	Slot13Name     sql.NullString
-	Slot13Path     sql.NullString
+	Slot13Size     sql.NullInt64
 	Slot13Duration sql.NullFloat64
 	Slot14ID       sql.NullInt64
 	Slot14Name     sql.NullString
-	Slot14Path     sql.NullString
+	Slot14Size     sql.NullInt64
 	Slot14Duration sql.NullFloat64
 	Slot15ID       sql.NullInt64
 	Slot15Name     sql.NullString
-	Slot15Path     sql.NullString
+	Slot15Size     sql.NullInt64
 	Slot15Duration sql.NullFloat64
 }
 
@@ -340,74 +327,74 @@ func (q *Queries) GetPaletteWithAudioFiles(ctx context.Context, id int64) (GetPa
 		&i.PaletteName,
 		&i.Slot0ID,
 		&i.Slot0Name,
-		&i.Slot0Path,
+		&i.Slot0Size,
 		&i.Slot0Duration,
 		&i.Slot1ID,
 		&i.Slot1Name,
-		&i.Slot1Path,
+		&i.Slot1Size,
 		&i.Slot1Duration,
 		&i.Slot2ID,
 		&i.Slot2Name,
-		&i.Slot2Path,
+		&i.Slot2Size,
 		&i.Slot2Duration,
 		&i.Slot3ID,
 		&i.Slot3Name,
-		&i.Slot3Path,
+		&i.Slot3Size,
 		&i.Slot3Duration,
 		&i.Slot4ID,
 		&i.Slot4Name,
-		&i.Slot4Path,
+		&i.Slot4Size,
 		&i.Slot4Duration,
 		&i.Slot5ID,
 		&i.Slot5Name,
-		&i.Slot5Path,
+		&i.Slot5Size,
 		&i.Slot5Duration,
 		&i.Slot6ID,
 		&i.Slot6Name,
-		&i.Slot6Path,
+		&i.Slot6Size,
 		&i.Slot6Duration,
 		&i.Slot7ID,
 		&i.Slot7Name,
-		&i.Slot7Path,
+		&i.Slot7Size,
 		&i.Slot7Duration,
 		&i.Slot8ID,
 		&i.Slot8Name,
-		&i.Slot8Path,
+		&i.Slot8Size,
 		&i.Slot8Duration,
 		&i.Slot9ID,
 		&i.Slot9Name,
-		&i.Slot9Path,
+		&i.Slot9Size,
 		&i.Slot9Duration,
 		&i.Slot10ID,
 		&i.Slot10Name,
-		&i.Slot10Path,
+		&i.Slot10Size,
 		&i.Slot10Duration,
 		&i.Slot11ID,
 		&i.Slot11Name,
-		&i.Slot11Path,
+		&i.Slot11Size,
 		&i.Slot11Duration,
 		&i.Slot12ID,
 		&i.Slot12Name,
-		&i.Slot12Path,
+		&i.Slot12Size,
 		&i.Slot12Duration,
 		&i.Slot13ID,
 		&i.Slot13Name,
-		&i.Slot13Path,
+		&i.Slot13Size,
 		&i.Slot13Duration,
 		&i.Slot14ID,
 		&i.Slot14Name,
-		&i.Slot14Path,
+		&i.Slot14Size,
 		&i.Slot14Duration,
 		&i.Slot15ID,
 		&i.Slot15Name,
-		&i.Slot15Path,
+		&i.Slot15Size,
 		&i.Slot15Duration,
 	)
 	return i, err
 }
 
 const listAudioFiles = `-- name: ListAudioFiles :many
-SELECT id, name, path, duration FROM audio_files
+SELECT id, name, size, duration FROM audio_files
 ORDER BY name
 `
 
@@ -423,7 +410,7 @@ func (q *Queries) ListAudioFiles(ctx context.Context) ([]AudioFile, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.Path,
+			&i.Size,
 			&i.Duration,
 		); err != nil {
 			return nil, err
@@ -502,14 +489,14 @@ func (q *Queries) PaletteNameExists(ctx context.Context, name string) (int64, er
 const updateAudioFile = `-- name: UpdateAudioFile :exec
 UPDATE audio_files
 set name = ?,
-path = ?,
+size = ?,
 duration = ?
 WHERE id = ?
 `
 
 type UpdateAudioFileParams struct {
 	Name     string
-	Path     string
+	Size     int64
 	Duration float64
 	ID       int64
 }
@@ -517,7 +504,7 @@ type UpdateAudioFileParams struct {
 func (q *Queries) UpdateAudioFile(ctx context.Context, arg UpdateAudioFileParams) error {
 	_, err := q.db.ExecContext(ctx, updateAudioFile,
 		arg.Name,
-		arg.Path,
+		arg.Size,
 		arg.Duration,
 		arg.ID,
 	)

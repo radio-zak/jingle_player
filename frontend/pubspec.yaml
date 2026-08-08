@@ -23,6 +23,7 @@ dependencies:
   mocktail: ^1.0.5
   grpc: ^5.1.0
   protobuf: ^6.0.0
+  mime: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: "flutter"

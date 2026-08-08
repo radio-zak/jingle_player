@@ -32,7 +32,7 @@ class TimeRemainingClock extends StatelessWidget {
           alignment: FractionalOffset.center,
           child: Consumer<AudioProvider>(
             builder: (context, player, child) {
-              switch (player.isConnected) {
+              switch (player.isAudioStatusConnected) {
                 case true:
                   return Text(
                     player.playbackStatus != "PLAYING"
