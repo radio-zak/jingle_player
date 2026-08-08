@@ -3,13 +3,13 @@ package control
 import (
 	"context"
 	"database/sql"
+	engine "djinn_server/internal/audio_engine"
+	"djinn_server/internal/config"
+	"djinn_server/internal/db"
+	"djinn_server/internal/models"
+	pb "djinn_server/internal/pb"
 	"fmt"
 	"io"
-	engine "jingle_player_backend/internal/audio_engine"
-	"jingle_player_backend/internal/config"
-	"jingle_player_backend/internal/db"
-	"jingle_player_backend/internal/models"
-	pb "jingle_player_backend/internal/pb"
 	"os"
 	"path"
 

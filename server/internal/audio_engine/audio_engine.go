@@ -2,11 +2,11 @@ package audio_engine
 
 import (
 	"context"
+	"djinn_server/internal/config"
+	"djinn_server/internal/models"
+	"djinn_server/internal/uiservice"
 	"fmt"
 	"io"
-	"jingle_player_backend/internal/config"
-	"jingle_player_backend/internal/models"
-	"jingle_player_backend/internal/uiservice"
 	"os"
 	"path"
 	"sync"

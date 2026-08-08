@@ -1,6 +1,6 @@
 package models
 
-import "jingle_player_backend/internal/db"
+import "djinn_server/internal/db"
 
 type PlayerSlot struct {
 	ID        int32

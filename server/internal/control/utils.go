@@ -2,8 +2,8 @@ package control
 
 import (
 	"database/sql"
-	"jingle_player_backend/internal/db"
-	"jingle_player_backend/internal/pb"
+	"djinn_server/internal/db"
+	"djinn_server/internal/pb"
 )
 
 // Helper to convert nullable db fields into a *pb.AudioFile pointer

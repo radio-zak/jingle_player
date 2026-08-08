@@ -1,8 +1,8 @@
 package uiservice
 
 import (
+	"djinn_server/internal/models"
 	"fmt"
-	"jingle_player_backend/internal/models"
 	"sync"
 )
 

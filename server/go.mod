@@ -1,4 +1,4 @@
-module jingle_player_backend
+module djinn_server
 
 go 1.25.0
 
