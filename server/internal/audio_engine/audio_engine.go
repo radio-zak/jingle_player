@@ -29,6 +29,9 @@ type Player struct {
 	Mu             sync.RWMutex
 	Slots          [16]*models.PlayerSlot
 	cancelPlayback context.CancelFunc
+	closeCtx       context.Context
+	closeCancel    context.CancelFunc
+	closeOnce      sync.Once
 }
 
 func InitPlayer(cfg *config.Config) (*Player, error) {
@@ -38,9 +41,19 @@ func InitPlayer(cfg *config.Config) (*Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := &Player{init: true, sampleRate: uint32(cfg.Audio.SampleRate), channels: 2, bitDepth: 24, bufferSize: cfg.Audio.BufferSize,
+	closeCtx, closeCancel := context.WithCancel(context.Background())
+	p := &Player{
+		init:        true,
+		sampleRate:  uint32(cfg.Audio.SampleRate),
+		channels:    2,
+		bitDepth:    24,
+		bufferSize:  cfg.Audio.BufferSize,
+		config:      cfg,
 		AudioStatus: &models.AudioStatus{ActiveSlot: nil, State: models.StateStopped, TimeRemaining: 0},
-		UI:          uiservice.NewUIService()}
+		UI:          uiservice.NewUIService(),
+		closeCtx:    closeCtx,
+		closeCancel: closeCancel,
+	}
 
 	for i := 0; i <= numSlots-1; i++ {
 		id := int32(i)
@@ -60,6 +73,8 @@ func (p *Player) broadcastPlayerState() {
 
 	for {
 		select {
+		case <-p.closeCtx.Done():
+			return
 		case <-ticker.C:
 			p.Mu.RLock()
 			p.UI.Mu.RLock()
@@ -88,6 +103,8 @@ func (p *Player) broadcastSlotState() {
 
 	for {
 		select {
+		case <-p.closeCtx.Done():
+			return
 		case <-ticker.C:
 			for i := 0; i < 16; i++ {
 				p.Mu.RLock()
@@ -113,11 +130,23 @@ func (p *Player) broadcastSlotState() {
 }
 
 func (p *Player) Close() error {
-	fmt.Println("Shutting down PortAudio")
-	if !p.init {
-		return nil
-	}
-	return portaudio.Terminate()
+	var err error
+	p.closeOnce.Do(func() {
+		fmt.Println("Shutting down audio engine")
+		if stopErr := p.StopAudio(); stopErr != nil {
+			fmt.Println("Error stopping playback during close:", stopErr)
+		}
+		if p.closeCancel != nil {
+			p.closeCancel()
+		}
+		if !p.init {
+			return
+		}
+		p.init = false
+		fmt.Println("Shutting down PortAudio")
+		err = portaudio.Terminate()
+	})
+	return err
 }
 
 func (p *Player) GetVersion() string {
@@ -168,9 +197,9 @@ func (p *Player) PlayAudio() error {
 
 func (p *Player) runAudioPlayback(ctx context.Context, slotID int32) error {
 	slot := p.Slots[slotID].GetFileName()
-	path := path.Join("./media", slot)
-	fmt.Printf("Opening file %v", path)
-	f, err := os.Open(path)
+	filePath := path.Join(p.config.Media.Directory, slot)
+	fmt.Printf("Opening file %v", filePath)
+	f, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("Failed to load file from disk:", err)
 		return err

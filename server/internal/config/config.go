@@ -13,7 +13,7 @@ type Config struct {
 	Server   ServerConfig   `koanf:"server"`
 	Database DatabaseConfig `koanf:"database"`
 	Audio    AudioConfig    `koanf:"audio"`
-	Media    MediaConfig    `koandf:"media"`
+	Media    MediaConfig    `koanf:"media"`
 }
 
 type ServerConfig struct {
